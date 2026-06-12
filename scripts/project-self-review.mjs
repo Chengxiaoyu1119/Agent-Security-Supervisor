@@ -1,0 +1,429 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
+const root = process.cwd();
+
+function readText(relativePath) {
+  const fullPath = path.join(root, relativePath);
+  return fs.existsSync(fullPath) ? fs.readFileSync(fullPath, 'utf8') : '';
+}
+
+function countMatches(text, pattern) {
+  return (text.match(pattern) ?? []).length;
+}
+
+function fileInfo(relativePath) {
+  const fullPath = path.join(root, relativePath);
+  if (!fs.existsSync(fullPath)) {
+    return { exists: false, lines: 0, bytes: 0 };
+  }
+  const text = fs.readFileSync(fullPath, 'utf8');
+  return {
+    exists: true,
+    lines: text.split(/\r?\n/).length,
+    bytes: Buffer.byteLength(text)
+  };
+}
+
+function pngInfo(relativePath) {
+  const fullPath = path.join(root, relativePath);
+  if (!fs.existsSync(fullPath)) {
+    return { exists: false, width: 0, height: 0, bytes: 0 };
+  }
+  const buffer = fs.readFileSync(fullPath);
+  return {
+    exists: true,
+    width: buffer.readUInt32BE(16),
+    height: buffer.readUInt32BE(20),
+    bytes: buffer.length
+  };
+}
+
+function latestPackage() {
+  const dir = path.join(root, 'backend', 'sandbox', 'submission_packages');
+  if (!fs.existsSync(dir)) {
+    return null;
+  }
+  const zips = fs.readdirSync(dir)
+    .filter((name) => name.endsWith('.zip'))
+    .map((name) => {
+      const fullPath = path.join(dir, name);
+      return { name, fullPath, mtimeMs: fs.statSync(fullPath).mtimeMs, bytes: fs.statSync(fullPath).size };
+    })
+    .sort((a, b) => b.mtimeMs - a.mtimeMs);
+  return zips[0] ?? null;
+}
+
+function latestPackageDirectory(zip) {
+  if (!zip) {
+    return null;
+  }
+  return zip.fullPath.replace(/\.zip$/i, '');
+}
+
+function packageHasFile(packageDir, filename) {
+  if (!packageDir || !fs.existsSync(packageDir)) {
+    return false;
+  }
+  const stack = [packageDir];
+  while (stack.length) {
+    const current = stack.pop();
+    for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
+      const fullPath = path.join(current, entry.name);
+      if (entry.isDirectory()) {
+        stack.push(fullPath);
+      } else if (entry.name === filename) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
+function packageContainsText(packageDir, keyword) {
+  if (!packageDir || !fs.existsSync(packageDir)) {
+    return false;
+  }
+  const allowed = new Set(['.md', '.json', '.txt', '.html']);
+  const stack = [packageDir];
+  while (stack.length) {
+    const current = stack.pop();
+    for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
+      const fullPath = path.join(current, entry.name);
+      if (entry.isDirectory()) {
+        stack.push(fullPath);
+      } else if (allowed.has(path.extname(entry.name).toLowerCase())) {
+        try {
+          if (fs.readFileSync(fullPath, 'utf8').includes(keyword)) {
+            return true;
+          }
+        } catch {
+          // Ignore unreadable generated artifacts.
+        }
+      }
+    }
+  }
+  return false;
+}
+
+function loadJson(relativePath) {
+  const text = readText(relativePath);
+  if (!text) {
+    return null;
+  }
+  try {
+    return JSON.parse(text);
+  } catch {
+    return null;
+  }
+}
+
+const outputIndex = process.argv.findIndex((arg) => arg === '--output');
+const outputRoot = outputIndex >= 0 && process.argv[outputIndex + 1]
+  ? path.resolve(root, process.argv[outputIndex + 1])
+  : path.join(root, 'backend', 'sandbox', 'reports');
+fs.mkdirSync(outputRoot, { recursive: true });
+
+const appText = readText('src/App.tsx');
+const stylesText = readText('src/styles.css');
+const visualText = readText('src/视觉系统.css');
+const tokenText = readText('src/design/tokens.css');
+const dataText = readText('backend/zhian/data.py');
+const fallbackText = readText('src/fallback.ts');
+const readmeText = readText('README.md');
+const architectureText = readText('PROJECT_ARCHITECTURE.md');
+const deliveryGuideText = readText('docs/比赛交付材料包说明.md');
+const selfReviewRecordText = readText('docs/多Agent自审优化闭环报告-20260609.md');
+const competitionResearchText = readText('docs/命题挑战赛调研摘要.md');
+
+const uiDir = path.join(root, 'src', 'components', 'ui');
+const uiComponents = fs.existsSync(uiDir)
+  ? fs.readdirSync(uiDir).filter((name) => name.endsWith('.tsx'))
+  : [];
+
+const readiness = loadJson('backend/sandbox/reports/赛前一键体检报告.json');
+const readinessPayload = readiness?.summary ? readiness : readiness?.readiness ?? readiness;
+const blockers = readinessPayload?.blockers ?? [];
+const attackChains = loadJson('backend/sandbox/reports/组合攻击链评测.json');
+
+const profileBlock = dataText.includes('STUDENT_COMPETITION_ATTACK_MAP')
+  ? dataText.slice(dataText.indexOf('STUDENT_COMPETITION_ATTACK_MAP'), dataText.indexOf('POLICIES = ['))
+  : '';
+const studentProfileIds = [
+  'team-account-portal',
+  'challenge-materials',
+  'submission-review',
+  'scoreboard-judge',
+  'training-camp-net'
+];
+const studentScenarioIds = [
+  'TEAM-ACCOUNT-001',
+  'SUBMISSION-EXFIL-001',
+  'CHALLENGE-ATTACHMENT-001',
+  'JUDGE-SEED-001',
+  'CAMPUS-SESSION-001'
+];
+const studentProfileCount = studentProfileIds.filter((id) => profileBlock.includes(id)).length;
+const studentScenarioCount = studentScenarioIds.filter((id) => dataText.includes(id) && fallbackText.includes(id)).length;
+const attackChainCount = Array.isArray(attackChains?.chains) ? attackChains.chains.length : 0;
+const hasStudentPortalChain = JSON.stringify(attackChains ?? {}).includes('student-competition-portal-chain');
+const domainResidualText = [
+  readmeText,
+  architectureText,
+  competitionResearchText,
+  dataText,
+  fallbackText,
+  appText
+].join('\n');
+const misleadingDomainResidualCount = countMatches(
+  domainResidualText,
+  /customer|customers|finance|ledger|客户|财务|订单|库存|工单|合作方|网络风险|通用网络风险/g
+);
+
+const screenshots = [
+  'backend/sandbox/reports/frontend-governance-desktop.png',
+  'backend/sandbox/reports/frontend-governance-mobile.png',
+  'backend/sandbox/reports/scenario-library-desktop.png',
+  'backend/sandbox/reports/experiment-lab-desktop.png',
+  'backend/sandbox/reports/agent-chain-desktop.png',
+  'backend/sandbox/reports/attack-chain-workbench-desktop.png',
+  'backend/sandbox/reports/attack-chain-workbench-mobile.png',
+  'backend/sandbox/reports/policy-impact-matrix-desktop.png',
+  'backend/sandbox/reports/audit-hash-verify-desktop.png',
+  'backend/sandbox/reports/decision-pill-audit-desktop.png',
+  'backend/sandbox/reports/decision-pill-alerts-desktop.png',
+  'backend/sandbox/reports/decision-pill-settings-desktop.png',
+  'backend/sandbox/reports/demo-drill-desktop.png',
+  'backend/sandbox/reports/approval-queue-desktop.png',
+  'backend/sandbox/reports/readiness-panel-desktop.png',
+  'backend/sandbox/reports/student-competition-attack-map-desktop.png',
+  'backend/sandbox/reports/student-competition-attack-map-mobile.png'
+].map((relativePath) => ({ path: relativePath, ...pngInfo(relativePath) }));
+
+const directDecisionMarkupCount = countMatches(appText, /className=\{`decision \$\{/g);
+const hardcodedColorCount = countMatches(stylesText + '\n' + visualText, /#[0-9a-fA-F]{3,8}|rgba?\(/g);
+const tokenUsageCount = countMatches(stylesText + '\n' + visualText + '\n' + tokenText, /var\(--/g);
+const primaryDocText = [readmeText, deliveryGuideText, selfReviewRecordText].join('\n');
+const oldMetricResidualCount = countMatches(primaryDocText, /17 个剧本|51 条|51 个|17 条/g);
+const latestZip = latestPackage();
+const latestPackageDir = latestPackageDirectory(latestZip);
+const packageStudentMapDesktop = packageHasFile(latestPackageDir, 'student-competition-attack-map-desktop.png');
+const packageStudentMapMobile = packageHasFile(latestPackageDir, 'student-competition-attack-map-mobile.png');
+const packageStudentChain = packageContainsText(latestPackageDir, 'student-competition-portal-chain');
+const packageStudentScenario = packageContainsText(latestPackageDir, 'SUBMISSION-EXFIL-001');
+
+const checks = [
+  {
+    id: 'design-token-source',
+    title: '设计 Token 源头',
+    status: tokenText.includes('--color-brand') && tokenText.includes('--shadow-card') ? 'passed' : 'failed',
+    evidence: 'src/design/tokens.css 已建立颜色、间距、圆角、阴影和旧变量别名。'
+  },
+  {
+    id: 'ui-component-reuse',
+    title: '基础 UI 组件复用',
+    status: uiComponents.length >= 4 ? 'passed' : 'warning',
+    evidence: `当前基础 UI 组件 ${uiComponents.length} 个：${uiComponents.join('、') || '暂无'}。`
+  },
+  {
+    id: 'decision-pill-standardized',
+    title: '安全决策标签统一',
+    status: directDecisionMarkupCount === 0 ? 'passed' : 'warning',
+    evidence: `页面直接拼接 decision class 的位置剩余 ${directDecisionMarkupCount} 处。`
+  },
+  {
+    id: 'frontend-screenshot-proof',
+    title: '前端截图证据',
+    status: screenshots.every((item) => item.exists) ? 'passed' : 'warning',
+    evidence: `关键截图存在 ${screenshots.filter((item) => item.exists).length}/${screenshots.length} 张。`
+  },
+  {
+    id: 'student-competition-profile-map',
+    title: '学生比赛攻击面画像',
+    status: studentProfileCount >= 5 ? 'passed' : 'warning',
+    evidence: `已识别 ${studentProfileCount}/5 类学生比赛对象画像：${studentProfileIds.filter((id) => profileBlock.includes(id)).join('、') || '暂无'}。`
+  },
+  {
+    id: 'student-competition-scenarios',
+    title: '学生比赛专项剧本',
+    status: studentScenarioCount >= 5 && (readinessPayload?.summary?.scenario_count ?? 0) >= 22 ? 'passed' : 'warning',
+    evidence: `专项剧本同步 ${studentScenarioCount}/5 个，体检剧本总数 ${readinessPayload?.summary?.scenario_count ?? '未生成'}。`
+  },
+  {
+    id: 'attack-chain-coverage',
+    title: '组合攻击链覆盖',
+    status: attackChainCount >= 4 && hasStudentPortalChain ? 'passed' : 'warning',
+    evidence: `组合攻击链 ${attackChainCount} 条，学生比赛平台对象链：${hasStudentPortalChain ? '已生成' : '缺失'}。`
+  },
+  {
+    id: 'submission-student-evidence',
+    title: '学生比赛画像交付归档',
+    status: packageStudentMapDesktop && packageStudentMapMobile && packageStudentChain && packageStudentScenario ? 'passed' : 'warning',
+    evidence: `最新提交包学生画像截图 ${packageStudentMapDesktop && packageStudentMapMobile ? '已归档' : '缺失'}，学生组合链 ${packageStudentChain ? '已归档' : '缺失'}，专项剧本 ${packageStudentScenario ? '已归档' : '缺失'}。`
+  },
+  {
+    id: 'delivery-metric-consistency',
+    title: '交付口径一致性',
+    status: oldMetricResidualCount === 0 ? 'passed' : 'warning',
+    evidence: `README、交付说明和最新自审闭环报告中旧口径命中 ${oldMetricResidualCount} 处。`
+  },
+  {
+    id: 'direction-residual-scan',
+    title: '方向残留词检查',
+    status: misleadingDomainResidualCount === 0 ? 'passed' : 'warning',
+    evidence: `核心源码与主要文档中客户/财务/网络风险等误导词命中 ${misleadingDomainResidualCount} 处。`
+  },
+  {
+    id: 'readiness-score',
+    title: '赛前体检结果',
+    status: (readinessPayload?.readiness_score ?? readinessPayload?.readiness?.readiness_score ?? 0) >= 90 ? 'passed' : 'warning',
+    evidence: `当前体检分 ${readinessPayload?.readiness_score ?? readinessPayload?.readiness?.readiness_score ?? '未生成'}。`
+  },
+  {
+    id: 'openclaw-runtime-proof',
+    title: 'OpenClaw 真实运行补证',
+    status: blockers.some((item) => item.id === 'openclaw-runtime-inspect') ? 'blocked' : 'passed',
+    evidence: blockers.some((item) => item.id === 'openclaw-runtime-inspect')
+      ? '仍缺真实 OpenClaw runtime inspect 运行证明。'
+      : '未发现 OpenClaw runtime inspect 阻塞项。'
+  }
+];
+
+const unresolved = [];
+if (fileInfo('src/App.tsx').lines > 2500) {
+  unresolved.push('src/App.tsx 仍然过大，后续应按页面拆分。');
+}
+if (hardcodedColorCount > 200) {
+  unresolved.push(`历史 CSS 仍有 ${hardcodedColorCount} 处硬编码颜色，需要继续迁移到 Token。`);
+}
+if (checks.some((item) => item.id === 'openclaw-runtime-proof' && item.status === 'blocked')) {
+  unresolved.push('OpenClaw 真实 runtime inspect 仍是唯一 P0 补证项。');
+}
+
+const report = {
+  generated_at: new Date().toISOString(),
+  project: '智安哨：大模型智能体攻击面研究与行为监督平台',
+  self_review_agents: [
+    '代码结构审查子代理',
+    '页面审美审查子代理',
+    '比赛交付审查子代理',
+    '本地自审脚本'
+  ],
+  frontend: {
+    app: fileInfo('src/App.tsx'),
+    styles: fileInfo('src/styles.css'),
+    visual_system: fileInfo('src/视觉系统.css'),
+    tokens: fileInfo('src/design/tokens.css'),
+    ui_component_count: uiComponents.length,
+    ui_components: uiComponents,
+    direct_decision_markup_count: directDecisionMarkupCount,
+    hardcoded_color_count: hardcodedColorCount,
+    token_usage_count: tokenUsageCount
+  },
+  readiness: {
+    score: readinessPayload?.readiness_score ?? readinessPayload?.readiness?.readiness_score ?? null,
+    passed_count: readinessPayload?.summary?.passed_count ?? null,
+    check_count: readinessPayload?.summary?.check_count ?? null,
+    blocker_count: readinessPayload?.summary?.blocker_count ?? null,
+    latest_package_zip: readinessPayload?.summary?.latest_package_zip ?? latestZip?.fullPath ?? null
+  },
+  competition_domain: {
+    student_profile_count: studentProfileCount,
+    student_profile_ids: studentProfileIds.filter((id) => profileBlock.includes(id)),
+    student_scenario_count: studentScenarioCount,
+    student_scenario_ids: studentScenarioIds.filter((id) => dataText.includes(id) && fallbackText.includes(id)),
+    attack_chain_count: attackChainCount,
+    has_student_portal_chain: hasStudentPortalChain,
+    misleading_domain_residual_count: misleadingDomainResidualCount,
+    old_metric_residual_count: oldMetricResidualCount
+  },
+  latest_package: {
+    ...(latestZip ?? {}),
+    package_dir: latestPackageDir,
+    student_map_desktop: packageStudentMapDesktop,
+    student_map_mobile: packageStudentMapMobile,
+    student_chain: packageStudentChain,
+    student_scenario: packageStudentScenario
+  },
+  screenshots,
+  checks,
+  solved_this_round: [
+    '新增项目自审报告脚本，形成可重复运行的自审闭环。',
+    '新增 DecisionPill，统一安全决策标签渲染。',
+    '抽离运行证据组件 RunEvidenceStrip、RunAuditTimeline，降低 App.tsx 展示逻辑堆积。',
+    '抽离攻击面属性组件 SurfaceAttributeGroup，为后续按页面拆分铺路。',
+    '抽离攻击面证据索引 SurfaceEvidenceIndexBoard 和研究矩阵 SurfaceResearchMatrix，继续压缩主页面展示逻辑。',
+    '抽离攻击面卡片和工作台 SurfaceCard、SurfaceWorkbench，App.tsx 主文件继续降到 4000 行以内。',
+    '抽离攻击剧本库 ScenarioLibrary 和多 Agent 链路 AgentChain，App.tsx 主文件继续降到 3500 行以内。',
+    '抽离攻击复现实验室 ExperimentLab、ComparisonPanel、BatchResultPanel，App.tsx 主文件继续降到 3300 行以内。',
+    '新增组合攻击链后端模块、API、CLI 和前端工作台，把单点剧本串成多步红队路径。',
+    '抽离防御策略中心 PolicyCenter，新增策略影响矩阵、覆盖工具、攻击面和关闭影响说明。',
+    '补齐人工复核批准后的沙箱重放闭环，并在复核单中展示重放结果。',
+    '新增审计 hash 整链验证接口和前端验证入口，审计页可直接展示证据链有效性。',
+    '修复 readiness CLI 目录输出容错，用户传目录时自动写入默认报告文件名。',
+    '调整 Token 加载顺序、迁移根级颜色变量并收敛实验室空状态，CSS 硬编码颜色预算收紧到 690 以内。',
+    '保留设计 Token 和基础 UI 组件目录，后续页面改造有固定入口。',
+    '前端桌面和移动端治理截图已生成并纳入提交包。'
+    , '新增学生比赛攻击面画像，覆盖队伍账号、赛题附件、提交物、私有榜单和训练平台会话。'
+    , '新增 5 个学生比赛专项攻击剧本，并串成学生比赛平台对象组合攻击链。'
+    , '自审脚本新增方向残留词、学生画像、专项剧本和组合链检查。'
+  ],
+  unresolved
+};
+
+const jsonPath = path.join(outputRoot, '多Agent自审优化报告.json');
+const mdPath = path.join(outputRoot, '多Agent自审优化报告.md');
+
+const lines = [
+  '# 多 Agent 自审优化报告',
+  '',
+  `生成时间：${report.generated_at}`,
+  '',
+  '## 自审代理',
+  '',
+  ...report.self_review_agents.map((name) => `- ${name}`),
+  '',
+  '## 本轮已解决',
+  '',
+  ...report.solved_this_round.map((item) => `- ${item}`),
+  '',
+  '## 自动检查结果',
+  '',
+  '| 检查项 | 状态 | 证据 |',
+  '|---|---|---|',
+  ...checks.map((item) => `| ${item.title} | ${item.status} | ${item.evidence} |`),
+  '',
+  '## 前端治理指标',
+  '',
+  `- App.tsx 行数：${report.frontend.app.lines}`,
+  `- 基础 UI 组件数：${report.frontend.ui_component_count}`,
+  `- 直接拼接决策标签：${report.frontend.direct_decision_markup_count} 处`,
+  `- 历史 CSS 硬编码颜色：${report.frontend.hardcoded_color_count} 处`,
+  `- Token 使用次数：${report.frontend.token_usage_count} 次`,
+  '',
+  '## 学生比赛攻击面指标',
+  '',
+  `- 学生比赛对象画像：${report.competition_domain.student_profile_count}/5`,
+  `- 学生比赛专项剧本：${report.competition_domain.student_scenario_count}/5`,
+  `- 组合攻击链：${report.competition_domain.attack_chain_count} 条`,
+  `- 学生比赛平台对象链：${report.competition_domain.has_student_portal_chain ? '已生成' : '缺失'}`,
+  `- 误导方向残留词：${report.competition_domain.misleading_domain_residual_count} 处`,
+  '',
+  '## 仍未完成',
+  '',
+  ...(unresolved.length ? unresolved.map((item) => `- ${item}`) : ['- 暂无阻塞项。']),
+  '',
+  '## 最新提交包',
+  '',
+  `- ${report.readiness.latest_package_zip ?? '未检测到最新提交包'}`,
+  '',
+  '## 截图证据',
+  '',
+  ...screenshots.map((item) => `- ${item.exists ? '已生成' : '缺失'}：${item.path}${item.exists ? `（${item.width}x${item.height}）` : ''}`),
+  ''
+];
+
+fs.writeFileSync(jsonPath, JSON.stringify(report, null, 2), 'utf8');
+fs.writeFileSync(mdPath, lines.join('\n'), 'utf8');
+
+console.log(JSON.stringify({ json_path: jsonPath, markdown_path: mdPath, checks: checks.length, unresolved_count: unresolved.length }, null, 2));

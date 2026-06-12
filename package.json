@@ -1,0 +1,30 @@
+{
+  "name": "zhian-shao-agent-security",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 5178",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "api": "python -X utf8 -m uvicorn backend.zhian.main:app --host 127.0.0.1 --port 8012",
+    "cli": "python -X utf8 -m backend.zhian.cli",
+    "ui:audit": "node scripts/frontend-governance-check.mjs",
+    "self:review": "node scripts/project-self-review.mjs --output backend/sandbox/reports"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^6.2.5",
+    "antd": "^6.4.3",
+    "lucide-react": "^0.468.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "playwright": "^1.60.0",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11"
+  }
+}

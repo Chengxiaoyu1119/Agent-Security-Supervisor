@@ -1,0 +1,119 @@
+from fastapi import APIRouter, HTTPException, Response, Body
+from pydantic import BaseModel
+from typing import Any
+from .. import data
+from ..database import latest_runs, load_run, latest_audit_logs
+from ..model_adapter import provider_status
+from ..agents import *
+from ..attack_chains import *
+from ..supervisor import *
+from ..events import *
+from ..readiness import *
+from ..roadmap import *
+from ..demo_drill import *
+from ..calibration import *
+from ..ablation import *
+from ..assessment import *
+from ..services.package_service import *
+from ..openclaw_adapter import *
+from ..surface_pack import *
+from ..benign import *
+from ..benign_workflows import *
+from ..datasets import *
+from ..approvals import *
+from ..integrity import *
+from ..main_models import *
+
+router = APIRouter()
+
+@router.get("/api/scenarios")
+def scenarios() -> list[dict]:
+    return get_scenarios()
+
+
+@router.get("/api/runs/{run_id}/audit_hash/verify")
+def verify_run_audit_hash(run_id: str) -> dict:
+    run = load_run(run_id)
+    if not run:
+        raise HTTPException(status_code=404, detail=f"未知运行记录：{run_id}")
+    logs = run.get("audit_logs", [])
+    if not logs:
+        return {
+            "run_id": run_id,
+            "scenario_id": run.get("scenario", {}).get("id", ""),
+            "created_at": run.get("created_at", ""),
+            "valid": False,
+            "checked": 0,
+            "failures": [{"step": 0, "reason": "缺少审计日志"}],
+        }
+    if any("audit_hash" not in log or "previous_hash" not in log for log in logs):
+        return {
+            "run_id": run_id,
+            "scenario_id": run.get("scenario", {}).get("id", ""),
+            "created_at": run.get("created_at", ""),
+            "valid": False,
+            "checked": len(logs),
+            "failures": [{"step": 0, "reason": "审计日志缺少 hash 字段"}],
+        }
+    verification = verify_audit_hashes(logs, seed=f"{run_id}:{run.get('created_at')}")
+    return {
+        "run_id": run_id,
+        "scenario_id": run.get("scenario", {}).get("id", ""),
+        "created_at": run.get("created_at", ""),
+        "valid": verification["valid"],
+        "checked": verification["checked"],
+        "failures": verification["failures"],
+        "first_hash": logs[0].get("audit_hash", ""),
+        "last_hash": logs[-1].get("audit_hash", ""),
+    }
+
+
+@router.post("/api/run")
+def run(request: RunRequest) -> dict:
+    try:
+        return run_scenario(request.scenario_id, request.guard_enabled)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=f"未知攻击剧本：{request.scenario_id}") from exc
+
+
+@router.post("/api/compare")
+def compare(request: RunRequest) -> dict:
+    try:
+        return compare_scenario(request.scenario_id)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=f"未知攻击剧本：{request.scenario_id}") from exc
+
+
+@router.post("/api/batch_compare")
+def batch_compare(request: BatchCompareRequest) -> dict:
+    try:
+        return batch_compare_scenarios(request.scenario_ids)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=f"未知攻击剧本：{exc.args[0]}") from exc
+
+
+@router.get("/api/attack_chains")
+def attack_chains() -> list[dict]:
+    return list_attack_chains()
+
+
+@router.post("/api/attack_chains/{chain_id}/run")
+def run_attack_chain_endpoint(chain_id: str, request: AttackChainRunRequest) -> dict:
+    try:
+        return run_attack_chain(chain_id, guard_enabled=request.guard_enabled)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=f"未知组合攻击链：{exc.args[0]}") from exc
+
+
+@router.post("/api/attack_chains/{chain_id}/compare")
+def compare_attack_chain_endpoint(chain_id: str) -> dict:
+    try:
+        return compare_attack_chain(chain_id)
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=f"未知组合攻击链：{exc.args[0]}") from exc
+
+
+@router.post("/api/attack_chains/write")
+def write_attack_chain_report_endpoint() -> dict:
+    return write_attack_chain_report()
+
