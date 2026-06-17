@@ -1,0 +1,185 @@
+/* 多 Agent 攻击链 */
+
+.zh-agent-chain-empty {
+  padding: 48px;
+  text-align: center;
+}
+
+.zh-agent-chain-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.zh-agent-chain-title {
+  margin: 0;
+}
+
+.zh-agent-chain-select {
+  width: 100%;
+  min-width: 200px;
+  max-width: 300px;
+}
+
+.zh-agent-chain-hero {
+  height: 100%;
+  background: linear-gradient(145deg, var(--ant-color-primary-bg) 0%, transparent 100%);
+}
+
+.zh-agent-chain-hero__tag {
+  margin-bottom: 16px;
+}
+
+.zh-agent-chain-hero__stats {
+  margin-top: 24px;
+}
+
+.zh-agent-chain-defense-tags {
+  margin-top: 24px;
+}
+
+.zh-agent-chain-stage-card {
+  height: 100%;
+}
+
+.zh-agent-chain-stage-card--controlled {
+  border-color: var(--ant-color-success-border);
+}
+
+.zh-agent-chain-stage-card--exposed {
+  border-color: var(--ant-color-error-border);
+}
+
+.zh-agent-chain-stage-card--idle {
+  border-color: var(--ant-color-border-secondary);
+}
+
+.zh-agent-chain-stage-head {
+  margin-bottom: 12px;
+}
+
+.zh-agent-chain-stage-title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.zh-agent-chain-stage-name {
+  word-break: break-word;
+}
+
+.zh-agent-chain-stage-tag {
+  margin: 0;
+}
+
+.zh-agent-chain-stage-description {
+  min-height: 40px;
+  font-size: 13px;
+}
+
+.zh-agent-chain-stage-meta {
+  margin-bottom: 12px;
+}
+
+.zh-agent-chain-stage-code {
+  white-space: normal;
+  word-break: break-all;
+}
+
+.zh-agent-chain-stage-footer {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ant-color-border-secondary);
+}
+
+.zh-agent-chain-stage-footer--compare {
+  display: flex;
+  justify-content: space-between;
+}
+
+.zh-agent-badge-primary .ant-badge-count {
+  background-color: var(--ant-color-primary);
+}
+
+.zh-agent-badge-brand .ant-badge-count {
+  color: var(--zh-brand-primary);
+  background-color: var(--zh-on-brand);
+  box-shadow: none;
+}
+
+.zh-agent-runtime-time {
+  font-size: 13px;
+  font-weight: normal;
+}
+
+.zh-agent-runtime-summary {
+  text-align: right;
+}
+
+.zh-agent-runtime-score {
+  margin: 0;
+  color: var(--ant-color-primary);
+}
+
+.zh-agent-runtime-label {
+  font-size: 12px;
+}
+
+.zh-agent-runtime-stack,
+.zh-agent-run-stack {
+  width: 100%;
+}
+
+.zh-agent-runtime-item {
+  background: var(--ant-color-bg-layout);
+}
+
+.zh-agent-runtime-policy {
+  margin-top: 8px;
+}
+
+.zh-agent-run-select {
+  width: 200px;
+  max-width: 100%;
+}
+
+.zh-agent-run-card {
+  margin-top: 24px;
+}
+
+.zh-agent-steps {
+  padding: 16px 0;
+  overflow-x: auto;
+}
+
+.zh-agent-timeline-item {
+  margin-bottom: 16px;
+}
+
+.zh-agent-timeline-time {
+  font-size: 12px;
+}
+
+.zh-agent-timeline-meta {
+  margin-bottom: 8px;
+  color: var(--ant-color-text-secondary);
+  font-size: 13px;
+}
+
+.zh-agent-timeline-message {
+  margin: 0;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  background: var(--ant-color-bg-layout);
+}
+
+.zh-agent-result-title {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 16px;
+}
+
+.zh-agent-result-meta {
+  margin-top: 16px;
+  color: var(--ant-color-text-secondary);
+}

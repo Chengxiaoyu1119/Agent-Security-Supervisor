@@ -118,4 +118,3 @@ export const competitionCapabilityRows = [
     evidence: 'audit_logs / alerts / decision / policy_id'
   }
 ];
-

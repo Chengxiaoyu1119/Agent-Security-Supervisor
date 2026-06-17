@@ -7,5 +7,9 @@ export function StatusPill({ status, variant = 'solid' }: StatusPillProps) {
   let color = 'default';
   if (status === '已评估' || status === '评估中') color = 'success';
   if (status === '待生成' || status === '未覆盖') color = 'error';
-  return <Tag color={color} bordered={variant === 'outline'}>{status}</Tag>;
+  return (
+    <Tag color={color} bordered={variant === 'outline'}>
+      {status}
+    </Tag>
+  );
 }

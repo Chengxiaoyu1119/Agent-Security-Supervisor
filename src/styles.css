@@ -1,4 +1,6 @@
-html, body, #root {
+html,
+body,
+#root {
   margin: 0;
   padding: 0;
   height: 100vh;
@@ -9,17 +11,16 @@ html, body, #root {
 html[data-theme='dark'],
 html[data-theme='dark'] body,
 html[data-theme='dark'] #root {
-  background-color: #141414;
-  color: rgba(255, 255, 255, 0.85);
+  background-color: var(--zh-bg-page-dark);
+  color: var(--zh-text-dark);
 }
 
 html[data-theme='light'],
 html[data-theme='light'] body,
 html[data-theme='light'] #root {
-  background-color: #f5f5f5;
-  color: rgba(0, 0, 0, 0.88);
+  background-color: var(--zh-bg-page);
+  color: var(--zh-text);
 }
-
 
 /* Scrollbar Styles */
 ::-webkit-scrollbar {
@@ -32,29 +33,29 @@ html[data-theme='light'] #root {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(150, 150, 150, 0.4);
+  background: var(--zh-scrollbar-thumb);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(150, 150, 150, 0.6);
+  background: var(--zh-scrollbar-thumb-hover);
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(150, 150, 150, 0.4) transparent;
+  scrollbar-color: var(--zh-scrollbar-thumb) transparent;
 }
 
 html[data-theme='dark'] ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--zh-scrollbar-thumb-dark);
 }
 
 html[data-theme='dark'] ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--zh-scrollbar-thumb-dark-hover);
 }
 
 html[data-theme='dark'] * {
-  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+  scrollbar-color: var(--zh-scrollbar-thumb-dark) transparent;
 }
 
 /* Responsive Overrides */
@@ -65,13 +66,85 @@ html[data-theme='dark'] * {
 }
 
 @media (max-width: 992px) {
-  .desktop-sider, .ant-layout-sider-zero-width-trigger {
+  .desktop-sider,
+  .ant-layout-sider-zero-width-trigger {
     display: none !important;
   }
 }
 
 .main-content {
   padding: 24px;
+}
+
+.zh-page-loading {
+  display: flex;
+  min-height: 240px;
+  align-items: center;
+  justify-content: center;
+}
+
+.zh-page-stack,
+.zh-column-stack {
+  display: flex;
+  flex-direction: column;
+}
+
+.zh-page-stack {
+  gap: var(--zh-section-gap, 24px);
+}
+
+.zh-tab-stack {
+  width: 100%;
+  padding-top: 8px;
+}
+
+.zh-full-height {
+  height: 100%;
+}
+
+.zh-mb-24 {
+  margin-bottom: var(--zh-section-gap, 24px);
+}
+
+.zh-text-block,
+.zh-meta-block {
+  display: block;
+}
+
+.zh-meta-block {
+  font-size: var(--zh-font-size-meta, 12px);
+}
+
+.zh-evidence-code-block {
+  margin: 1em 0;
+  padding: 16px;
+  overflow-x: auto;
+  background: var(--ant-color-bg-container-disabled);
+  border-radius: var(--zh-radius-control, 8px);
+}
+
+.zh-evidence-code-block--small {
+  padding: 12px;
+  border-radius: var(--zh-radius-compact, 6px);
+}
+
+.zh-evidence-code-block--flush {
+  margin: 0;
+}
+
+.zh-evidence-code-block--max-small {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.zh-evidence-code-block--max-large {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.zh-section-title__meta {
+  font-size: var(--zh-font-size-meta, 12px);
+  font-weight: normal;
 }
 
 @media (max-width: 768px) {
@@ -84,12 +157,12 @@ html[data-theme='dark'] * {
   .hide-on-mobile {
     display: none !important;
   }
-  
+
   /* Fix Select components overflowing on mobile */
   .ant-select {
     max-width: 100%;
   }
-  
+
   /* Allow Row/Col wrapping more easily */
   .ant-card-body {
     padding: 16px;

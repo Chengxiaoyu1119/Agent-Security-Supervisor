@@ -1,0 +1,182 @@
+/* 通用样式 */
+:root {
+  --zh-visual-muted-text: var(--ant-color-text-secondary);
+  --zh-visual-subtle-border: var(--zh-border-subtle);
+  --zh-visual-soft-surface: var(--zh-bg-panel-soft);
+}
+
+/* 通用布局工具 */
+
+.zh-page-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--zh-section-gap);
+}
+
+.zh-panel-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--zh-panel-gap);
+}
+
+.zh-panel-grid {
+  display: grid;
+  gap: var(--zh-panel-gap);
+}
+
+/* 通用文本与面板工具 */
+
+.zh-muted-text {
+  color: var(--zh-visual-muted-text);
+}
+
+.zh-soft-surface {
+  background: var(--zh-visual-soft-surface);
+  border: 1px solid var(--zh-visual-subtle-border);
+  border-radius: var(--zh-radius-panel);
+}
+
+.zh-action-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--zh-panel-gap);
+  flex-wrap: wrap;
+}
+
+.zh-action-row__content {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
+.zh-action-row__actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.zh-toolbar-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--zh-panel-gap);
+  flex-wrap: wrap;
+}
+
+.zh-break-anywhere {
+  white-space: normal;
+  word-break: break-all;
+}
+
+.zh-full-width {
+  width: 100%;
+}
+
+.zh-zero-margin {
+  margin: 0;
+}
+
+.zh-text-sm {
+  font-size: 12px;
+}
+
+.zh-text-md {
+  font-size: 13px;
+}
+
+.zh-text-lg {
+  font-size: 16px;
+}
+
+.zh-text-block {
+  display: block;
+}
+
+.zh-panel-soft {
+  background: var(--ant-color-fill-quaternary);
+}
+
+/* 元信息与证据列表 */
+.zh-meta-grid {
+  display: grid;
+  gap: 8px 16px;
+}
+
+.zh-meta-grid--2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.zh-meta-grid--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.zh-meta-grid--4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.zh-meta-grid__item {
+  min-width: 0;
+}
+
+.zh-meta-grid__label,
+.zh-meta-grid__value,
+.zh-evidence-list__meta {
+  display: block;
+}
+
+.zh-meta-grid__label,
+.zh-evidence-list__meta {
+  font-size: var(--zh-font-size-meta);
+}
+
+.zh-meta-grid__value {
+  word-break: break-word;
+}
+
+.zh-evidence-list {
+  width: 100%;
+}
+
+.zh-evidence-list__item {
+  width: 100%;
+}
+
+.zh-evidence-list__item--danger {
+  border-left: 3px solid var(--zh-risk-critical);
+}
+
+.zh-evidence-list__item--warning {
+  border-left: 3px solid var(--zh-risk-high);
+}
+
+.zh-evidence-list__item--info {
+  border-left: 3px solid var(--zh-risk-medium);
+}
+
+.zh-evidence-list__item--success {
+  border-left: 3px solid var(--zh-risk-low);
+}
+
+.zh-evidence-list__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.zh-evidence-list__description {
+  margin: 4px 0;
+  font-size: 13px;
+}
+
+.zh-evidence-list__tags {
+  margin-top: 8px;
+}
+
+@media (max-width: 768px) {
+  .zh-meta-grid--2,
+  .zh-meta-grid--3,
+  .zh-meta-grid--4 {
+    grid-template-columns: 1fr;
+  }
+}

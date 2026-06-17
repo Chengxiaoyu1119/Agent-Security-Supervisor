@@ -1,0 +1,62 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "start:frontend",
+      "type": "shell",
+      "command": "npm run dev -- --strictPort",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": true,
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "close": false,
+        "showReuseMessage": false
+      }
+    },
+    {
+      "label": "start:backend",
+      "type": "shell",
+      "command": "npm run api",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": true,
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "close": false,
+        "showReuseMessage": false
+      }
+    },
+    {
+      "label": "start:all",
+      "dependsOn": [
+        "start:backend",
+        "start:frontend"
+      ],
+      "dependsOrder": "parallel",
+      "isBackground": true,
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "close": false,
+        "showReuseMessage": false
+      }
+    }
+  ]
+}

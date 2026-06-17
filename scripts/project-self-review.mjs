@@ -44,7 +44,8 @@ function latestPackage() {
   if (!fs.existsSync(dir)) {
     return null;
   }
-  const zips = fs.readdirSync(dir)
+  const zips = fs
+    .readdirSync(dir)
     .filter((name) => name.endsWith('.zip'))
     .map((name) => {
       const fullPath = path.join(dir, name);
@@ -119,9 +120,10 @@ function loadJson(relativePath) {
 }
 
 const outputIndex = process.argv.findIndex((arg) => arg === '--output');
-const outputRoot = outputIndex >= 0 && process.argv[outputIndex + 1]
-  ? path.resolve(root, process.argv[outputIndex + 1])
-  : path.join(root, 'backend', 'sandbox', 'reports');
+const outputRoot =
+  outputIndex >= 0 && process.argv[outputIndex + 1]
+    ? path.resolve(root, process.argv[outputIndex + 1])
+    : path.join(root, 'backend', 'sandbox', 'reports');
 fs.mkdirSync(outputRoot, { recursive: true });
 
 const appText = readText('src/App.tsx');
@@ -137,12 +139,10 @@ const selfReviewRecordText = readText('docs/多Agent自审优化闭环报告-202
 const competitionResearchText = readText('docs/命题挑战赛调研摘要.md');
 
 const uiDir = path.join(root, 'src', 'components', 'ui');
-const uiComponents = fs.existsSync(uiDir)
-  ? fs.readdirSync(uiDir).filter((name) => name.endsWith('.tsx'))
-  : [];
+const uiComponents = fs.existsSync(uiDir) ? fs.readdirSync(uiDir).filter((name) => name.endsWith('.tsx')) : [];
 
 const readiness = loadJson('backend/sandbox/reports/赛前一键体检报告.json');
-const readinessPayload = readiness?.summary ? readiness : readiness?.readiness ?? readiness;
+const readinessPayload = readiness?.summary ? readiness : (readiness?.readiness ?? readiness);
 const blockers = readinessPayload?.blockers ?? [];
 const attackChains = loadJson('backend/sandbox/reports/组合攻击链评测.json');
 
@@ -164,7 +164,9 @@ const studentScenarioIds = [
   'CAMPUS-SESSION-001'
 ];
 const studentProfileCount = studentProfileIds.filter((id) => profileBlock.includes(id)).length;
-const studentScenarioCount = studentScenarioIds.filter((id) => dataText.includes(id) && fallbackText.includes(id)).length;
+const studentScenarioCount = studentScenarioIds.filter(
+  (id) => dataText.includes(id) && fallbackText.includes(id)
+).length;
 const attackChainCount = Array.isArray(attackChains?.chains) ? attackChains.chains.length : 0;
 const hasStudentPortalChain = JSON.stringify(attackChains ?? {}).includes('student-competition-portal-chain');
 const domainResidualText = [
@@ -258,7 +260,10 @@ const checks = [
   {
     id: 'submission-student-evidence',
     title: '学生比赛画像交付归档',
-    status: packageStudentMapDesktop && packageStudentMapMobile && packageStudentChain && packageStudentScenario ? 'passed' : 'warning',
+    status:
+      packageStudentMapDesktop && packageStudentMapMobile && packageStudentChain && packageStudentScenario
+        ? 'passed'
+        : 'warning',
     evidence: `最新提交包学生画像截图 ${packageStudentMapDesktop && packageStudentMapMobile ? '已归档' : '缺失'}，学生组合链 ${packageStudentChain ? '已归档' : '缺失'}，专项剧本 ${packageStudentScenario ? '已归档' : '缺失'}。`
   },
   {
@@ -276,7 +281,10 @@ const checks = [
   {
     id: 'readiness-score',
     title: '赛前体检结果',
-    status: (readinessPayload?.readiness_score ?? readinessPayload?.readiness?.readiness_score ?? 0) >= 90 ? 'passed' : 'warning',
+    status:
+      (readinessPayload?.readiness_score ?? readinessPayload?.readiness?.readiness_score ?? 0) >= 90
+        ? 'passed'
+        : 'warning',
     evidence: `当前体检分 ${readinessPayload?.readiness_score ?? readinessPayload?.readiness?.readiness_score ?? '未生成'}。`
   },
   {
@@ -303,12 +311,7 @@ if (checks.some((item) => item.id === 'openclaw-runtime-proof' && item.status ==
 const report = {
   generated_at: new Date().toISOString(),
   project: '智安哨：大模型智能体攻击面研究与行为监督平台',
-  self_review_agents: [
-    '代码结构审查子代理',
-    '页面审美审查子代理',
-    '比赛交付审查子代理',
-    '本地自审脚本'
-  ],
+  self_review_agents: ['代码结构审查子代理', '页面审美审查子代理', '比赛交付审查子代理', '本地自审脚本'],
   frontend: {
     app: fileInfo('src/App.tsx'),
     styles: fileInfo('src/styles.css'),
@@ -363,10 +366,10 @@ const report = {
     '修复 readiness CLI 目录输出容错，用户传目录时自动写入默认报告文件名。',
     '调整 Token 加载顺序、迁移根级颜色变量并收敛实验室空状态，CSS 硬编码颜色预算收紧到 690 以内。',
     '保留设计 Token 和基础 UI 组件目录，后续页面改造有固定入口。',
-    '前端桌面和移动端治理截图已生成并纳入提交包。'
-    , '新增学生比赛攻击面画像，覆盖队伍账号、赛题附件、提交物、私有榜单和训练平台会话。'
-    , '新增 5 个学生比赛专项攻击剧本，并串成学生比赛平台对象组合攻击链。'
-    , '自审脚本新增方向残留词、学生画像、专项剧本和组合链检查。'
+    '前端桌面和移动端治理截图已生成并纳入提交包。',
+    '新增学生比赛攻击面画像，覆盖队伍账号、赛题附件、提交物、私有榜单和训练平台会话。',
+    '新增 5 个学生比赛专项攻击剧本，并串成学生比赛平台对象组合攻击链。',
+    '自审脚本新增方向残留词、学生画像、专项剧本和组合链检查。'
   ],
   unresolved
 };
@@ -419,11 +422,20 @@ const lines = [
   '',
   '## 截图证据',
   '',
-  ...screenshots.map((item) => `- ${item.exists ? '已生成' : '缺失'}：${item.path}${item.exists ? `（${item.width}x${item.height}）` : ''}`),
+  ...screenshots.map(
+    (item) =>
+      `- ${item.exists ? '已生成' : '缺失'}：${item.path}${item.exists ? `（${item.width}x${item.height}）` : ''}`
+  ),
   ''
 ];
 
 fs.writeFileSync(jsonPath, JSON.stringify(report, null, 2), 'utf8');
 fs.writeFileSync(mdPath, lines.join('\n'), 'utf8');
 
-console.log(JSON.stringify({ json_path: jsonPath, markdown_path: mdPath, checks: checks.length, unresolved_count: unresolved.length }, null, 2));
+console.log(
+  JSON.stringify(
+    { json_path: jsonPath, markdown_path: mdPath, checks: checks.length, unresolved_count: unresolved.length },
+    null,
+    2
+  )
+);

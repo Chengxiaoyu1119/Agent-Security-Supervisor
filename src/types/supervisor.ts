@@ -1,0 +1,143 @@
+import type { GuardDecision, RiskLevel } from './common';
+import type { AlertItem, AuditLog } from './runtime';
+
+export type ApprovalStatus = '待复核' | '已批准' | '已驳回';
+
+export interface ApprovalReview {
+  id: string;
+  audit_id: string;
+  run_id: string;
+  status: ApprovalStatus;
+  final_decision: string;
+  approval_action: string;
+  tool: string;
+  arguments: Record<string, unknown>;
+  policy_id: string;
+  risk_level: RiskLevel;
+  risk_score?: number;
+  risk_factors?: string[];
+  anomaly_score?: number;
+  anomaly_signals?: string[];
+  reason: string;
+  recommendation: string;
+  source_app: string;
+  agent_id: string;
+  conversation_id: string;
+  model_input_excerpt: string;
+  model_output_excerpt: string;
+  audit_hash: string;
+  previous_hash: string;
+  review_previous_hash: string;
+  review_hash: string;
+  hash_valid: boolean;
+  operator: string;
+  comment: string;
+  created_at: string;
+  reviewed_at: string;
+  execution_note: string;
+  sandbox_replay_requested?: boolean;
+  sandbox_replayed_at?: string;
+  sandbox_replay?: {
+    executed: boolean;
+    sandboxed: boolean;
+    simulated?: boolean;
+    output: string;
+  } | null;
+}
+
+export interface ApprovalReviewList {
+  generated_at: string;
+  status_filter: string;
+  summary: {
+    total: number;
+    pending_count: number;
+    approved_count: number;
+    rejected_count: number;
+    high_risk_count: number;
+    hash_valid_count: number;
+    latest_created_at: string;
+    latest_reviewed_at: string;
+  };
+  reviews: ApprovalReview[];
+}
+
+export interface ApprovalDecisionResult {
+  updated: boolean;
+  review: ApprovalReview;
+  summary: ApprovalReviewList['summary'];
+}
+
+export interface SupervisorEvaluation {
+  run_id: string;
+  audit_id: string;
+  persisted: boolean;
+  decision: GuardDecision;
+  risk_level: RiskLevel;
+  risk_score?: number;
+  risk_factors?: string[];
+  anomaly_score?: number;
+  anomaly_signals?: string[];
+  policy_id: string;
+  reason: string;
+  recommendation: string;
+  execution_mode: string;
+  surface_id: string;
+  risk_evidence: {
+    tool: string;
+    risk_hint: string;
+    arguments: Record<string, unknown>;
+    context_sources: string[];
+    model_input_excerpt: string;
+    model_output_excerpt: string;
+    detection_points: string[];
+    risk_score?: number;
+    risk_factors?: string[];
+    anomaly_score?: number;
+    anomaly_signals?: string[];
+  };
+  audit_log: AuditLog;
+  alert: AlertItem | null;
+  approval_review?: ApprovalReview | null;
+}
+
+export interface SupervisorBatchEvaluation {
+  total: number;
+  controlled: number;
+  control_rate: number;
+  results: SupervisorEvaluation[];
+}
+
+export interface ExternalAgentDemoRecord {
+  task_id: string;
+  title: string;
+  tool: string;
+  arguments: Record<string, unknown>;
+  decision: string;
+  policy_id: string;
+  reason: string;
+  executed: boolean;
+  tool_result: Record<string, unknown> | string | null;
+  run_id?: string;
+  audit_id?: string;
+  audit_hash?: string;
+  risk_level?: RiskLevel;
+  risk_score?: number;
+  anomaly_score?: number;
+}
+
+export interface ExternalAgentDemoResult {
+  generated_at: string;
+  supervisor_url: string;
+  summary: {
+    task_count: number;
+    controlled_count: number;
+    executed_count: number;
+    control_rate: number;
+    executed_tools: string[];
+    audit_hash_count: number;
+  };
+  records: ExternalAgentDemoRecord[];
+  runtime_dir: string;
+  json_path: string;
+  markdown_path: string;
+}

@@ -1,15 +1,60 @@
-import type { AlertItem, ApprovalDecisionResult, ApprovalReviewList, AttackCaseDataset, AttackChain, AttackChainCompareResult, AttackChainRunResult, AuditHashVerification, AuditLog, BatchCompareResult, CompareResult, CompetitionReadiness, CompetitionReadinessWriteResult, DemoDrillResult, ExternalAgentDemoResult, OpenClawIntegrationBundle, OpenClawPluginPackageResult, OpenClawPluginValidationWriteResult, Overview, Policy, ReportData, RunResult, Scenario, StudentCompetitionAttackProfile, SubmissionPackageResult, SupervisorBatchEvaluation, SupervisorEvaluation, SurfaceEvidencePack, SurfaceEvidencePackIndex, SurfaceEvidencePackWriteResult } from './types';
+import type {
+  AlertItem,
+  ApprovalDecisionResult,
+  ApprovalReviewList,
+  AttackCaseDataset,
+  AttackChain,
+  AttackChainCompareResult,
+  AttackChainRunResult,
+  AuditHashVerification,
+  AuditLog,
+  BatchCompareResult,
+  CompareResult,
+  CompetitionReadiness,
+  CompetitionReadinessWriteResult,
+  DemoDrillResult,
+  ExternalAgentDemoResult,
+  OpenClawIntegrationBundle,
+  OpenClawPluginPackageResult,
+  OpenClawPluginValidationWriteResult,
+  Overview,
+  Policy,
+  ReportData,
+  RunResult,
+  Scenario,
+  StudentCompetitionAttackProfile,
+  SubmissionPackageResult,
+  SupervisorBatchEvaluation,
+  SupervisorEvaluation,
+  SurfaceEvidencePack,
+  SurfaceEvidencePackIndex,
+  SurfaceEvidencePackWriteResult
+} from './types';
 import { fallbackOverview, fallbackPolicies, fallbackScenarios } from './fallback';
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(path, {
-    headers: { 'Content-Type': 'application/json' },
-    ...init
-  });
-  if (!response.ok) {
-    throw new Error(await response.text());
+type RequestOptions = {
+  timeoutMs?: number;
+};
+
+async function request<T>(path: string, init?: RequestInit, options: RequestOptions = {}): Promise<T> {
+  const controller = options.timeoutMs ? new AbortController() : undefined;
+  const timeoutId = controller ? window.setTimeout(() => controller.abort(), options.timeoutMs) : undefined;
+
+  try {
+    const response = await fetch(path, {
+      headers: { 'Content-Type': 'application/json' },
+      ...init,
+      signal: controller?.signal ?? init?.signal
+    });
+    if (!response.ok) {
+      throw new Error(await response.text());
+    }
+    return response.json() as Promise<T>;
+  } finally {
+    if (timeoutId !== undefined) {
+      window.clearTimeout(timeoutId);
+    }
   }
-  return response.json() as Promise<T>;
 }
 
 export async function fetchOverview(): Promise<Overview> {
@@ -132,7 +177,7 @@ export async function compareAttackChain(chainId: string): Promise<AttackChainCo
 }
 
 export async function fetchReport(): Promise<ReportData> {
-  return request<ReportData>('/api/report');
+  return request<ReportData>('/api/report', undefined, { timeoutMs: 8000 });
 }
 
 export async function fetchAttackCaseDataset(): Promise<AttackCaseDataset> {
@@ -222,7 +267,10 @@ export async function evaluateSupervisorEvent(event: Record<string, unknown>): P
   });
 }
 
-export async function evaluateSupervisorBatch(events: Record<string, unknown>[], options: { guard_enabled?: boolean; execute_in_sandbox?: boolean } = {}): Promise<SupervisorBatchEvaluation> {
+export async function evaluateSupervisorBatch(
+  events: Record<string, unknown>[],
+  options: { guard_enabled?: boolean; execute_in_sandbox?: boolean } = {}
+): Promise<SupervisorBatchEvaluation> {
   return request<SupervisorBatchEvaluation>('/api/supervisor/batch_evaluate', {
     method: 'POST',
     body: JSON.stringify({

@@ -1,0 +1,12 @@
+dist/
+node_modules/
+.venv/
+.git/
+.vscode/
+backend/sandbox/
+scripts/archive/
+package-lock.json
+PROJECT_ARCHITECTURE.md
+README.md
+AGENTS.md
+SOUL.md
