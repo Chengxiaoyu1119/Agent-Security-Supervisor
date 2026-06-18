@@ -1,0 +1,79 @@
+---
+import { pipeline, stats } from '../content/homepage';
+---
+
+<section class="hero" id="top">
+  <div class="hero__scene" aria-hidden="true">
+    <div class="console-surface">
+      <div class="console-surface__bar">
+        <span></span>
+        <span></span>
+        <span></span>
+        <strong>Agent Security Supervisor</strong>
+      </div>
+      <div class="console-surface__grid">
+        <div class="signal-panel signal-panel--danger">
+          <small>Attack</small>
+          <strong>工具调用劫持</strong>
+          <p>code.run / file.read / api.call</p>
+        </div>
+        <div class="signal-panel signal-panel--guard">
+          <small>Decision</small>
+          <strong>拒绝</strong>
+          <p>risk_score 97 / anomaly 88</p>
+        </div>
+        <div class="signal-panel signal-panel--audit">
+          <small>Evidence</small>
+          <strong>audit hash</strong>
+          <p>策略命中、参数、复核链路留痕</p>
+        </div>
+      </div>
+      <div class="pipeline-preview">
+        {pipeline.slice(1, 6).map((item) => <span>{item}</span>)}
+      </div>
+    </div>
+  </div>
+
+  <nav class="nav" aria-label="主导航">
+    <a href="#top" class="brand">
+      <img src="/favicon.svg" alt="智安哨" />
+      <span>
+        <strong>智安哨</strong>
+        <em>Agent Security Supervisor</em>
+      </span>
+    </a>
+    <div class="nav__links">
+      <a href="#capabilities">核心能力</a>
+      <a href="#surfaces">攻击面</a>
+      <a href="#pipeline">监督流水线</a>
+      <a href="#openclaw">OpenClaw</a>
+    </div>
+    <div class="nav__actions">
+      <a href="http://127.0.0.1:3000" class="button button--ghost">查看文档</a>
+      <a href="http://127.0.0.1:5178" class="button">进入控制台</a>
+    </div>
+  </nav>
+
+  <div class="hero__content">
+    <p class="eyebrow">LLM Agent Attack Lab / Tool-Call Supervisor</p>
+    <h1>智安哨 Agent 安全监督台</h1>
+    <p class="lead">
+      面向 LLM Agent 的攻击复现、工具调用监督、证据留痕与防御评测平台。它把红队样本、沙箱工具、
+      行为策略、审计报告和 OpenClaw 接入连成一条可复核的安全闭环。
+    </p>
+    <div class="hero__actions">
+      <a href="http://127.0.0.1:5178" class="button button--large">进入控制台</a>
+      <a href="http://127.0.0.1:3000" class="button button--large button--ghost">阅读文档</a>
+    </div>
+  </div>
+
+  <div class="stats-strip" aria-label="项目核心指标">
+    {stats.map((item) => (
+      <article>
+        <strong>{item.value}</strong>
+        <span>{item.label}</span>
+        <p>{item.note}</p>
+      </article>
+    ))}
+  </div>
+</section>

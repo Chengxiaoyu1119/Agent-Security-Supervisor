@@ -3,7 +3,7 @@ node_modules/
 .venv/
 .git/
 .vscode/
-backend/sandbox/
+apps/api/sandbox/
 scripts/archive/
 package-lock.json
 PROJECT_ARCHITECTURE.md

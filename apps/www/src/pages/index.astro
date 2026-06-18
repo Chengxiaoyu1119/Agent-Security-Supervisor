@@ -1,0 +1,108 @@
+---
+import HeroScene from '../components/HeroScene.astro';
+import { attackSurfaces, capabilities, integrationCards, pipeline } from '../content/homepage';
+import '../styles/global.css';
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="智安哨 Agent Security Supervisor，面向 LLM Agent 的攻击复现、工具调用监督、证据留痕与防御评测平台。"
+    />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>智安哨 Agent Security Supervisor</title>
+  </head>
+  <body>
+    <HeroScene />
+
+    <main>
+      <section class="section" id="capabilities">
+        <div class="section__head">
+          <p class="eyebrow">Capabilities</p>
+          <h2>从攻击复现到防御评测的一套闭环</h2>
+          <p>官网只讲项目主线，具体运行、接口和证据材料进入文档站与控制台继续查看。</p>
+        </div>
+        <div class="card-grid">
+          {capabilities.map((item) => (
+            <article class="capability-card">
+              <span>{item.tag}</span>
+              <h3>{item.title}</h3>
+              <p>{item.description}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section class="section section--muted" id="surfaces">
+        <div class="section__head">
+          <p class="eyebrow">Attack Surfaces</p>
+          <h2>7 类智能体攻击面</h2>
+          <p>每类攻击面都配有样本、工具调用脚本、策略命中和报告证据，避免停留在概念展示。</p>
+        </div>
+        <div class="surface-table" role="table" aria-label="攻击面矩阵">
+          <div class="surface-table__row surface-table__row--head" role="row">
+            <span>攻击面</span>
+            <span>风险</span>
+            <span>剧本</span>
+            <span>样本</span>
+            <span>验证重点</span>
+          </div>
+          {attackSurfaces.map((surface) => (
+            <div class="surface-table__row" role="row">
+              <strong>{surface.name}</strong>
+              <span class={`risk risk--${surface.risk}`}>{surface.risk}</span>
+              <span>{surface.scripts}</span>
+              <span>{surface.samples}</span>
+              <p>{surface.focus}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section class="section" id="pipeline">
+        <div class="section__head">
+          <p class="eyebrow">Supervisor Pipeline</p>
+          <h2>工具调用前置监督流水线</h2>
+          <p>监督器不是替 Agent 执行任务，而是在危险动作发生前建立可解释、可审计的安全闸门。</p>
+        </div>
+        <div class="pipeline">
+          {pipeline.map((item, index) => (
+            <div class="pipeline__step">
+              <span>{String(index + 1).padStart(2, '0')}</span>
+              <strong>{item}</strong>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section class="section section--dark" id="openclaw">
+        <div class="section__head">
+          <p class="eyebrow">Integration</p>
+          <h2>OpenClaw 与外部 Agent 接入</h2>
+          <p>智安哨可以作为外部 Agent 的工具调用防火墙，也可以保留插件包、验收报告和审计证据。</p>
+        </div>
+        <div class="integration-grid">
+          {integrationCards.map((item) => (
+            <article>
+              <h3>{item.title}</h3>
+              <p>{item.description}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section class="cta">
+        <h2>开始查看项目</h2>
+        <p>如果你是第一次接触，建议先看文档站的“快速开始”，再进入控制台运行剧本。</p>
+        <div>
+          <a href="http://127.0.0.1:3000" class="button button--large button--ghost">查看文档</a>
+          <a href="http://127.0.0.1:5178" class="button button--large">进入控制台</a>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

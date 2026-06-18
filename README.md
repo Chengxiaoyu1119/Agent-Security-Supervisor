@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  <img src="public/favicon.svg" alt="智安哨 logo" width="92" />
+  <img src="apps/console/public/favicon.svg" alt="智安哨 logo" width="92" />
 </p>
 
 <h1 align="center">智安哨：大模型智能体攻击面研究与行为监督平台</h1>
@@ -78,14 +78,14 @@
 
 | 模块 | 能力 | 代码入口 |
 |---|---|---|
-| 攻击面研究台 | 展示 7 类攻击面、风险等级、样本数量、脚本数量和防御建议 | `src/pages/Dashboard.tsx` |
-| 攻击剧本库 | 管理提示注入、越狱、数据泄露、工具劫持等剧本 | `src/components/scenarios/ScenarioLibrary.tsx` |
-| 攻击复现实验室 | 支持单剧本运行、无防护/有防护对比、批量对比 | `src/components/lab/ExperimentLab.tsx` |
-| 多 Agent 攻击链 | 模拟规划 Agent、执行 Agent、目标智能体、监督 Agent、评测 Agent | `src/components/agent/AgentChain.tsx` |
-| 行为监督器 | 对工具调用输出允许、拒绝、询问、隔离四类决策 | `backend/zhian/supervisor.py` |
-| 审计与告警 | 记录工具参数、策略命中、风险分、异常分、审计 hash | `backend/zhian/integrity.py` |
-| 证据包与报告 | 导出攻击面证据包、误报评测、攻防有效性报告、赛前体检 | `backend/zhian/evidence.py` |
-| OpenClaw 接入 | 提供事件 schema、hook 示例、native plugin 包和验证报告 | `backend/zhian/openclaw_adapter.py` |
+| 攻击面研究台 | 展示 7 类攻击面、风险等级、样本数量、脚本数量和防御建议 | `apps/console/src/pages/Dashboard.tsx` |
+| 攻击剧本库 | 管理提示注入、越狱、数据泄露、工具劫持等剧本 | `apps/console/src/components/scenarios/ScenarioLibrary.tsx` |
+| 攻击复现实验室 | 支持单剧本运行、无防护/有防护对比、批量对比 | `apps/console/src/components/lab/ExperimentLab.tsx` |
+| 多 Agent 攻击链 | 模拟规划 Agent、执行 Agent、目标智能体、监督 Agent、评测 Agent | `apps/console/src/components/agent/AgentChain.tsx` |
+| 行为监督器 | 对工具调用输出允许、拒绝、询问、隔离四类决策 | `apps/api/agent_supervisor/supervisor.py` |
+| 审计与告警 | 记录工具参数、策略命中、风险分、异常分、审计 hash | `apps/api/agent_supervisor/integrity.py` |
+| 证据包与报告 | 导出攻击面证据包、误报评测、攻防有效性报告、赛前体检 | `apps/api/agent_supervisor/evidence.py` |
+| OpenClaw 接入 | 提供事件 schema、hook 示例、native plugin 包和验证报告 | `apps/api/agent_supervisor/openclaw_adapter.py` |
 
 > [!NOTE]
 > “监督器”可以理解为智能体的安全检查员。每次智能体想调用文件、邮件、API、代码执行、记忆或环境变量工具时，它先判断这次调用能不能放行。
@@ -194,8 +194,10 @@ sequenceDiagram
 ### 1. 安装依赖
 
 ```bash
-npm install
-python -m pip install -r backend/requirements.txt
+npm --prefix apps/console install
+npm --prefix apps/www install
+npm --prefix apps/docs install
+python -m pip install -r apps/api/requirements.txt
 ```
 
 ### 2. 启动后端 API
@@ -219,7 +221,7 @@ http://127.0.0.1:8012/api/health
 ### 3. 启动前端页面
 
 ```bash
-npm run dev
+npm run console:dev
 ```
 
 打开：
@@ -267,13 +269,13 @@ CLI 是命令行工具。它适合批量评测、导出报告、生成提交包�
 |---|---|
 | 运行单个攻击剧本 | `npm run cli -- run TOOL-HIJACK-001 on` |
 | 批量运行全部剧本对比 | `npm run cli -- batch --guard compare` |
-| 导出攻防有效性评测 | `python -X utf8 -m backend.zhian.cli assess --run-compare` |
-| 评估外部智能体事件日志 | `python -X utf8 -m backend.zhian.cli evaluate --input backend/sandbox/examples/agent-events-batch.json` |
+| 导出攻防有效性评测 | `python -X utf8 -m apps.api.agent_supervisor.cli assess --run-compare` |
+| 评估外部智能体事件日志 | `python -X utf8 -m apps.api.agent_supervisor.cli evaluate --input apps/api/sandbox/examples/agent-events-batch.json` |
 | 运行 OpenClaw 兼容批量接入演示 | `npm run cli -- demo-external` |
 | 运行最小外部 Agent 工具调度演示 | `npm run cli -- external-agent-demo` |
 | 运行策略消融实验 | `npm run cli -- policy-ablation` |
-| 导出单个攻击面证据包 | `npm run cli -- surface-pack --surface prompt-injection --output backend/sandbox/reports` |
-| 一键导出全部攻击面证据包 | `npm run cli -- surface-packs --output backend/sandbox/reports` |
+| 导出单个攻击面证据包 | `npm run cli -- surface-pack --surface prompt-injection --output apps/api/sandbox/reports` |
+| 一键导出全部攻击面证据包 | `npm run cli -- surface-packs --output apps/api/sandbox/reports` |
 | 生成干净提交包 | `npm run cli -- clean-package` |
 | 赛前一键体检 | `npm run cli -- readiness --write` |
 | OpenClaw 插件包生成 | `npm run cli -- openclaw-plugin` |
@@ -380,32 +382,26 @@ flowchart TD
 
 ```text
 agent-security-supervisor/
-├─ src/                              # React 前端研究台
-│  ├─ pages/                         # Dashboard、报告、告警、设置等页面
-│  ├─ components/                    # 攻击链、实验室、策略中心、证据板
-│  ├─ design/                        # 设计 token 与视觉系统说明
-│  ├─ api.ts                         # 前端请求后端 API 的封装
-│  └─ App.tsx                        # 页面导航和全局状态入口
-├─ backend/
-│  ├─ zhian/                         # FastAPI、监督器、评测、报告、CLI
-│  │  ├─ config/                     # 攻击面、剧本、策略配置
-│  │  ├─ routers/                    # API 路由
-│  │  ├─ services/                   # 提交包等服务
-│  │  ├─ supervisor.py               # 行为监督核心
-│  │  ├─ cli.py                      # 命令行入口
-│  │  └─ model_adapter.py            # DeepSeek、智谱、本地模拟模型适配
-│  └─ sandbox/                       # 本地靶场数据、示例事件、报告输出
+├─ apps/
+│  ├─ api/                           # FastAPI、监督器、评测、报告、CLI
+│  │  ├─ agent_supervisor/           # 后端 Python 包
+│  │  ├─ sandbox/                    # 本地靶场数据、示例事件、报告输出
+│  │  └─ tests/                      # 后端单元测试
+│  ├─ console/                       # React + Vite 控制台
+│  │  └─ src/                        # 页面、组件、类型、样式和请求封装
+│  ├─ www/                           # Astro 官网介绍页
+│  └─ docs/                          # Docusaurus 正式文档站
+├─ docs/                             # 历史开发记录、方案和过程材料
 ├─ scripts/                          # 前端治理检查、自审脚本
-├─ public/favicon.svg                # 项目标识
-├─ package.json                      # Node 脚本和前端依赖
-└─ backend/requirements.txt          # Python 后端依赖
+├─ package.json                      # 根目录统一命令入口
+└─ apps/api/requirements.txt         # Python 后端依赖
 ```
 
 ## 质量检查
 
 | 检查 | 命令 | 说明 |
 |---|---|---|
-| 前端构建 | `npm run build` | TypeScript 类型检查 + Vite 构建 |
+| 控制台构建 | `npm run console:build` | TypeScript 类型检查 + Vite 构建 |
 | 前端治理检查 | `npm run ui:audit` | 检查前端结构和治理规则 |
 | 项目自审 | `npm run self:review` | 输出项目自审报告到沙箱报告目录 |
 | 后端健康 | `GET /api/health` | 确认 FastAPI 服务正常 |

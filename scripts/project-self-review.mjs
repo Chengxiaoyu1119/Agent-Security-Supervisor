@@ -40,7 +40,7 @@ function pngInfo(relativePath) {
 }
 
 function latestPackage() {
-  const dir = path.join(root, 'backend', 'sandbox', 'submission_packages');
+  const dir = path.join(root, 'apps', 'api', 'sandbox', 'submission_packages');
   if (!fs.existsSync(dir)) {
     return null;
   }
@@ -123,32 +123,32 @@ const outputIndex = process.argv.findIndex((arg) => arg === '--output');
 const outputRoot =
   outputIndex >= 0 && process.argv[outputIndex + 1]
     ? path.resolve(root, process.argv[outputIndex + 1])
-    : path.join(root, 'backend', 'sandbox', 'reports');
+    : path.join(root, 'apps', 'api', 'sandbox', 'reports');
 fs.mkdirSync(outputRoot, { recursive: true });
 
-const appText = readText('src/App.tsx');
-const stylesText = readText('src/styles.css');
-const visualText = readText('src/视觉系统.css');
-const tokenText = readText('src/design/tokens.css');
-const dataText = readText('backend/zhian/data.py');
-const scenarioConfig = loadJson('backend/zhian/config/scenarios.json') ?? [];
-const studentProfileConfig = loadJson('backend/zhian/config/student_competition_attack_map.json') ?? [];
-const attackChainSourceText = readText('backend/zhian/attack_chains.py');
+const appText = readText('apps/console/src/App.tsx');
+const stylesText = readText('apps/console/src/styles.css');
+const visualText = readText('apps/console/src/视觉系统.css');
+const tokenText = readText('apps/console/src/design/tokens.css');
+const dataText = readText('apps/api/agent_supervisor/data.py');
+const scenarioConfig = loadJson('apps/api/agent_supervisor/config/scenarios.json') ?? [];
+const studentProfileConfig = loadJson('apps/api/agent_supervisor/config/student_competition_attack_map.json') ?? [];
+const attackChainSourceText = readText('apps/api/agent_supervisor/attack_chains.py');
 const readmeText = readText('README.md');
 const architectureText = readText('PROJECT_ARCHITECTURE.md');
 const deliveryGuideText = readText('docs/Coding/比赛交付材料包说明.md');
 const selfReviewRecordText = readText('docs/Coding/多Agent自审优化闭环报告-20260609.md');
 const competitionResearchText = readText('docs/Coding/命题挑战赛调研摘要.md');
 
-const uiDir = path.join(root, 'src', 'components', 'ui');
+const uiDir = path.join(root, 'apps', 'console', 'src', 'components', 'ui');
 const uiComponents = fs.existsSync(uiDir)
   ? fs.readdirSync(uiDir).filter((name) => name.endsWith('.tsx') && !name.endsWith('.test.tsx'))
   : [];
 
-const readiness = loadJson('backend/sandbox/reports/赛前一键体检报告.json');
+const readiness = loadJson('apps/api/sandbox/reports/赛前一键体检报告.json');
 const readinessPayload = readiness?.summary ? readiness : (readiness?.readiness ?? readiness);
 const blockers = readinessPayload?.blockers ?? [];
-const attackChains = loadJson('backend/sandbox/reports/组合攻击链评测.json');
+const attackChains = loadJson('apps/api/sandbox/reports/组合攻击链评测.json');
 
 const studentProfileIds = [
   'team-account-portal',
@@ -197,23 +197,23 @@ const misleadingDomainResidualCount = countMatches(
 );
 
 const screenshots = [
-  'backend/sandbox/reports/frontend-governance-desktop.png',
-  'backend/sandbox/reports/frontend-governance-mobile.png',
-  'backend/sandbox/reports/scenario-library-desktop.png',
-  'backend/sandbox/reports/experiment-lab-desktop.png',
-  'backend/sandbox/reports/agent-chain-desktop.png',
-  'backend/sandbox/reports/attack-chain-workbench-desktop.png',
-  'backend/sandbox/reports/attack-chain-workbench-mobile.png',
-  'backend/sandbox/reports/policy-impact-matrix-desktop.png',
-  'backend/sandbox/reports/audit-hash-verify-desktop.png',
-  'backend/sandbox/reports/decision-pill-audit-desktop.png',
-  'backend/sandbox/reports/decision-pill-alerts-desktop.png',
-  'backend/sandbox/reports/decision-pill-settings-desktop.png',
-  'backend/sandbox/reports/demo-drill-desktop.png',
-  'backend/sandbox/reports/approval-queue-desktop.png',
-  'backend/sandbox/reports/readiness-panel-desktop.png',
-  'backend/sandbox/reports/student-competition-attack-map-desktop.png',
-  'backend/sandbox/reports/student-competition-attack-map-mobile.png'
+  'apps/api/sandbox/reports/frontend-governance-desktop.png',
+  'apps/api/sandbox/reports/frontend-governance-mobile.png',
+  'apps/api/sandbox/reports/scenario-library-desktop.png',
+  'apps/api/sandbox/reports/experiment-lab-desktop.png',
+  'apps/api/sandbox/reports/agent-chain-desktop.png',
+  'apps/api/sandbox/reports/attack-chain-workbench-desktop.png',
+  'apps/api/sandbox/reports/attack-chain-workbench-mobile.png',
+  'apps/api/sandbox/reports/policy-impact-matrix-desktop.png',
+  'apps/api/sandbox/reports/audit-hash-verify-desktop.png',
+  'apps/api/sandbox/reports/decision-pill-audit-desktop.png',
+  'apps/api/sandbox/reports/decision-pill-alerts-desktop.png',
+  'apps/api/sandbox/reports/decision-pill-settings-desktop.png',
+  'apps/api/sandbox/reports/demo-drill-desktop.png',
+  'apps/api/sandbox/reports/approval-queue-desktop.png',
+  'apps/api/sandbox/reports/readiness-panel-desktop.png',
+  'apps/api/sandbox/reports/student-competition-attack-map-desktop.png',
+  'apps/api/sandbox/reports/student-competition-attack-map-mobile.png'
 ].map((relativePath) => ({ path: relativePath, ...pngInfo(relativePath) }));
 
 const directDecisionMarkupCount = countMatches(appText, /className=\{`decision \$\{/g);
@@ -317,7 +317,7 @@ const checks = [
 ];
 
 const unresolved = [];
-if (fileInfo('src/App.tsx').lines > 2500) {
+if (fileInfo('apps/console/src/App.tsx').lines > 2500) {
   unresolved.push('src/App.tsx 仍然过大，后续应按页面拆分。');
 }
 if (hardcodedColorCount > 200) {
@@ -332,10 +332,10 @@ const report = {
   project: '智安哨：大模型智能体攻击面研究与行为监督平台',
   self_review_agents: ['代码结构审查子代理', '页面审美审查子代理', '比赛交付审查子代理', '本地自审脚本'],
   frontend: {
-    app: fileInfo('src/App.tsx'),
-    styles: fileInfo('src/styles.css'),
-    visual_system: fileInfo('src/视觉系统.css'),
-    tokens: fileInfo('src/design/tokens.css'),
+    app: fileInfo('apps/console/src/App.tsx'),
+    styles: fileInfo('apps/console/src/styles.css'),
+    visual_system: fileInfo('apps/console/src/视觉系统.css'),
+    tokens: fileInfo('apps/console/src/design/tokens.css'),
     ui_component_count: uiComponents.length,
     ui_components: uiComponents,
     direct_decision_markup_count: directDecisionMarkupCount,
@@ -370,7 +370,7 @@ const report = {
   screenshots,
   checks,
   current_baseline: [
-    `前端主入口 App.tsx 当前 ${fileInfo('src/App.tsx').lines} 行。`,
+    `前端主入口 App.tsx 当前 ${fileInfo('apps/console/src/App.tsx').lines} 行。`,
     `基础 UI 组件 ${uiComponents.length} 个，目录由治理脚本约束。`,
     `学生比赛对象画像 ${studentProfileCount}/5，专项剧本 ${studentScenarioCount}/5。`,
     `组合攻击链 ${attackChainCount} 条，学生比赛平台对象链${hasStudentPortalChain ? '已存在' : '缺失'}。`,
