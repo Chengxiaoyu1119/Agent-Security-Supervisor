@@ -23,6 +23,7 @@
   --zh-bg-panel-soft: var(--ant-color-fill-quaternary, rgba(0, 0, 0, 0.02));
   --zh-bg-panel-muted: var(--ant-color-fill-tertiary, rgba(0, 0, 0, 0.04));
   --zh-bg-panel-emphasis: var(--ant-color-fill-secondary, rgba(0, 0, 0, 0.05));
+  --zh-bg-panel-emphasis-dark: var(--ant-color-fill-secondary, rgba(255, 255, 255, 0.08));
   --zh-border-subtle: var(--ant-color-border-secondary, #f0f0f0);
   --zh-border-subtle-dark: var(--ant-color-border-secondary, #303030);
   --zh-border-strong: var(--ant-color-border, #d9d9d9);

@@ -88,8 +88,14 @@ export function AppShell({
       }}
     >
       <Layout className="zh-app-root">
-        <Sider breakpoint="lg" collapsedWidth="0" width={280} theme="light" className="desktop-sider zh-app-sider">
-          <div className="zh-app-brand">
+        <Sider
+          breakpoint="lg"
+          collapsedWidth="0"
+          width={280}
+          theme={theme}
+          className={`desktop-sider zh-app-sider zh-app-sider--${theme}`}
+        >
+          <div className={`zh-app-brand zh-app-brand--${theme}`}>
             <img src="/favicon.svg" alt="logo" className="zh-app-logo" />
             <div>
               <Typography.Title level={4} className="zh-title-flush">
@@ -100,7 +106,7 @@ export function AppShell({
               </Typography.Text>
             </div>
           </div>
-          <Menu mode="inline" theme="light" selectedKeys={[page]} className="zh-app-menu" items={menuItems} />
+          <Menu mode="inline" theme={theme} selectedKeys={[page]} className="zh-app-menu" items={menuItems} />
         </Sider>
 
         <Drawer
@@ -118,11 +124,11 @@ export function AppShell({
           styles={{ body: { padding: 0 } }}
           size="default"
         >
-          <Menu mode="inline" theme="light" selectedKeys={[page]} className="zh-app-menu" items={menuItems} />
+          <Menu mode="inline" theme={theme} selectedKeys={[page]} className="zh-app-menu" items={menuItems} />
         </Drawer>
 
         <Layout className="zh-app-layout">
-          <Header className="zh-app-header">
+          <Header className={`zh-app-header zh-app-header--${theme}`}>
             <Space>
               <UiButton type="text" icon={<MenuIcon size={20} />} onClick={onOpenDrawer} className="mobile-menu-btn" />
               <Typography.Title level={3} className="zh-app-header-title">
