@@ -35,7 +35,7 @@ import type {
 } from '../types';
 import { externalEventSample, externalBatchEventSample } from '../utils';
 
-export function SettingsPanel({ overview, refresh }: { overview: Overview; refresh: () => Promise<void> }) {
+export function SettingsPanel({ overview, refresh }: { overview: Overview; refresh: () => Promise<unknown> }) {
   const [eventJson, setEventJson] = useState(JSON.stringify(externalEventSample, null, 2));
   const [batchJson, setBatchJson] = useState(JSON.stringify(externalBatchEventSample, null, 2));
   const [evaluation, setEvaluation] = useState<SupervisorEvaluation | null>(null);

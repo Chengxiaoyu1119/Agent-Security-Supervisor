@@ -59,7 +59,7 @@ export function ReportNormalEvaluationTab({ report }: ReportNormalEvaluationTabP
                   }
                   className="zh-full-height"
                 >
-                  <Typography.Paragraph type="secondary" style={{ minHeight: 44 }}>
+                  <Typography.Paragraph type="secondary" className="zh-min-h-44">
                     {item.hypothesis}
                   </Typography.Paragraph>
                   <Space size="large" className="zh-mb-16">
@@ -226,17 +226,8 @@ export function ReportNormalEvaluationTab({ report }: ReportNormalEvaluationTabP
           </Row>
           <div className="zh-column-stack">
             {report.benign_workflow_evaluation.workflows.map((workflow, idx) => (
-              <div
-                key={idx}
-                style={{
-                  padding: '12px 0',
-                  borderBottom: '1px solid var(--ant-color-border-secondary)',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-start'
-                }}
-              >
-                <div style={{ flex: 1, paddingRight: 16 }}>
+              <div key={idx} className="zh-report-list-item zh-report-list-item--top">
+                <div className="zh-report-list-content">
                   <div>
                     <Typography.Text strong>{workflow.title}</Typography.Text>
                   </div>

@@ -52,7 +52,7 @@ export function DashboardOverviewTab({
     <div className="zh-page-stack zh-mt-8">
       <Row gutter={[24, 24]}>
         <Col span={24}>
-          <PanelCard variant="borderless" styles={{ body: { padding: 32 } }}>
+          <PanelCard variant="borderless" bodyPadding={32}>
             <Flex justify="space-between" align="center" wrap="wrap" gap={24}>
               <div className="zh-dashboard-hero-copy">
                 <Typography.Text type="secondary">命题挑战赛 · 大模型应用安全监督原型</Typography.Text>
@@ -174,14 +174,7 @@ export function DashboardOverviewTab({
               <Typography.Text type="secondary" className="zh-text-meta zh-mb-12 zh-text-block">
                 红队攻击方 (Red Team Agents)
               </Typography.Text>
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  marginBottom: 16
-                }}
-              >
+              <div className="zh-dashboard-agent-flow">
                 <DashboardAgentNode icon={<GitBranch size={20} />} title="规划 Agent" desc="分解攻击剧本" />
                 <ArrowRight size={16} color="var(--ant-color-text-tertiary)" />
                 <DashboardAgentNode icon={<FlaskConical size={20} />} title="样本生成" desc="构造对抗样本" />
@@ -228,21 +221,14 @@ export function DashboardOverviewTab({
             }
             variant="borderless"
             className="zh-full-height"
-            styles={{ body: { padding: 0 } }}
+            bodyPadding={0}
           >
             <div className="zh-column-stack">
               {overview.scenarios.slice(0, 5).map((scenario) => (
                 <div
                   key={scenario.id}
                   onClick={() => onSelectScenario(scenario.id)}
-                  style={{
-                    padding: '16px 24px',
-                    cursor: 'pointer',
-                    borderBottom: '1px solid var(--ant-color-border-secondary)',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                  }}
+                  className="zh-dashboard-scenario-item"
                 >
                   <div>
                     <div>

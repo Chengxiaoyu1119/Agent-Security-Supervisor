@@ -10,7 +10,7 @@ interface AuditLogListProps {
 
 export function AuditLogList({ logs, selectedLogId, onSelectLog }: AuditLogListProps) {
   return (
-    <div style={{ maxHeight: 600, overflowY: 'auto' }}>
+    <div className="zh-scroll-list zh-scroll-list--fixed">
       {logs.map((log) => {
         const selected = selectedLogId === log.id;
 
@@ -18,18 +18,12 @@ export function AuditLogList({ logs, selectedLogId, onSelectLog }: AuditLogListP
           <div
             key={log.id}
             onClick={() => onSelectLog(log.id)}
-            style={{
-              cursor: 'pointer',
-              background: selected ? 'var(--ant-color-primary-bg)' : 'transparent',
-              padding: '12px 16px',
-              borderLeft: selected ? '3px solid var(--ant-color-primary)' : '3px solid transparent',
-              borderBottom: '1px solid var(--ant-color-border-secondary)'
-            }}
+            className={`zh-selectable-list-item${selected ? ' zh-selectable-list-item--active' : ''}`}
           >
             <Flex justify="space-between" align="center" gap={16} wrap="wrap">
-              <div style={{ flex: '1 1 auto', minWidth: 0 }}>
+              <div className="zh-flex-min">
                 <Space wrap>
-                  <Typography.Text strong style={{ color: selected ? 'var(--ant-color-primary)' : 'inherit' }}>
+                  <Typography.Text strong className={selected ? 'zh-text-primary-active' : undefined}>
                     {log.tool}
                   </Typography.Text>
                   <LabelTag
@@ -46,9 +40,7 @@ export function AuditLogList({ logs, selectedLogId, onSelectLog }: AuditLogListP
                 </div>
               </div>
               <div>
-                <Typography.Text style={{ fontSize: 12, color: 'var(--ant-color-text-tertiary)' }}>
-                  {log.policy_id}
-                </Typography.Text>
+                <Typography.Text className="zh-text-meta zh-text-tertiary">{log.policy_id}</Typography.Text>
               </div>
             </Flex>
           </div>

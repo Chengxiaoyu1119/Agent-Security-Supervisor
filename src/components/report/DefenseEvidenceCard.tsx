@@ -16,7 +16,7 @@ export function DefenseEvidenceCard({ item, onOpenScenario }: DefenseEvidenceCar
   const withHash = item.with_guard?.audit_hashes?.[0] ?? '';
 
   return (
-    <PanelCard key={item.scenario_id} type="inner" styles={{ body: { padding: 16 } }}>
+    <PanelCard key={item.scenario_id} type="inner" bodyPadding={16}>
       <Row gutter={[24, 24]} align="top">
         <Col xs={24} md={8}>
           <Space orientation="vertical" className="zh-defense-evidence-case-stack">

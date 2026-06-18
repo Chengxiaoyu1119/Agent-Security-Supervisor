@@ -1,30 +1,13 @@
-from fastapi import APIRouter, HTTPException, Response, Body
-from pydantic import BaseModel
-from typing import Any
-from .. import data
-from ..database import latest_runs, load_run, latest_audit_logs
-from ..model_adapter import provider_status
-from ..agents import *
-from ..attack_chains import *
-from ..supervisor import *
-from ..events import *
-from ..readiness import *
-from ..roadmap import *
-from ..demo_drill import *
-from ..calibration import *
-from ..ablation import *
-from ..assessment import *
-from ..services.package_service import *
-from ..openclaw_adapter import *
-from ..surface_pack import *
-from ..benign import *
-from ..benign_workflows import *
-from ..datasets import *
-from ..approvals import *
-from ..integrity import *
-from ..main_models import *
+from fastapi import APIRouter, Depends, HTTPException, Query
 
-router = APIRouter()
+from ..auth import require_api_token
+from ..data import get_attack_surfaces, get_policies, get_scenarios, get_student_competition_attack_map, set_policy_enabled
+from ..database import latest_audit_logs, latest_runs
+from ..model_adapter import provider_status
+from ..main_models import PolicyUpdate
+from ..services.package_service import build_competition_package
+
+router = APIRouter(dependencies=[Depends(require_api_token)])
 
 
 @router.get("/api/health")
@@ -83,12 +66,12 @@ def models() -> list[dict]:
 
 
 @router.get("/api/audit_logs")
-def audit_logs(limit: int = 100) -> list[dict]:
+def audit_logs(limit: int = Query(100, ge=1, le=500)) -> list[dict]:
     return latest_audit_logs(limit)
 
 
 @router.get("/api/alerts")
-def alerts(limit: int = 100) -> list[dict]:
+def alerts(limit: int = Query(100, ge=1, le=500)) -> list[dict]:
     runs = latest_runs(limit)
     enriched = []
     for run in runs:

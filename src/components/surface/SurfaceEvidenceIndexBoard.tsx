@@ -55,20 +55,11 @@ export function SurfaceEvidenceIndexBoard({
                   type="inner"
                   hoverable
                   onClick={() => onSelectSurface(item.surface_id)}
-                  style={{
-                    cursor: 'pointer',
-                    borderColor:
-                      selectedSurfaceId === item.surface_id
-                        ? 'var(--ant-color-primary)'
-                        : 'var(--ant-color-border-secondary)',
-                    borderWidth: selectedSurfaceId === item.surface_id ? 2 : 1,
-                    height: '100%',
-                    display: 'flex',
-                    flexDirection: 'column'
-                  }}
-                  styles={{ body: { padding: 16, flex: 1, display: 'flex', flexDirection: 'column' } }}
+                  className={`zh-surface-evidence-card${
+                    selectedSurfaceId === item.surface_id ? ' zh-surface-evidence-card--selected' : ''
+                  }`}
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
+                  <div className="zh-surface-evidence-card__head">
                     <div>
                       <Typography.Text strong className="zh-text-block">
                         {item.surface_name}

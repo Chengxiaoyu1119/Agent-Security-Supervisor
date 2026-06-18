@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+﻿import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   fetchAlerts,
   fetchAttackChains,
   fetchAuditLogs,
+  fetchHealth,
   fetchOverview,
   fetchPolicies,
   fetchReport,
@@ -22,6 +23,7 @@ import type {
   RunResult,
   Scenario
 } from '../types';
+import { fallbackOverview, fallbackPolicies } from '../fallback';
 import { createFallbackReport } from './fallbackReport';
 import type { PageKey } from './navigation';
 
@@ -43,19 +45,26 @@ export function useAppData(page: PageKey) {
   const [guardEnabled, setGuardEnabled] = useState(true);
   const [report, setReport] = useState<ReportData | null>(null);
   const [apiNotice, setApiNotice] = useState('');
+  const [apiAvailable, setApiAvailable] = useState<boolean | null>(null);
 
   const refresh = useCallback(async () => {
-    const data = await fetchOverview();
+    const backendHealthy = await fetchHealth();
+    const data = backendHealthy ? await fetchOverview() : fallbackOverview;
+    const nextPolicies = backendHealthy ? await fetchPolicies() : fallbackPolicies;
+    setApiAvailable(backendHealthy);
     setOverview(data);
     setScenarios(data.scenarios);
     setAuditLogs(data.audit_logs);
     setAlerts(data.alerts);
-    setPolicies(await fetchPolicies());
-    if (!data.recent_runs.length) {
-      setApiNotice('当前使用内置样本。启动 FastAPI 后可写入真实实验日志。');
+    setPolicies(nextPolicies);
+    if (!backendHealthy) {
+      setApiNotice('当前后端未连接，页面会使用内置样本数据；启动 FastAPI 后可写入真实实验日志。');
+    } else if (!data.recent_runs.length) {
+      setApiNotice('后端已连接，目前暂无真实实验日志；运行脚本后这里会展示最新结果。');
     } else {
       setApiNotice('');
     }
+    return backendHealthy;
   }, []);
 
   const loadReport = useCallback(async () => {
@@ -78,18 +87,30 @@ export function useAppData(page: PageKey) {
   }, []);
 
   useEffect(() => {
-    void Promise.resolve().then(() => refresh());
-    fetchScenarios()
-      .then(setScenarios)
-      .catch(() => undefined);
-    fetchAttackChains()
-      .then((data) => {
-        setAttackChains(data);
-        if (data[0]?.id) {
-          setSelectedAttackChain((current) => current || data[0].id);
-        }
-      })
-      .catch(() => undefined);
+    let ignore = false;
+    void Promise.resolve().then(async () => {
+      const backendHealthy = await refresh();
+      if (ignore || !backendHealthy) {
+        return;
+      }
+      fetchScenarios()
+        .then((data) => {
+          if (!ignore) setScenarios(data);
+        })
+        .catch(() => undefined);
+      fetchAttackChains()
+        .then((data) => {
+          if (ignore) return;
+          setAttackChains(data);
+          if (data[0]?.id) {
+            setSelectedAttackChain((current) => current || data[0].id);
+          }
+        })
+        .catch(() => undefined);
+    });
+    return () => {
+      ignore = true;
+    };
   }, [refresh]);
 
   useEffect(() => {
@@ -137,6 +158,7 @@ export function useAppData(page: PageKey) {
     setGuardEnabled,
     report,
     apiNotice,
+    apiAvailable,
     setApiNotice,
     refresh,
     loadReport,

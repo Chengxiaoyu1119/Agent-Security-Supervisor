@@ -33,7 +33,7 @@ export function DashboardEvidenceTab({
 }: DashboardEvidenceTabProps) {
   return (
     <div className="zh-page-stack zh-mt-8">
-      <PanelCard variant="borderless" styles={{ body: { padding: '16px 24px' } }}>
+      <PanelCard variant="borderless" bodyPadding="16px 24px">
         <Flex justify="space-between" align="center" wrap="wrap" gap={16}>
           <Typography.Text strong>证据包管理与导出</Typography.Text>
           <UiButton

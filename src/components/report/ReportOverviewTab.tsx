@@ -132,18 +132,9 @@ export function ReportOverviewTab({ report }: ReportOverviewTabProps) {
           >
             <div className="zh-column-stack">
               {report.deliverables.map((item, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    padding: '12px 0',
-                    borderBottom: '1px solid var(--ant-color-border-secondary)',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                  }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
-                    <div style={{ paddingTop: 4 }}>
+                <div key={idx} className="zh-report-list-item">
+                  <div className="zh-report-list-main">
+                    <div className="zh-pt-4">
                       <UiBadge status="processing" />
                     </div>
                     <div>
@@ -170,16 +161,7 @@ export function ReportOverviewTab({ report }: ReportOverviewTabProps) {
           >
             <div className="zh-column-stack">
               {report.policy_hits.map((item, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    padding: '12px 0',
-                    borderBottom: '1px solid var(--ant-color-border-secondary)',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center'
-                  }}
-                >
+                <div key={idx} className="zh-report-list-item">
                   <Typography.Text>{item.policy_id}</Typography.Text>
                   <Typography.Text strong>{item.count}</Typography.Text>
                 </div>

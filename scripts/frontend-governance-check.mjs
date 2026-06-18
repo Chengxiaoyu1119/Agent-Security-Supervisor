@@ -38,7 +38,7 @@ const scannedExtensions = new Set(['.css', '.ts', '.tsx']);
 
 const colorPattern = /#[0-9a-fA-F]{3,8}|rgba?\(/g;
 const cssTokenPattern = /var\(--/g;
-const inlineStylePattern = /style=\{\{/g;
+const inlineStylePattern = /style=\{\{|styles=\{\{/g;
 const directAntdPrimitivePattern = /<(Button|Card|Tag|Badge|Progress|Alert|Table|Tabs|Select|Input)\b/g;
 const criticalAppLayoutSelectors = new Set([
   '.zh-app-loading',
@@ -56,6 +56,13 @@ function countMatches(text, pattern) {
   return (text.match(pattern) ?? []).length;
 }
 
+function lineNumbersForMatches(text, pattern) {
+  return text.split(/\r?\n/).flatMap((line, index) => {
+    pattern.lastIndex = 0;
+    return pattern.test(line) ? [index + 1] : [];
+  });
+}
+
 function countCssSelectorDefinitions(text, selectors) {
   const counts = Object.fromEntries(Array.from(selectors, (selector) => [selector, 0]));
   const withoutComments = text.replace(/\/\*[\s\S]*?\*\//g, '');
@@ -70,6 +77,20 @@ function countCssSelectorDefinitions(text, selectors) {
   }
 
   return counts;
+}
+
+function hasCssSelectorDeclaration(text, selector, declarationPattern) {
+  const withoutComments = text.replace(/\/\*[\s\S]*?\*\//g, '');
+  const selectorBlockPattern = /([^{}]+)\{([^{}]*)\}/g;
+
+  for (const match of withoutComments.matchAll(selectorBlockPattern)) {
+    const selectors = match[1].split(',').map((item) => item.trim());
+    if (selectors.includes(selector) && declarationPattern.test(match[2])) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 function readMaybe(relativePath) {
@@ -181,6 +202,14 @@ const cssHardcodedColorCount = summary
 const sourceHardcodedColorCount = summary.reduce((sum, item) => sum + item.hardcoded_color_count, 0);
 const sourceTokenUsageCount = summary.reduce((sum, item) => sum + item.token_usage_count, 0);
 const inlineStyleCount = summary.reduce((sum, item) => sum + item.inline_style_count, 0);
+const inlineStyleLocations = summary
+  .filter((item) => item.inline_style_count > 0)
+  .map((item) => ({
+    file: item.file,
+    count: item.inline_style_count,
+    lines: lineNumbersForMatches(readMaybe(item.file), inlineStylePattern)
+  }))
+  .sort((a, b) => b.count - a.count || a.file.localeCompare(b.file));
 const directAntdPrimitiveCount = summary.reduce((sum, item) => sum + item.direct_antd_primitive_count, 0);
 const directAntdPrimitiveOutsideUiCount = summary.reduce(
   (sum, item) => sum + item.direct_antd_primitive_outside_ui_count,
@@ -188,10 +217,41 @@ const directAntdPrimitiveOutsideUiCount = summary.reduce(
 );
 const antdPrimitiveWrapperCount = directAntdPrimitiveCount - directAntdPrimitiveOutsideUiCount;
 const tokenInfo = fileInfo('src/design/tokens.css');
-const appLayoutSelectorCounts = countCssSelectorDefinitions(readMaybe('src/styles.css'), criticalAppLayoutSelectors);
+const stylesText = readMaybe('src/styles.css');
+const appLayoutSelectorCounts = countCssSelectorDefinitions(stylesText, criticalAppLayoutSelectors);
 const duplicateAppLayoutSelectors = Object.entries(appLayoutSelectorCounts)
   .filter(([, count]) => count > 1)
   .map(([selector, count]) => ({ selector, count }));
+const darkLayoutRules = [
+  {
+    selector: '.zh-app-sider.zh-app-sider--dark',
+    declaration: 'background: var(--zh-bg-panel-dark)',
+    present: hasCssSelectorDeclaration(
+      stylesText,
+      '.zh-app-sider.zh-app-sider--dark',
+      /background:\s*var\(--zh-bg-panel-dark\)/
+    )
+  },
+  {
+    selector: '.zh-app-header.zh-app-header--dark',
+    declaration: 'background: var(--zh-bg-panel-dark)',
+    present: hasCssSelectorDeclaration(
+      stylesText,
+      '.zh-app-header.zh-app-header--dark',
+      /background:\s*var\(--zh-bg-panel-dark\)/
+    )
+  },
+  {
+    selector: '.zh-app-header.zh-app-header--dark .ant-btn-default',
+    declaration: 'background: var(--zh-bg-panel-dark)',
+    present: hasCssSelectorDeclaration(
+      stylesText,
+      '.zh-app-header.zh-app-header--dark .ant-btn-default',
+      /background:\s*var\(--zh-bg-panel-dark\)/
+    )
+  }
+];
+const missingDarkLayoutRules = darkLayoutRules.filter((rule) => !rule.present);
 
 const uiComponentDir = path.join(root, 'src', 'components', 'ui');
 const uiComponentCount = fs.existsSync(uiComponentDir)
@@ -207,8 +267,8 @@ const budgets = {
   source_file_max_lines: 300,
   css_hardcoded_color_max: 25,
   source_hardcoded_color_max: 25,
-  inline_style_max: 80,
-  inline_style_per_file_max: 24,
+  inline_style_max: 2,
+  inline_style_per_file_max: 2,
   ui_component_min: 12,
   token_file_min_bytes: 300,
   direct_antd_primitive_outside_ui_max: 0,
@@ -285,10 +345,19 @@ if (duplicateAppLayoutSelectors.length > budgets.duplicate_app_layout_selector_m
       .join(', ')}`
   );
 }
+if (missingDarkLayoutRules.length) {
+  violations.push(
+    `Missing dark layout rules: ${missingDarkLayoutRules
+      .map((rule) => `${rule.selector} requires ${rule.declaration}`)
+      .join(', ')}`
+  );
+}
 
 const warnings = [];
 if (inlineStyleCount > 0) {
-  warnings.push(`Inline styles remain: ${inlineStyleCount}. Avoid increasing this count without a clear reason.`);
+  warnings.push(
+    `Inline styles remain: ${inlineStyleCount}. Keep them limited to data-driven values and do not increase this count without updating the governance budget.`
+  );
 }
 if (directAntdPrimitiveOutsideUiCount > 0) {
   warnings.push(
@@ -306,6 +375,8 @@ const result = {
   source_hardcoded_color_count: sourceHardcodedColorCount,
   source_token_usage_count: sourceTokenUsageCount,
   inline_style_count: inlineStyleCount,
+  inline_style_locations: inlineStyleLocations,
+  top_inline_style_files: inlineStyleLocations.slice(0, 10),
   direct_antd_primitive_count: directAntdPrimitiveCount,
   direct_antd_primitive_outside_ui_count: directAntdPrimitiveOutsideUiCount,
   antd_primitive_wrapper_count: antdPrimitiveWrapperCount,
@@ -315,6 +386,8 @@ const result = {
   unexpected_design_entries: unexpectedDesignEntries,
   app_layout_selector_counts: appLayoutSelectorCounts,
   duplicate_app_layout_selectors: duplicateAppLayoutSelectors,
+  dark_layout_rules: darkLayoutRules,
+  missing_dark_layout_rules: missingDarkLayoutRules,
   oversized_source_files: oversizedSourceFiles,
   inline_style_hotspots: inlineStyleHotspots,
   largest_file: maxFile,
@@ -336,6 +409,7 @@ const result = {
     'Keep new colors in src/design/tokens.css and consume semantic variables.',
     'Keep src top-level entries within the documented pages/components/design structure.',
     'Keep critical app layout selectors defined once in src/styles.css.',
+    'Reserve inline styles for values that must be calculated from runtime data.',
     'Split App.tsx by page only after shared UI components are stable.',
     'Avoid adding new page-level CSS files unless they map to a clear feature boundary.'
   ]

@@ -62,6 +62,7 @@ export default function App() {
     setGuardEnabled,
     report,
     apiNotice,
+    apiAvailable,
     setApiNotice,
     refresh,
     loadReport,
@@ -130,6 +131,7 @@ export default function App() {
       {page === 'dashboard' && (
         <Dashboard
           overview={overview}
+          apiAvailable={apiAvailable}
           running={running}
           onSelectScenario={(id) => {
             setSelectedScenario(id);

@@ -15,9 +15,9 @@ backend/sandbox/reports/
 !.env.example
 .agents
 docs
-AGENTS.md
 SOUL.md
-PROJECT_ARCHITECTURE.md
 scripts/archive/
 backend/sandbox/submission_packages/
 .codex-ui.log
+AGENTS.md
+PROJECT_ARCHITECTURE.md

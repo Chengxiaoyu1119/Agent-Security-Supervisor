@@ -22,7 +22,7 @@ export function SurfaceScenarioList({
       }
       variant="borderless"
       className="zh-surface-panel-soft"
-      styles={{ body: { padding: 0 } }}
+      bodyPadding={0}
     >
       <div className="zh-column-stack">
         {scenarios.map((scenario) => {

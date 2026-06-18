@@ -35,7 +35,7 @@ describe('api client', () => {
     await expect(fetchOverview()).resolves.toEqual(overview);
     expect(fetchMock).toHaveBeenCalledWith('/api/overview', expect.objectContaining({ headers: expect.any(Headers) }));
     const init = fetchMock.mock.calls[0]?.[1];
-    expect((init?.headers as Headers).get('Content-Type')).toBe('application/json');
+    expect((init?.headers as Headers).get('Content-Type')).toBeNull();
   });
 
   it('falls back to local overview data when the backend is unavailable', async () => {

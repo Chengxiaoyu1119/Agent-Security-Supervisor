@@ -1,35 +1,65 @@
-from fastapi import APIRouter, HTTPException, Response, Body
-from pydantic import BaseModel
-from typing import Any
-from .. import data
-from ..database import latest_runs, load_run, latest_audit_logs
-from ..model_adapter import provider_status
-from ..agents import *
-from ..attack_chains import *
-from ..supervisor import *
-from ..events import *
-from ..readiness import *
-from ..roadmap import *
-from ..demo_drill import *
-from ..calibration import *
-from ..ablation import *
-from ..assessment import *
-from ..services.package_service import *
-from ..services.report_service import build_report
-from ..openclaw_adapter import *
-from ..surface_pack import *
-from ..benign import *
-from ..benign_workflows import *
-from ..datasets import *
-from ..approvals import *
-from ..integrity import *
-from ..main_models import *
-from ..evidence import *
+from datetime import datetime, timezone
 
-router = APIRouter()
+from fastapi import APIRouter, Depends, HTTPException, Query, Response
+
+from ..ablation import build_policy_ablation, build_policy_ablation_markdown
+from ..auth import require_api_token
+from ..approvals import (
+    build_approval_review_markdown,
+    decide_approval_review,
+    list_approval_reviews,
+    write_approval_review_report
+)
+from ..assessment import build_attack_effectiveness
+from ..benign import build_benign_cases_markdown, evaluate_benign_cases, get_benign_cases
+from ..benign_workflows import (
+    build_benign_workflow_markdown,
+    evaluate_benign_workflows,
+    write_benign_workflow_report
+)
+from ..calibration import (
+    build_anomaly_calibration,
+    build_anomaly_calibration_markdown,
+    write_anomaly_calibration_report
+)
+from ..database import latest_runs
+from ..datasets import build_attack_case_dataset, build_attack_case_markdown
+from ..demo_drill import (
+    build_judge_demo_drill_markdown,
+    load_judge_demo_drill_report,
+    run_judge_demo_drill
+)
+from ..evidence import (
+    build_output_filter_evidence,
+    build_output_filter_markdown,
+    build_surface_conclusions,
+    build_surface_conclusions_markdown
+)
+from ..main_models import ApprovalDecisionRequest
+from ..readiness import (
+    build_competition_readiness,
+    build_competition_readiness_markdown,
+    write_competition_readiness_report
+)
+from ..roadmap import build_project_roadmap, build_project_roadmap_markdown, write_project_roadmap
+from ..services.package_service import write_clean_submission_package, write_submission_package
+from ..services.report_service import build_report
+from ..surface_pack import (
+    build_surface_briefing_sheet_html,
+    build_surface_evidence_index,
+    build_surface_evidence_index_markdown,
+    build_surface_evidence_pack,
+    build_surface_evidence_pack_markdown,
+    write_all_surface_briefing_sheets,
+    write_all_surface_evidence_packs,
+    write_surface_briefing_sheet,
+    write_surface_evidence_pack
+)
+
+router = APIRouter(dependencies=[Depends(require_api_token)])
 
 @router.get("/api/approvals")
-def approval_reviews(status: str = "全部", limit: int = 100) -> dict:
+def approval_reviews(status: str = "全部", limit: int = Query(100, ge=1, le=500)) -> dict:
     try:
         return list_approval_reviews(status=status, limit=limit)
     except ValueError as exc:
@@ -37,7 +67,7 @@ def approval_reviews(status: str = "全部", limit: int = 100) -> dict:
 
 
 @router.get("/api/approvals.md")
-def approval_reviews_markdown(status: str = "全部", limit: int = 100) -> Response:
+def approval_reviews_markdown(status: str = "全部", limit: int = Query(100, ge=1, le=500)) -> Response:
     try:
         data = list_approval_reviews(status=status, limit=limit)
     except ValueError as exc:

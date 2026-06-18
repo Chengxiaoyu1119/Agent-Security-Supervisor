@@ -47,7 +47,7 @@ export function SurfaceDefenseBriefCard({
     latestGuarded?.status === '已控制' ? 'success' : latestGuarded?.status === '攻击成功' ? 'error' : 'processing';
 
   return (
-    <PanelCard type="inner" className="zh-mb-24" styles={{ body: { padding: 24 } }}>
+    <PanelCard type="inner" className="zh-mb-24" bodyPadding={24}>
       <div className="zh-surface-brief__head">
         <div>
           <Typography.Text type="secondary" className="zh-surface-matrix-label">

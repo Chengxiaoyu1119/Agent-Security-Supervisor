@@ -42,7 +42,7 @@ export function ExperimentControlPanel({
       variant="borderless"
     >
       <div className="zh-mb-16">
-        <Typography.Text type="secondary" style={{ display: 'block', marginBottom: 8 }}>
+        <Typography.Text type="secondary" className="zh-text-block zh-mb-8">
           选择剧本
         </Typography.Text>
         <UiSelect
@@ -53,22 +53,12 @@ export function ExperimentControlPanel({
         />
       </div>
 
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: 24,
-          padding: '12px 16px',
-          background: 'var(--ant-color-fill-quaternary)',
-          borderRadius: 8
-        }}
-      >
+      <div className="zh-control-switch-row">
         <Typography.Text strong>行为监督器</Typography.Text>
         <Switch checked={guardEnabled} onChange={setGuardEnabled} checkedChildren="开启" unCheckedChildren="关闭" />
       </div>
 
-      <Space orientation="vertical" style={{ width: '100%', marginBottom: 24 }}>
+      <Space orientation="vertical" className="zh-full-width zh-mb-24">
         <UiButton type="primary" block icon={<Play size={16} />} onClick={run} loading={running}>
           {running ? '运行中...' : '运行当前剧本'}
         </UiButton>

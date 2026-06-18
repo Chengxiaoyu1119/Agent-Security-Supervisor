@@ -56,22 +56,13 @@ export function ApprovalReviewQueue({
         </Col>
       </Row>
       {error ? (
-        <Typography.Text type="danger" style={{ display: 'block', marginBottom: 12 }}>
+        <Typography.Text type="danger" className="zh-text-block zh-mb-12">
           {error}
         </Typography.Text>
       ) : null}
       <div className="zh-column-stack">
         {reviews.map((review) => (
-          <div
-            key={review.id}
-            style={{
-              padding: '12px 0',
-              borderBottom: '1px solid var(--ant-color-border-secondary)',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}
-          >
+          <div key={review.id} className="zh-report-list-item">
             <div>
               <Space>
                 <LabelTag variant="filled" color={approvalStatusColor(review.status)}>

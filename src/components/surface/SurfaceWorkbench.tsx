@@ -34,7 +34,7 @@ export function SurfaceWorkbench({
   const color = getSurfaceRiskColor(surface.risk);
 
   return (
-    <PanelCard className={`zh-surface-workbench zh-surface-workbench--${color}`} styles={{ body: { padding: 24 } }}>
+    <PanelCard className={`zh-surface-workbench zh-surface-workbench--${color}`} bodyPadding={24}>
       <Row gutter={32}>
         <Col xs={24} lg={16}>
           <div className="zh-surface-workbench__head">

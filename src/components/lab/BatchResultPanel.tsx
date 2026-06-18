@@ -80,7 +80,7 @@ export function BatchResultPanel({ batch }: { batch: BatchCompareResult }) {
         size="small"
         bordered
       />
-      <Typography.Paragraph type="secondary" style={{ marginTop: 16, fontSize: 13 }}>
+      <Typography.Paragraph type="secondary" className="zh-note-text">
         * 批量运行会写入实验日志，评测报告页会自动统计这些运行记录，适合答辩时一键展示整体防护效果。
       </Typography.Paragraph>
     </PanelCard>

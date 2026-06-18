@@ -1,8 +1,52 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
+import net from 'node:net';
+import type { Plugin, ViteDevServer } from 'vite';
+
+const backendHost = '127.0.0.1';
+const backendPort = 8012;
+
+function isBackendOnline(timeoutMs = 250) {
+  return new Promise<boolean>((resolve) => {
+    const socket = net.createConnection({ host: backendHost, port: backendPort });
+    let settled = false;
+    const finish = (online: boolean) => {
+      if (settled) return;
+      settled = true;
+      socket.destroy();
+      resolve(online);
+    };
+
+    socket.setTimeout(timeoutMs);
+    socket.once('connect', () => finish(true));
+    socket.once('timeout', () => finish(false));
+    socket.once('error', () => finish(false));
+  });
+}
+
+function backendHealthFallbackPlugin(): Plugin {
+  return {
+    name: 'zhian-backend-health-fallback',
+    configureServer(server: ViteDevServer) {
+      server.middlewares.use('/api/health', async (request, response, next) => {
+        if (request.method !== 'GET' && request.method !== 'HEAD') {
+          next();
+          return;
+        }
+        if (await isBackendOnline()) {
+          next();
+          return;
+        }
+        response.statusCode = 200;
+        response.setHeader('Content-Type', 'application/json; charset=utf-8');
+        response.end(JSON.stringify({ ok: false, service: 'zhian-shao', offline: true }));
+      });
+    }
+  };
+}
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [backendHealthFallbackPlugin(), react()],
   test: {
     environment: 'jsdom',
     setupFiles: './src/test/setup.ts',
@@ -37,7 +81,7 @@ export default defineConfig({
   server: {
     port: 5178,
     proxy: {
-      '/api': 'http://127.0.0.1:8012'
+      '/api': `http://${backendHost}:${backendPort}`
     }
   }
 });

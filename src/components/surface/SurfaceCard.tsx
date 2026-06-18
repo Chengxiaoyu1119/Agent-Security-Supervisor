@@ -25,7 +25,6 @@ export function SurfaceCard({
       hoverable
       onClick={onSelect}
       className={`zh-surface-card${selected ? ' zh-surface-card--selected' : ''}`}
-      styles={{ body: { display: 'flex', flexDirection: 'column', height: '100%', padding: 16 } }}
     >
       <div className="zh-surface-card__head">
         <Typography.Text strong className="zh-text-lg">

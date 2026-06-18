@@ -127,7 +127,7 @@ export function ReportAttackEvaluationTab({ report, onOpenScenario }: ReportAtta
       >
         <div className="zh-column-stack">
           {report.surface_conclusions.conclusions.map((item, idx) => (
-            <div key={idx} style={{ padding: '16px 0', borderBottom: '1px solid var(--ant-color-border-secondary)' }}>
+            <div key={idx} className="zh-divided-list__item">
               <div className="zh-mb-8">
                 <Space>
                   <Typography.Text strong>{item.surface_name}</Typography.Text>

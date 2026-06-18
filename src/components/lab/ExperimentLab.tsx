@@ -8,7 +8,7 @@ export function ExperimentLab(props: ExperimentLabProps) {
   return (
     <Row gutter={[24, 24]} align="stretch">
       <Col xs={24} lg={8}>
-        <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', gap: 24 }}>
+        <div className="zh-lab-side-stack">
           <ExperimentControlPanel
             scenario={props.scenario}
             scenarios={props.scenarios}

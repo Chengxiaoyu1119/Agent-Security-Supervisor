@@ -39,16 +39,12 @@ export function SurfaceResearchMatrix({
           画像层把提示注入、工具劫持、数据泄露等攻击面，映射到队伍账号、赛题附件、提交物、私有榜单和训练平台会话。这样答辩时能讲清楚攻击从哪里进、碰到什么资产、由哪条策略拦截。
         </Typography.Paragraph>
         <Space size="large" className="zh-surface-matrix-hero__stats">
-          <Statistic value={displayedProfiles.length} suffix="类比赛对象" styles={{ content: { fontSize: 24 } }} />
-          <Statistic
-            value={scenarioCount || surfaces.length}
-            suffix="个关联剧本"
-            styles={{ content: { fontSize: 24 } }}
-          />
+          <Statistic value={displayedProfiles.length} suffix="类比赛对象" className="zh-surface-matrix-stat" />
+          <Statistic value={scenarioCount || surfaces.length} suffix="个关联剧本" className="zh-surface-matrix-stat" />
           <Statistic
             value={highRiskCount || surfaces.filter((surface) => ['critical', 'high'].includes(surface.risk)).length}
             suffix="个高风险对象"
-            styles={{ content: { fontSize: 24, color: 'var(--ant-color-error)' } }}
+            className="zh-surface-matrix-stat zh-surface-matrix-stat--danger"
           />
         </Space>
       </div>
@@ -56,14 +52,11 @@ export function SurfaceResearchMatrix({
       <Row gutter={[24, 24]} className="zh-surface-matrix-grid">
         {displayedProfiles.map((profile) => {
           let color = 'default';
-          let borderTone = 'var(--ant-color-border-secondary)';
           if (profile.risk === 'critical') {
             color = 'error';
-            borderTone = 'var(--ant-color-error-border)';
           }
           if (profile.risk === 'high') {
             color = 'warning';
-            borderTone = 'var(--ant-color-warning-border)';
           }
           if (profile.risk === 'medium') {
             color = 'processing';
@@ -73,12 +66,8 @@ export function SurfaceResearchMatrix({
             <Col xs={24} md={12} xl={8} key={profile.id}>
               <PanelCard
                 type="inner"
-                className="zh-surface-matrix-card"
-                style={{ borderColor: borderTone }}
+                className={`zh-surface-matrix-card zh-surface-matrix-card--${profile.risk}`}
                 hoverable
-                styles={{
-                  header: { borderBottom: `1px solid ${borderTone}`, background: 'var(--ant-color-fill-quaternary)' }
-                }}
                 title={
                   <div className="zh-surface-matrix-title">
                     <div>

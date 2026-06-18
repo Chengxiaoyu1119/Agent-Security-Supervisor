@@ -76,7 +76,7 @@ export function AuditLogDetail({ log, copied, onCopy }: AuditLogDetailProps) {
         {log.tool_output.output}
       </EvidenceCodeBlock>
 
-      <Flex justify="flex-end" style={{ marginTop: 16 }}>
+      <Flex justify="flex-end" className="zh-detail-actions">
         <UiButton icon={<Copy size={16} />} onClick={onCopy}>
           {copied ? '已复制' : '复制证据'}
         </UiButton>

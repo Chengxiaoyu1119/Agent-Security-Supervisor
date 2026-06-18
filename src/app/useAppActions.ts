@@ -29,7 +29,7 @@ type UseAppActionsOptions = {
   setAttackChainCompareResult: Dispatch<SetStateAction<AttackChainCompareResult | null>>;
   setRunning: Dispatch<SetStateAction<boolean>>;
   setApiNotice: Dispatch<SetStateAction<string>>;
-  refresh: () => Promise<void>;
+  refresh: () => Promise<unknown>;
   loadReport: () => Promise<void>;
 };
 

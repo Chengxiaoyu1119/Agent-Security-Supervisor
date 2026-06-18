@@ -6,11 +6,13 @@ import { UiTabs } from '../components/ui';
 
 export function Dashboard({
   overview,
+  apiAvailable,
   running,
   onSelectScenario,
   onBatchCompare
 }: {
   overview: Overview;
+  apiAvailable: boolean | null;
   running: boolean;
   onSelectScenario: (id: string) => void;
   onBatchCompare: (ids: string[], label: string) => void;
@@ -99,6 +101,12 @@ export function Dashboard({
         setSurfacePack(null);
         return;
       }
+      if (!apiAvailable) {
+        setSurfacePack(null);
+        setSurfacePackLoading(false);
+        setSurfacePackError('后端未连接，证据包接口暂不可用。');
+        return;
+      }
       setSurfacePackLoading(true);
       setSurfacePackError('');
       fetchSurfaceEvidencePack(activeSurfaceId)
@@ -117,12 +125,18 @@ export function Dashboard({
     return () => {
       ignore = true;
     };
-  }, [activeSurfaceId]);
+  }, [activeSurfaceId, apiAvailable]);
 
   useEffect(() => {
     let ignore = false;
     void Promise.resolve().then(() => {
       if (ignore) return;
+      if (!apiAvailable) {
+        setSurfacePackIndex(null);
+        setSurfacePackIndexLoading(false);
+        setSurfacePackIndexError('后端未连接，全量证据索引暂不可用。');
+        return;
+      }
       setSurfacePackIndexLoading(true);
       setSurfacePackIndexError('');
       fetchSurfaceEvidencePackIndex()
@@ -141,7 +155,7 @@ export function Dashboard({
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [apiAvailable]);
 
   const handleExportAllSurfacePacks = async () => {
     setAllPackExporting(true);

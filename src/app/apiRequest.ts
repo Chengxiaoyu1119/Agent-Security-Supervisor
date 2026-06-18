@@ -6,6 +6,9 @@ export type RequestOptions = {
 
 export type ApiErrorCode = 'http_error' | 'network_error' | 'timeout' | 'parse_error';
 
+const DEFAULT_TIMEOUT_MS = 15000;
+const DEFAULT_GET_RETRY = 1;
+
 type ApiErrorParams = {
   code: ApiErrorCode;
   path: string;
@@ -37,9 +40,17 @@ export function setAuthTokenProvider(provider: AuthTokenProvider | null) {
   authTokenProvider = provider;
 }
 
-async function buildRequestHeaders(headers: HeadersInit | undefined, options: RequestOptions) {
+function hasJsonBody(init: RequestInit | undefined) {
+  return Boolean(init?.body) && !(init?.body instanceof FormData);
+}
+
+async function buildRequestHeaders(
+  headers: HeadersInit | undefined,
+  init: RequestInit | undefined,
+  options: RequestOptions
+) {
   const mergedHeaders = new Headers(headers);
-  if (!mergedHeaders.has('Content-Type')) {
+  if (hasJsonBody(init) && !mergedHeaders.has('Content-Type')) {
     mergedHeaders.set('Content-Type', 'application/json');
   }
   if (!options.skipAuth && authTokenProvider && !mergedHeaders.has('Authorization')) {
@@ -101,18 +112,19 @@ async function parseJsonResponse<T>(response: Response, path: string): Promise<T
 }
 
 export async function request<T>(path: string, init?: RequestInit, options: RequestOptions = {}): Promise<T> {
-  const attempts = Math.max(1, (options.retry ?? 0) + 1);
+  const attempts = Math.max(1, (options.retry ?? DEFAULT_GET_RETRY) + 1);
+  const timeoutMs = options.timeoutMs ?? DEFAULT_TIMEOUT_MS;
   let lastError: ApiError | undefined;
 
   for (let attempt = 0; attempt < attempts; attempt += 1) {
-    const controller = options.timeoutMs ? new AbortController() : undefined;
-    const timeoutId = controller ? window.setTimeout(() => controller.abort(), options.timeoutMs) : undefined;
+    const controller = timeoutMs > 0 ? new AbortController() : undefined;
+    const timeoutId = controller ? window.setTimeout(() => controller.abort(), timeoutMs) : undefined;
     const { headers, signal, ...requestInit } = init ?? {};
 
     try {
       const response = await fetch(path, {
         ...requestInit,
-        headers: await buildRequestHeaders(headers, options),
+        headers: await buildRequestHeaders(headers, init, options),
         signal: controller?.signal ?? signal
       });
       if (!response.ok) {

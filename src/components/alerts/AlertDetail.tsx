@@ -81,7 +81,7 @@ export function AlertDetail({ alert, copied, onCopy }: AlertDetailProps) {
         {alert.tool_output?.output ?? '未执行或暂无输出。'}
       </EvidenceCodeBlock>
 
-      <Flex justify="flex-end" style={{ marginTop: 16 }}>
+      <Flex justify="flex-end" className="zh-detail-actions">
         <UiButton icon={<Copy size={16} />} onClick={onCopy}>
           {copied ? '已复制' : '复制证据'}
         </UiButton>

@@ -1,30 +1,23 @@
-from fastapi import APIRouter, HTTPException, Response, Body
-from pydantic import BaseModel
 from typing import Any
-from .. import data
-from ..database import latest_runs, load_run, latest_audit_logs
-from ..model_adapter import provider_status
-from ..agents import *
-from ..attack_chains import *
-from ..supervisor import *
-from ..events import *
-from ..readiness import *
-from ..roadmap import *
-from ..demo_drill import *
-from ..calibration import *
-from ..ablation import *
-from ..assessment import *
-from ..services.package_service import *
-from ..openclaw_adapter import *
-from ..surface_pack import *
-from ..benign import *
-from ..benign_workflows import *
-from ..datasets import *
-from ..approvals import *
-from ..integrity import *
-from ..main_models import *
 
-router = APIRouter()
+from fastapi import APIRouter, Body, Depends, HTTPException, Response
+
+from ..auth import require_api_token
+from ..events import evaluate_agent_event
+from ..external_agent_demo import run_minimal_external_agent_demo
+from ..main_models import AgentToolEvent, BatchAgentToolEvents
+from ..openclaw_adapter import build_openclaw_hook_example, build_openclaw_integration_bundle
+from ..openclaw_plugin_package import (
+    build_openclaw_plugin_package_markdown,
+    build_openclaw_plugin_package_summary,
+    build_openclaw_plugin_validation_markdown,
+    validate_openclaw_plugin_package,
+    write_openclaw_plugin_package,
+    write_openclaw_plugin_validation_report
+)
+from ..services.package_service import build_competition_package
+
+router = APIRouter(dependencies=[Depends(require_api_token)])
 
 @router.get("/api/integrations/openclaw/schema")
 def openclaw_schema() -> dict:

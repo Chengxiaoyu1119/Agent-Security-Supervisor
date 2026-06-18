@@ -57,7 +57,7 @@ export function ScenarioLibrary({
             </Space>
           }
           variant="borderless"
-          styles={{ body: { padding: 0 } }}
+          bodyPadding={0}
         >
           <div className="zh-filter-panel">
             <UiInput
@@ -98,21 +98,11 @@ export function ScenarioLibrary({
                   <div
                     key={scenario.id}
                     onClick={() => onSelect(scenario.id)}
-                    style={{
-                      padding: '12px 16px',
-                      cursor: 'pointer',
-                      background: selected === scenario.id ? 'var(--ant-color-primary-bg)' : 'transparent',
-                      borderLeft:
-                        selected === scenario.id ? '3px solid var(--ant-color-primary)' : '3px solid transparent',
-                      borderBottom: '1px solid var(--ant-color-border-secondary)'
-                    }}
+                    className={`zh-selectable-list-item${selected === scenario.id ? ' zh-selectable-list-item--active' : ''}`}
                   >
                     <div>
                       <div className="zh-split-row">
-                        <Typography.Text
-                          strong
-                          style={{ color: selected === scenario.id ? 'var(--ant-color-primary)' : 'inherit' }}
-                        >
+                        <Typography.Text strong className={selected === scenario.id ? 'zh-text-primary-active' : ''}>
                           {scenario.title}
                         </Typography.Text>
                         <LabelTag color={color} className="zh-mr-0">
@@ -155,16 +145,13 @@ export function ScenarioLibrary({
             variant="borderless"
           >
             <div
-              style={{
-                marginBottom: 24,
-                padding: 16,
-                background: active.severity === 'critical' ? 'var(--ant-color-error-bg)' : 'var(--ant-color-info-bg)',
-                borderRadius: 8
-              }}
+              className={`zh-risk-summary ${
+                active.severity === 'critical' ? 'zh-risk-summary--critical' : 'zh-risk-summary--info'
+              }`}
             >
               <Typography.Text
                 strong
-                style={{ color: active.severity === 'critical' ? 'var(--ant-color-error)' : 'inherit', marginRight: 8 }}
+                className={`zh-mr-8 ${active.severity === 'critical' ? 'zh-risk-summary__label--critical' : ''}`}
               >
                 {riskLabel[active.severity]}风险
               </Typography.Text>

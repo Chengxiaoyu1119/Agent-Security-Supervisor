@@ -1,30 +1,14 @@
-from fastapi import APIRouter, HTTPException, Response, Body
-from pydantic import BaseModel
-from typing import Any
-from .. import data
-from ..database import latest_runs, load_run, latest_audit_logs
-from ..model_adapter import provider_status
-from ..agents import *
-from ..attack_chains import *
-from ..supervisor import *
-from ..events import *
-from ..readiness import *
-from ..roadmap import *
-from ..demo_drill import *
-from ..calibration import *
-from ..ablation import *
-from ..assessment import *
-from ..services.package_service import *
-from ..openclaw_adapter import *
-from ..surface_pack import *
-from ..benign import *
-from ..benign_workflows import *
-from ..datasets import *
-from ..approvals import *
-from ..integrity import *
-from ..main_models import *
+from fastapi import APIRouter, Depends, HTTPException
 
-router = APIRouter()
+from ..agents import batch_compare_scenarios, compare_scenario, run_scenario
+from ..auth import require_api_token
+from ..attack_chains import compare_attack_chain, list_attack_chains, run_attack_chain, write_attack_chain_report
+from ..data import get_scenarios
+from ..database import load_run
+from ..integrity import verify_audit_hashes
+from ..main_models import AttackChainRunRequest, BatchCompareRequest, RunRequest
+
+router = APIRouter(dependencies=[Depends(require_api_token)])
 
 @router.get("/api/scenarios")
 def scenarios() -> list[dict]:

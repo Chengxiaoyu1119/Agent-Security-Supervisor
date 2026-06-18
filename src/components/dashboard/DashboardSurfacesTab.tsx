@@ -42,7 +42,7 @@ export function DashboardSurfacesTab({
 }: DashboardSurfacesTabProps) {
   return (
     <div className="zh-page-stack zh-mt-8">
-      <PanelCard variant="borderless" styles={{ body: { padding: '16px 24px' } }}>
+      <PanelCard variant="borderless" bodyPadding="16px 24px">
         <ActionRow
           content={
             <div className="zh-toolbar-controls">
@@ -50,13 +50,13 @@ export function DashboardSurfacesTab({
                 placeholder="名称、入口、资产、检测信号"
                 value={surfaceQuery}
                 onChange={(e) => setSurfaceQuery(e.target.value)}
-                style={{ width: 240 }}
+                className="zh-control-240"
                 prefix={<Typography.Text type="secondary">搜索</Typography.Text>}
               />
               <UiSelect
                 value={riskFilter}
                 onChange={setRiskFilter}
-                style={{ width: 160 }}
+                className="zh-control-160"
                 options={['全部', 'critical', 'high', 'medium', 'low'].map((risk) => ({
                   label: risk === '全部' ? '全部风险' : riskLabel[risk],
                   value: risk
@@ -83,7 +83,7 @@ export function DashboardSurfacesTab({
 
       <Row gutter={24}>
         <Col xs={24} lg={8}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div className="zh-column-stack zh-gap-16">
             {filteredSurfaces.map((surface) => (
               <SurfaceCard
                 key={surface.id}
@@ -94,7 +94,7 @@ export function DashboardSurfacesTab({
               />
             ))}
             {!filteredSurfaces.length && (
-              <Typography.Text type="secondary" style={{ textAlign: 'center', padding: 48 }}>
+              <Typography.Text type="secondary" className="zh-text-block zh-text-center zh-p-48">
                 没有匹配的攻击面。
               </Typography.Text>
             )}
@@ -114,7 +114,7 @@ export function DashboardSurfacesTab({
             />
           ) : (
             <PanelCard variant="borderless">
-              <div style={{ textAlign: 'center', padding: 48 }}>
+              <div className="zh-text-center zh-p-48">
                 <Typography.Text type="secondary">暂无攻击面数据。</Typography.Text>
               </div>
             </PanelCard>

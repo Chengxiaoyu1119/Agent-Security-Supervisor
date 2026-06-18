@@ -139,7 +139,7 @@ export function ReportPanel({
           ]}
         />
       ) : (
-        <PanelCard variant="borderless" style={{ textAlign: 'center', padding: 64 }}>
+        <PanelCard variant="borderless" className="zh-centered-panel">
           <Typography.Text type="secondary">正在加载报告...</Typography.Text>
         </PanelCard>
       )}

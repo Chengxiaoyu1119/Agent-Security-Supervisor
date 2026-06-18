@@ -17,22 +17,11 @@ export function SettingsBasicsTab({ overview }: SettingsBasicsTabProps) {
               <Typography.Text strong className="zh-text-block">
                 {model.provider}
               </Typography.Text>
-              <Typography.Text type="secondary" style={{ fontSize: 13, display: 'block', marginBottom: 4 }}>
+              <Typography.Text type="secondary" className="zh-text-sm zh-text-block zh-mb-4">
                 {model.model}
               </Typography.Text>
               <div className="zh-mb-8">
-                <LabelTag
-                  variant="filled"
-                  color="processing"
-                  style={{
-                    fontFamily: 'monospace',
-                    whiteSpace: 'normal',
-                    wordBreak: 'break-all',
-                    display: 'inline-block',
-                    padding: '2px 6px',
-                    lineHeight: 1.4
-                  }}
-                >
+                <LabelTag variant="filled" color="processing" className="zh-code-tag">
                   {model.endpoint ?? model.mode}
                 </LabelTag>
               </div>
@@ -47,24 +36,14 @@ export function SettingsBasicsTab({ overview }: SettingsBasicsTabProps) {
       <PanelCard title="赛题成果对齐" type="inner">
         <div className="zh-column-stack">
           {competitionCapabilityRows.map((item, idx) => (
-            <div
-              key={idx}
-              style={{
-                padding: '16px 0',
-                borderBottom:
-                  idx === competitionCapabilityRows.length - 1 ? 'none' : '1px solid var(--ant-color-border-secondary)'
-              }}
-            >
+            <div key={idx} className="zh-divided-list__item">
               <div>
                 <Typography.Text strong>{item.requirement}</Typography.Text>
               </div>
-              <div style={{ marginTop: 8 }}>
+              <div className="zh-mt-8">
                 <Space orientation="vertical" size={2} className="zh-full-width">
                   <Typography.Text type="secondary">{item.implementation}</Typography.Text>
-                  <Typography.Text
-                    type="secondary"
-                    style={{ fontFamily: 'monospace', fontSize: 12, wordBreak: 'break-all' }}
-                  >
+                  <Typography.Text type="secondary" className="zh-code-sm">
                     {item.evidence}
                   </Typography.Text>
                 </Space>

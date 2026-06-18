@@ -23,7 +23,7 @@ function getDecisionColor(decision: AlertItem['decision']) {
 
 export function AlertList({ alerts, selectedAlertId, onSelectAlert }: AlertListProps) {
   return (
-    <div style={{ maxHeight: 600, overflowY: 'auto', display: 'flex', flexDirection: 'column' }}>
+    <div className="zh-scroll-list zh-scroll-list--fixed zh-scroll-list--stack">
       {alerts.map((alert) => {
         const selected = selectedAlertId === alert.id;
 
@@ -31,22 +31,16 @@ export function AlertList({ alerts, selectedAlertId, onSelectAlert }: AlertListP
           <div
             key={alert.id}
             onClick={() => onSelectAlert(alert.id)}
-            style={{
-              cursor: 'pointer',
-              background: selected ? 'var(--ant-color-primary-bg)' : 'transparent',
-              padding: '12px 16px',
-              borderLeft: selected ? '3px solid var(--ant-color-primary)' : '3px solid transparent',
-              borderBottom: '1px solid var(--ant-color-border-secondary)',
-              display: 'flex',
-              gap: 16
-            }}
+            className={`zh-selectable-list-item zh-selectable-list-item--flex${
+              selected ? ' zh-selectable-list-item--active' : ''
+            }`}
           >
-            <div style={{ paddingTop: 2 }}>
+            <div className="zh-list-icon-offset">
               <AlertTriangle size={20} color={getAlertIconColor(alert)} />
             </div>
             <div className="zh-flex-spacer">
               <Space>
-                <Typography.Text strong style={{ color: selected ? 'var(--ant-color-primary)' : 'inherit' }}>
+                <Typography.Text strong className={selected ? 'zh-text-primary-active' : undefined}>
                   {alert.title}
                 </Typography.Text>
                 <LabelTag variant="filled" color={getDecisionColor(alert.decision)}>
@@ -54,7 +48,7 @@ export function AlertList({ alerts, selectedAlertId, onSelectAlert }: AlertListP
                 </LabelTag>
               </Space>
               <div className="zh-mt-4">
-                <Typography.Paragraph type="secondary" ellipsis={{ rows: 2 }} style={{ marginBottom: 4 }}>
+                <Typography.Paragraph type="secondary" ellipsis={{ rows: 2 }} className="zh-mb-4">
                   {alert.evidence}
                 </Typography.Paragraph>
                 <Space wrap size={[0, 4]}>

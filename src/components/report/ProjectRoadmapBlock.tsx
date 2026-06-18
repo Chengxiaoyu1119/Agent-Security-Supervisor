@@ -95,9 +95,13 @@ export function ProjectRoadmapBlock({ roadmap }: { roadmap: ProjectRoadmap }) {
                 key={item.id}
                 size="small"
                 type="inner"
-                style={{
-                  borderLeft: `3px solid var(--ant-color-${item.priority === 'P0' ? 'error' : item.priority === 'P1' ? 'warning' : 'info'})`
-                }}
+                className={
+                  item.priority === 'P0'
+                    ? 'zh-roadmap-card--p0'
+                    : item.priority === 'P1'
+                      ? 'zh-roadmap-card--p1'
+                      : 'zh-roadmap-card--p2'
+                }
               >
                 <div className="zh-split-row zh-mb-4">
                   <Typography.Text strong>{item.title}</Typography.Text>

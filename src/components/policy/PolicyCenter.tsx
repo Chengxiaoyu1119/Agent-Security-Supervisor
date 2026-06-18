@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Row, Col, Typography, Switch, Space, Descriptions, Flex } from 'antd';
 import { updatePolicyEnabled } from '../../api';
 import type { Policy } from '../../types';
@@ -21,13 +21,26 @@ export function PolicyCenter({
     () => new Set(policies.map((policy) => policy.layer).filter(Boolean)).size,
     [policies]
   );
+  const [savingPolicyId, setSavingPolicyId] = useState('');
+  const [policyError, setPolicyError] = useState('');
 
-  function togglePolicy(id: string) {
+  async function togglePolicy(id: string) {
     const current = policies.find((policy) => policy.id === id);
     if (!current) return;
     const enabled = !current.enabled;
+    const previousPolicies = policies;
+    setPolicyError('');
+    setSavingPolicyId(id);
     setPolicies(policies.map((policy) => (policy.id === id ? { ...policy, enabled } : policy)));
-    updatePolicyEnabled(id, enabled).catch(() => undefined);
+    try {
+      const savedPolicy = await updatePolicyEnabled(id, enabled);
+      setPolicies(previousPolicies.map((policy) => (policy.id === id ? savedPolicy : policy)));
+    } catch {
+      setPolicies(previousPolicies);
+      setPolicyError('策略状态保存失败，页面已恢复到保存前状态。');
+    } finally {
+      setSavingPolicyId('');
+    }
   }
 
   return (
@@ -42,6 +55,8 @@ export function PolicyCenter({
           </Typography.Text>
         </Space>
       </Flex>
+
+      {policyError ? <UiAlert type="error" title={policyError} showIcon /> : null}
 
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12} md={6}>
@@ -67,45 +82,39 @@ export function PolicyCenter({
           <Col xs={24} sm={24} md={24} lg={12} xl={12} xxl={8} key={policy.id}>
             <PanelCard
               variant="borderless"
-              style={{
-                height: '100%',
-                opacity: policy.enabled ? 1 : 0.6,
-                display: 'flex',
-                flexDirection: 'column',
-                transition: 'all 0.3s ease'
-              }}
-              styles={{ body: { flex: 1, display: 'flex', flexDirection: 'column' } }}
+              className={`zh-policy-card${policy.enabled ? '' : ' zh-policy-card--disabled'}`}
             >
-              <div
-                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}
-              >
+              <div className="zh-policy-card__head">
                 <Space align="start">
                   <DecisionPill decision={policy.decision} />
                   <div className="zh-column-stack">
-                    <Typography.Text strong style={{ fontSize: 16, lineHeight: 1.2 }}>
+                    <Typography.Text strong className="zh-policy-card__title">
                       {policy.name}
                     </Typography.Text>
-                    <Typography.Text type="secondary" style={{ fontSize: 12, marginTop: 4 }}>
+                    <Typography.Text type="secondary" className="zh-policy-card__id">
                       {policy.id}
                     </Typography.Text>
                   </div>
                 </Space>
-                <Switch checked={policy.enabled} onChange={() => togglePolicy(policy.id)} size="small" />
+                <Switch
+                  checked={policy.enabled}
+                  disabled={Boolean(savingPolicyId)}
+                  loading={savingPolicyId === policy.id}
+                  onChange={() => void togglePolicy(policy.id)}
+                  size="small"
+                />
               </div>
 
-              <Typography.Paragraph type="secondary" style={{ marginBottom: 16, fontSize: 13, flex: 1 }}>
+              <Typography.Paragraph type="secondary" className="zh-policy-card__description">
                 {policy.description}
               </Typography.Paragraph>
 
               <div
-                style={{
-                  background: 'var(--ant-color-fill-quaternary)',
-                  padding: 12,
-                  borderRadius: 8,
-                  marginBottom: policy.risk_controls?.length ? 16 : policy.disable_impact ? 16 : 0
-                }}
+                className={`zh-policy-card__meta${
+                  policy.risk_controls?.length || policy.disable_impact ? ' zh-policy-card__meta--spaced' : ''
+                }`}
               >
-                <Descriptions size="small" column={2} style={{ marginBottom: 0 }}>
+                <Descriptions size="small" column={2} className="zh-description-flush">
                   <Descriptions.Item
                     label={
                       <Typography.Text type="secondary" className="zh-text-meta">
@@ -138,7 +147,7 @@ export function PolicyCenter({
               </div>
 
               {policy.risk_controls?.length ? (
-                <Space size={[0, 8]} wrap style={{ marginBottom: policy.disable_impact ? 16 : 0 }}>
+                <Space size={[0, 8]} wrap className={policy.disable_impact ? 'zh-mb-16' : undefined}>
                   {policy.risk_controls.map((item) => (
                     <LabelTag key={item} variant="filled" color="processing">
                       {item}
@@ -148,12 +157,7 @@ export function PolicyCenter({
               ) : null}
 
               {policy.disable_impact && (
-                <UiAlert
-                  type="warning"
-                  title={`关闭影响: ${policy.disable_impact}`}
-                  showIcon
-                  style={{ marginTop: 'auto' }}
-                />
+                <UiAlert type="warning" title={`关闭影响: ${policy.disable_impact}`} showIcon className="zh-mt-auto" />
               )}
             </PanelCard>
           </Col>

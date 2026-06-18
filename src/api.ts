@@ -35,6 +35,15 @@ import { request } from './app/apiRequest';
 export { ApiError, setAuthTokenProvider } from './app/apiRequest';
 export type { ApiErrorCode, RequestOptions } from './app/apiRequest';
 
+export async function fetchHealth(): Promise<boolean> {
+  try {
+    const health = await request<{ ok: boolean }>('/api/health', undefined, { retry: 0, timeoutMs: 5000 });
+    return health.ok === true;
+  } catch {
+    return false;
+  }
+}
+
 export async function fetchOverview(): Promise<Overview> {
   try {
     return await request<Overview>('/api/overview');

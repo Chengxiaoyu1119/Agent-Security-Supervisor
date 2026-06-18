@@ -66,29 +66,18 @@ export function AnomalyCalibrationBlock({ calibration }: { calibration: AnomalyC
                 key={item.threshold}
                 size="small"
                 type="inner"
-                style={{
-                  borderLeft: item.threshold === selected ? '3px solid var(--ant-color-primary)' : 'none',
-                  background: item.threshold === selected ? 'var(--ant-color-primary-bg)' : undefined
-                }}
+                className={item.threshold === selected ? 'zh-threshold-card--selected' : ''}
               >
                 <Row align="middle">
                   <Col span={4}>
                     <Typography.Text strong>{item.threshold}</Typography.Text>
                   </Col>
                   <Col span={14}>
-                    <div
-                      style={{
-                        display: 'flex',
-                        gap: 4,
-                        height: 8,
-                        background: 'var(--ant-color-fill-secondary)',
-                        borderRadius: 4,
-                        overflow: 'hidden'
-                      }}
-                    >
-                      <div style={{ width: `${item.attack_recall_rate}%`, background: 'var(--ant-color-info)' }} />
+                    <div className="zh-threshold-bar">
+                      <div className="zh-threshold-bar__recall" style={{ width: `${item.attack_recall_rate}%` }} />
                       <div
-                        style={{ width: `${item.benign_false_alarm_rate}%`, background: 'var(--ant-color-warning)' }}
+                        className="zh-threshold-bar__false-alarm"
+                        style={{ width: `${item.benign_false_alarm_rate}%` }}
                       />
                     </div>
                   </Col>

@@ -11,11 +11,11 @@ export function ComparisonPanel({ comparison }: { comparison: CompareResult }) {
     <PanelCard type="inner" title="对比结果分析" className="zh-mt-24">
       <Row gutter={24} align="middle">
         <Col span={11}>
-          <PanelCard variant="borderless" style={{ background: 'var(--ant-color-error-bg)' }}>
+          <PanelCard variant="borderless" className="zh-compare-card--danger">
             <Typography.Text type="secondary" className="zh-text-block">
               无防护复现
             </Typography.Text>
-            <Typography.Title level={4} style={{ color: 'var(--ant-color-error)', marginTop: 8 }}>
+            <Typography.Title level={4} className="zh-compare-title zh-compare-title--danger">
               {before.attack_success ? '攻击成功' : '未达成风险'}
             </Typography.Title>
             <Typography.Paragraph className="zh-text-body">
@@ -32,11 +32,11 @@ export function ComparisonPanel({ comparison }: { comparison: CompareResult }) {
           </Typography.Title>
         </Col>
         <Col span={11}>
-          <PanelCard variant="borderless" style={{ background: 'var(--ant-color-success-bg)' }}>
+          <PanelCard variant="borderless" className="zh-compare-card--success">
             <Typography.Text type="secondary" className="zh-text-block">
               有防护验证
             </Typography.Text>
-            <Typography.Title level={4} style={{ color: 'var(--ant-color-success)', marginTop: 8 }}>
+            <Typography.Title level={4} className="zh-compare-title zh-compare-title--success">
               {after.attack_success ? '仍需加固' : '风险已控制'}
             </Typography.Title>
             <Typography.Paragraph className="zh-text-body">

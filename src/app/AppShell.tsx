@@ -121,7 +121,7 @@ export function AppShell({
           placement="left"
           onClose={onCloseDrawer}
           open={drawerVisible}
-          styles={{ body: { padding: 0 } }}
+          classNames={{ body: 'zh-drawer-body-flush' }}
           size="default"
         >
           <Menu mode="inline" theme={theme} selectedKeys={[page]} className="zh-app-menu" items={menuItems} />

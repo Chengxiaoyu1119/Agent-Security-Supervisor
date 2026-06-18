@@ -23,8 +23,7 @@ export function ExperimentResultPanel({ result, compareResult, batchResult }: Ex
         </Space>
       }
       variant="borderless"
-      style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
-      styles={{ body: { flex: 1, display: 'flex', flexDirection: 'column' } }}
+      className="zh-lab-result-card"
     >
       {result ? (
         <Space orientation="vertical" size="large" className="zh-full-width">
@@ -57,16 +56,7 @@ export function ExperimentResultPanel({ result, compareResult, batchResult }: Ex
           {batchResult && <BatchResultPanel batch={batchResult} />}
         </Space>
       ) : (
-        <div
-          style={{
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'var(--ant-color-text-description)',
-            padding: 64
-          }}
-        >
+        <div className="zh-result-empty">
           <Typography.Text type="secondary">暂无实验结果。请点击左侧运行按钮开始测试。</Typography.Text>
         </div>
       )}

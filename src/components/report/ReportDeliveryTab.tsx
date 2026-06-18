@@ -76,11 +76,7 @@ export function ReportDeliveryTab({
           {packageError && <UiAlert type="error" title={packageError} className="zh-mb-24" />}
 
           {submissionPackage && (
-            <PanelCard
-              type="inner"
-              style={{ marginBottom: 24, background: 'var(--ant-color-success-bg)' }}
-              variant="borderless"
-            >
+            <PanelCard type="inner" className="zh-success-panel zh-mb-24" variant="borderless">
               <Descriptions size="small" column={{ xs: 1, sm: 2, md: 4 }}>
                 <Descriptions.Item label="提交包目录">
                   <Typography.Text code>{submissionPackage.package_dir}</Typography.Text>
@@ -146,7 +142,7 @@ export function ReportDeliveryTab({
                     </UiButton>
                   ]}
                 >
-                  <Typography.Paragraph type="secondary" style={{ minHeight: 44 }}>
+                  <Typography.Paragraph type="secondary" className="zh-min-h-44">
                     {file.description}
                   </Typography.Paragraph>
                   <Typography.Text code>{file.filename}</Typography.Text>
@@ -163,17 +159,8 @@ export function ReportDeliveryTab({
         >
           <div className="zh-column-stack">
             {competitionPackage.checklist.map((item, idx) => (
-              <div
-                key={idx}
-                style={{
-                  padding: '12px 0',
-                  borderBottom: '1px solid var(--ant-color-border-secondary)',
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: 12
-                }}
-              >
-                <div style={{ paddingTop: 2 }}>
+              <div key={idx} className="zh-checklist-item">
+                <div className="zh-pt-2">
                   <UiBadge status={item.status === '满足' ? 'success' : 'processing'} text={item.status} />
                 </div>
                 <div className="zh-flex-spacer">

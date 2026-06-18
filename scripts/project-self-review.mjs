@@ -131,24 +131,25 @@ const stylesText = readText('src/styles.css');
 const visualText = readText('src/视觉系统.css');
 const tokenText = readText('src/design/tokens.css');
 const dataText = readText('backend/zhian/data.py');
-const fallbackText = readText('src/fallback.ts');
+const scenarioConfig = loadJson('backend/zhian/config/scenarios.json') ?? [];
+const studentProfileConfig = loadJson('backend/zhian/config/student_competition_attack_map.json') ?? [];
+const attackChainSourceText = readText('backend/zhian/attack_chains.py');
 const readmeText = readText('README.md');
 const architectureText = readText('PROJECT_ARCHITECTURE.md');
-const deliveryGuideText = readText('docs/比赛交付材料包说明.md');
-const selfReviewRecordText = readText('docs/多Agent自审优化闭环报告-20260609.md');
-const competitionResearchText = readText('docs/命题挑战赛调研摘要.md');
+const deliveryGuideText = readText('docs/Coding/比赛交付材料包说明.md');
+const selfReviewRecordText = readText('docs/Coding/多Agent自审优化闭环报告-20260609.md');
+const competitionResearchText = readText('docs/Coding/命题挑战赛调研摘要.md');
 
 const uiDir = path.join(root, 'src', 'components', 'ui');
-const uiComponents = fs.existsSync(uiDir) ? fs.readdirSync(uiDir).filter((name) => name.endsWith('.tsx')) : [];
+const uiComponents = fs.existsSync(uiDir)
+  ? fs.readdirSync(uiDir).filter((name) => name.endsWith('.tsx') && !name.endsWith('.test.tsx'))
+  : [];
 
 const readiness = loadJson('backend/sandbox/reports/赛前一键体检报告.json');
 const readinessPayload = readiness?.summary ? readiness : (readiness?.readiness ?? readiness);
 const blockers = readinessPayload?.blockers ?? [];
 const attackChains = loadJson('backend/sandbox/reports/组合攻击链评测.json');
 
-const profileBlock = dataText.includes('STUDENT_COMPETITION_ATTACK_MAP')
-  ? dataText.slice(dataText.indexOf('STUDENT_COMPETITION_ATTACK_MAP'), dataText.indexOf('POLICIES = ['))
-  : '';
 const studentProfileIds = [
   'team-account-portal',
   'challenge-materials',
@@ -163,18 +164,31 @@ const studentScenarioIds = [
   'JUDGE-SEED-001',
   'CAMPUS-SESSION-001'
 ];
-const studentProfileCount = studentProfileIds.filter((id) => profileBlock.includes(id)).length;
-const studentScenarioCount = studentScenarioIds.filter(
-  (id) => dataText.includes(id) && fallbackText.includes(id)
-).length;
-const attackChainCount = Array.isArray(attackChains?.chains) ? attackChains.chains.length : 0;
-const hasStudentPortalChain = JSON.stringify(attackChains ?? {}).includes('student-competition-portal-chain');
+const configuredProfileIds = new Set(
+  Array.isArray(studentProfileConfig) ? studentProfileConfig.map((item) => item?.id).filter(Boolean) : []
+);
+const configuredScenarioIds = new Set(
+  Array.isArray(scenarioConfig) ? scenarioConfig.map((item) => item?.id).filter(Boolean) : []
+);
+const sourceAttackChainIds = Array.from(
+  attackChainSourceText.matchAll(/^\s{8}"id": "([^"]+-chain)",$/gm),
+  (match) => match[1]
+);
+const reportAttackChains = Array.isArray(attackChains?.chains) ? attackChains.chains : [];
+const attackChainIds = reportAttackChains.length
+  ? reportAttackChains.map((item) => item.id).filter(Boolean)
+  : sourceAttackChainIds;
+const studentProfileCount = studentProfileIds.filter((id) => configuredProfileIds.has(id)).length;
+const studentScenarioCount = studentScenarioIds.filter((id) => configuredScenarioIds.has(id)).length;
+const attackChainCount = attackChainIds.length;
+const hasStudentPortalChain = attackChainIds.includes('student-competition-portal-chain');
 const domainResidualText = [
   readmeText,
   architectureText,
   competitionResearchText,
   dataText,
-  fallbackText,
+  JSON.stringify(scenarioConfig),
+  JSON.stringify(studentProfileConfig),
   appText
 ].join('\n');
 const misleadingDomainResidualCount = countMatches(
@@ -218,7 +232,12 @@ const checks = [
   {
     id: 'design-token-source',
     title: '设计 Token 源头',
-    status: tokenText.includes('--color-brand') && tokenText.includes('--shadow-card') ? 'passed' : 'failed',
+    status:
+      tokenText.includes('--zh-brand-primary') &&
+      tokenText.includes('--zh-shadow-panel') &&
+      tokenText.includes('--zh-radius-panel')
+        ? 'passed'
+        : 'failed',
     evidence: 'src/design/tokens.css 已建立颜色、间距、圆角、阴影和旧变量别名。'
   },
   {
@@ -243,7 +262,7 @@ const checks = [
     id: 'student-competition-profile-map',
     title: '学生比赛攻击面画像',
     status: studentProfileCount >= 5 ? 'passed' : 'warning',
-    evidence: `已识别 ${studentProfileCount}/5 类学生比赛对象画像：${studentProfileIds.filter((id) => profileBlock.includes(id)).join('、') || '暂无'}。`
+    evidence: `已识别 ${studentProfileCount}/5 类学生比赛对象画像：${studentProfileIds.filter((id) => configuredProfileIds.has(id)).join('、') || '暂无'}。`
   },
   {
     id: 'student-competition-scenarios',
@@ -332,9 +351,9 @@ const report = {
   },
   competition_domain: {
     student_profile_count: studentProfileCount,
-    student_profile_ids: studentProfileIds.filter((id) => profileBlock.includes(id)),
+    student_profile_ids: studentProfileIds.filter((id) => configuredProfileIds.has(id)),
     student_scenario_count: studentScenarioCount,
-    student_scenario_ids: studentScenarioIds.filter((id) => dataText.includes(id) && fallbackText.includes(id)),
+    student_scenario_ids: studentScenarioIds.filter((id) => configuredScenarioIds.has(id)),
     attack_chain_count: attackChainCount,
     has_student_portal_chain: hasStudentPortalChain,
     misleading_domain_residual_count: misleadingDomainResidualCount,
@@ -350,26 +369,12 @@ const report = {
   },
   screenshots,
   checks,
-  solved_this_round: [
-    '新增项目自审报告脚本，形成可重复运行的自审闭环。',
-    '新增 DecisionPill，统一安全决策标签渲染。',
-    '抽离运行证据组件 RunEvidenceStrip、RunAuditTimeline，降低 App.tsx 展示逻辑堆积。',
-    '抽离攻击面属性组件 SurfaceAttributeGroup，为后续按页面拆分铺路。',
-    '抽离攻击面证据索引 SurfaceEvidenceIndexBoard 和研究矩阵 SurfaceResearchMatrix，继续压缩主页面展示逻辑。',
-    '抽离攻击面卡片和工作台 SurfaceCard、SurfaceWorkbench，App.tsx 主文件继续降到 4000 行以内。',
-    '抽离攻击剧本库 ScenarioLibrary 和多 Agent 链路 AgentChain，App.tsx 主文件继续降到 3500 行以内。',
-    '抽离攻击复现实验室 ExperimentLab、ComparisonPanel、BatchResultPanel，App.tsx 主文件继续降到 3300 行以内。',
-    '新增组合攻击链后端模块、API、CLI 和前端工作台，把单点剧本串成多步红队路径。',
-    '抽离防御策略中心 PolicyCenter，新增策略影响矩阵、覆盖工具、攻击面和关闭影响说明。',
-    '补齐人工复核批准后的沙箱重放闭环，并在复核单中展示重放结果。',
-    '新增审计 hash 整链验证接口和前端验证入口，审计页可直接展示证据链有效性。',
-    '修复 readiness CLI 目录输出容错，用户传目录时自动写入默认报告文件名。',
-    '调整 Token 加载顺序、迁移根级颜色变量并收敛实验室空状态，CSS 硬编码颜色预算收紧到 690 以内。',
-    '保留设计 Token 和基础 UI 组件目录，后续页面改造有固定入口。',
-    '前端桌面和移动端治理截图已生成并纳入提交包。',
-    '新增学生比赛攻击面画像，覆盖队伍账号、赛题附件、提交物、私有榜单和训练平台会话。',
-    '新增 5 个学生比赛专项攻击剧本，并串成学生比赛平台对象组合攻击链。',
-    '自审脚本新增方向残留词、学生画像、专项剧本和组合链检查。'
+  current_baseline: [
+    `前端主入口 App.tsx 当前 ${fileInfo('src/App.tsx').lines} 行。`,
+    `基础 UI 组件 ${uiComponents.length} 个，目录由治理脚本约束。`,
+    `学生比赛对象画像 ${studentProfileCount}/5，专项剧本 ${studentScenarioCount}/5。`,
+    `组合攻击链 ${attackChainCount} 条，学生比赛平台对象链${hasStudentPortalChain ? '已存在' : '缺失'}。`,
+    `设计 Token 使用 ${tokenUsageCount} 次，历史 CSS 硬编码颜色 ${hardcodedColorCount} 处。`
   ],
   unresolved
 };
@@ -386,9 +391,9 @@ const lines = [
   '',
   ...report.self_review_agents.map((name) => `- ${name}`),
   '',
-  '## 本轮已解决',
+  '## 当前工程基线',
   '',
-  ...report.solved_this_round.map((item) => `- ${item}`),
+  ...report.current_baseline.map((item) => `- ${item}`),
   '',
   '## 自动检查结果',
   '',
