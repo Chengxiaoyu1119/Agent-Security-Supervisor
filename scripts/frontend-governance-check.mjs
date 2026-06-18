@@ -40,9 +40,36 @@ const colorPattern = /#[0-9a-fA-F]{3,8}|rgba?\(/g;
 const cssTokenPattern = /var\(--/g;
 const inlineStylePattern = /style=\{\{/g;
 const directAntdPrimitivePattern = /<(Button|Card|Tag|Badge|Progress|Alert|Table|Tabs|Select|Input)\b/g;
+const criticalAppLayoutSelectors = new Set([
+  '.zh-app-loading',
+  '.zh-app-loading__panel',
+  '.zh-app-logo',
+  '.zh-app-layout',
+  '.zh-app-sider',
+  '.zh-app-brand',
+  '.zh-app-menu',
+  '.zh-app-header',
+  '.zh-main-content'
+]);
 
 function countMatches(text, pattern) {
   return (text.match(pattern) ?? []).length;
+}
+
+function countCssSelectorDefinitions(text, selectors) {
+  const counts = Object.fromEntries(Array.from(selectors, (selector) => [selector, 0]));
+  const withoutComments = text.replace(/\/\*[\s\S]*?\*\//g, '');
+  const selectorBlockPattern = /(?:^|})\s*([^{}]+)\{/g;
+
+  for (const match of withoutComments.matchAll(selectorBlockPattern)) {
+    for (const selector of match[1].split(',').map((item) => item.trim())) {
+      if (selector in counts) {
+        counts[selector] += 1;
+      }
+    }
+  }
+
+  return counts;
 }
 
 function readMaybe(relativePath) {
@@ -161,6 +188,10 @@ const directAntdPrimitiveOutsideUiCount = summary.reduce(
 );
 const antdPrimitiveWrapperCount = directAntdPrimitiveCount - directAntdPrimitiveOutsideUiCount;
 const tokenInfo = fileInfo('src/design/tokens.css');
+const appLayoutSelectorCounts = countCssSelectorDefinitions(readMaybe('src/styles.css'), criticalAppLayoutSelectors);
+const duplicateAppLayoutSelectors = Object.entries(appLayoutSelectorCounts)
+  .filter(([, count]) => count > 1)
+  .map(([selector, count]) => ({ selector, count }));
 
 const uiComponentDir = path.join(root, 'src', 'components', 'ui');
 const uiComponentCount = fs.existsSync(uiComponentDir)
@@ -185,7 +216,8 @@ const budgets = {
   unexpected_src_entry_max: 0,
   unexpected_component_entry_max: 0,
   unexpected_page_entry_max: 0,
-  unexpected_design_entry_max: 0
+  unexpected_design_entry_max: 0,
+  duplicate_app_layout_selector_max: 0
 };
 
 const violations = [];
@@ -246,6 +278,13 @@ if (unexpectedPageEntries.length > budgets.unexpected_page_entry_max) {
 if (unexpectedDesignEntries.length > budgets.unexpected_design_entry_max) {
   violations.push(`Unexpected design entries: ${unexpectedDesignEntries.join(', ')}`);
 }
+if (duplicateAppLayoutSelectors.length > budgets.duplicate_app_layout_selector_max) {
+  violations.push(
+    `Duplicate app layout selectors: ${duplicateAppLayoutSelectors
+      .map((item) => `${item.selector} x${item.count}`)
+      .join(', ')}`
+  );
+}
 
 const warnings = [];
 if (inlineStyleCount > 0) {
@@ -274,6 +313,8 @@ const result = {
   unexpected_component_entries: unexpectedComponentEntries,
   unexpected_page_entries: unexpectedPageEntries,
   unexpected_design_entries: unexpectedDesignEntries,
+  app_layout_selector_counts: appLayoutSelectorCounts,
+  duplicate_app_layout_selectors: duplicateAppLayoutSelectors,
   oversized_source_files: oversizedSourceFiles,
   inline_style_hotspots: inlineStyleHotspots,
   largest_file: maxFile,
@@ -294,6 +335,7 @@ const result = {
     'Use Ant Design primitives directly inside src/components/ui only when creating reusable wrappers.',
     'Keep new colors in src/design/tokens.css and consume semantic variables.',
     'Keep src top-level entries within the documented pages/components/design structure.',
+    'Keep critical app layout selectors defined once in src/styles.css.',
     'Split App.tsx by page only after shared UI components are stable.',
     'Avoid adding new page-level CSS files unless they map to a clear feature boundary.'
   ]
