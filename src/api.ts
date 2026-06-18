@@ -31,31 +31,9 @@ import type {
   SurfaceEvidencePackWriteResult
 } from './types';
 import { fallbackOverview, fallbackPolicies, fallbackScenarios } from './fallback';
-
-type RequestOptions = {
-  timeoutMs?: number;
-};
-
-async function request<T>(path: string, init?: RequestInit, options: RequestOptions = {}): Promise<T> {
-  const controller = options.timeoutMs ? new AbortController() : undefined;
-  const timeoutId = controller ? window.setTimeout(() => controller.abort(), options.timeoutMs) : undefined;
-
-  try {
-    const response = await fetch(path, {
-      headers: { 'Content-Type': 'application/json' },
-      ...init,
-      signal: controller?.signal ?? init?.signal
-    });
-    if (!response.ok) {
-      throw new Error(await response.text());
-    }
-    return response.json() as Promise<T>;
-  } finally {
-    if (timeoutId !== undefined) {
-      window.clearTimeout(timeoutId);
-    }
-  }
-}
+import { request } from './app/apiRequest';
+export { ApiError, setAuthTokenProvider } from './app/apiRequest';
+export type { ApiErrorCode, RequestOptions } from './app/apiRequest';
 
 export async function fetchOverview(): Promise<Overview> {
   try {
@@ -177,7 +155,7 @@ export async function compareAttackChain(chainId: string): Promise<AttackChainCo
 }
 
 export async function fetchReport(): Promise<ReportData> {
-  return request<ReportData>('/api/report', undefined, { timeoutMs: 8000 });
+  return request<ReportData>('/api/report', undefined, { timeoutMs: 45000 });
 }
 
 export async function fetchAttackCaseDataset(): Promise<AttackCaseDataset> {

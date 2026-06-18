@@ -1,5 +1,5 @@
-import { Col, Row, Space, Table, Tag, Typography } from 'antd';
-import { MetricCard as Metric, SectionTitle, PanelCard } from '../ui';
+import { Col, Row, Space, Typography } from 'antd';
+import { LabelTag, MetricCard as Metric, PanelCard, SectionTitle, UiTable } from '../ui';
 import type { ReportData } from '../../types';
 
 type ReportNormalEvaluationTabProps = {
@@ -52,9 +52,9 @@ export function ReportNormalEvaluationTab({ report }: ReportNormalEvaluationTabP
                   title={
                     <Space>
                       <Typography.Text strong>{item.name}</Typography.Text>
-                      <Tag variant="filled" color={item.risk_exposed_count ? 'error' : 'success'}>
+                      <LabelTag variant="filled" color={item.risk_exposed_count ? 'error' : 'success'}>
                         {item.risk_exposed_count ? '出现暴露' : '有兜底'}
-                      </Tag>
+                      </LabelTag>
                     </Space>
                   }
                   className="zh-full-height"
@@ -62,7 +62,7 @@ export function ReportNormalEvaluationTab({ report }: ReportNormalEvaluationTabP
                   <Typography.Paragraph type="secondary" style={{ minHeight: 44 }}>
                     {item.hypothesis}
                   </Typography.Paragraph>
-                  <Space size="large" style={{ marginBottom: 16 }}>
+                  <Space size="large" className="zh-mb-16">
                     <div>
                       <Typography.Text type="secondary" className="zh-meta-block">
                         关闭策略
@@ -88,14 +88,14 @@ export function ReportNormalEvaluationTab({ report }: ReportNormalEvaluationTabP
                       <Typography.Text strong>{item.ablated.control_rate}%</Typography.Text>
                     </div>
                   </Space>
-                  <div style={{ marginBottom: 16 }}>
+                  <div className="zh-mb-16">
                     {item.disabled_policies.map((p) => (
-                      <Tag variant="filled" key={p}>
+                      <LabelTag variant="filled" key={p}>
                         {p}
-                      </Tag>
+                      </LabelTag>
                     ))}
                   </div>
-                  <Typography.Text type="secondary" style={{ fontSize: 13 }}>
+                  <Typography.Text type="secondary" className="zh-text-body">
                     {item.conclusion}
                   </Typography.Text>
                 </PanelCard>
@@ -141,7 +141,7 @@ export function ReportNormalEvaluationTab({ report }: ReportNormalEvaluationTabP
             <Metric label="匹配率" value={`${report.benign_evaluation.summary.expected_match_rate}%`} tone="green" />
           </Col>
         </Row>
-        <Table
+        <UiTable
           dataSource={report.benign_evaluation.cases}
           rowKey="id"
           size="small"
@@ -164,9 +164,9 @@ export function ReportNormalEvaluationTab({ report }: ReportNormalEvaluationTabP
               title: '误报',
               key: 'is_false_positive',
               render: (_, r) => (
-                <Tag variant="filled" color={r.is_false_positive ? 'error' : 'success'}>
+                <LabelTag variant="filled" color={r.is_false_positive ? 'error' : 'success'}>
                   {r.is_false_positive ? '是' : '否'}
-                </Tag>
+                </LabelTag>
               )
             },
             {
@@ -240,18 +240,18 @@ export function ReportNormalEvaluationTab({ report }: ReportNormalEvaluationTabP
                   <div>
                     <Typography.Text strong>{workflow.title}</Typography.Text>
                   </div>
-                  <div style={{ marginTop: 4 }}>
+                  <div className="zh-mt-4">
                     <Typography.Text type="secondary">{workflow.business_purpose}</Typography.Text>
                   </div>
                 </div>
                 <Space wrap>
-                  <Tag variant="filled" color={workflow.passed ? 'success' : 'error'}>
+                  <LabelTag variant="filled" color={workflow.passed ? 'success' : 'error'}>
                     {workflow.passed ? '通过' : '需复核'}
-                  </Tag>
-                  <Tag variant="filled">
+                  </LabelTag>
+                  <LabelTag variant="filled">
                     {workflow.step_count} 步 / 控制 {workflow.controlled_count}
-                  </Tag>
-                  <Tag variant="filled">{workflow.audit_chain_valid ? 'hash 有效' : 'hash 异常'}</Tag>
+                  </LabelTag>
+                  <LabelTag variant="filled">{workflow.audit_chain_valid ? 'hash 有效' : 'hash 异常'}</LabelTag>
                 </Space>
               </div>
             ))}

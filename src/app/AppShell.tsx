@@ -1,0 +1,158 @@
+import { type ReactNode, Suspense, useEffect, useMemo } from 'react';
+import { ConfigProvider, Drawer, Layout, Menu, Space, Spin, Typography, theme as antdTheme } from 'antd';
+import { Activity, Menu as MenuIcon, Moon, Play, Sun } from 'lucide-react';
+import { UiAlert, UiButton } from '../components/ui';
+import { navItems, type PageKey } from './navigation';
+
+const { Sider, Header, Content } = Layout;
+const { darkAlgorithm, defaultAlgorithm } = antdTheme;
+
+export type AppTheme = 'light' | 'dark';
+
+type AppShellProps = {
+  page: PageKey;
+  theme: AppTheme;
+  drawerVisible: boolean;
+  apiNotice: string;
+  children: ReactNode;
+  onPageChange: (page: PageKey) => void;
+  onThemeChange: (theme: AppTheme) => void;
+  onRefresh: () => void;
+  onOpenDrawer: () => void;
+  onCloseDrawer: () => void;
+  onOpenLab: () => void;
+};
+
+function PageFallback() {
+  return (
+    <div className="zh-page-loading">
+      <Spin size="small" />
+    </div>
+  );
+}
+
+export function AppLoading() {
+  return (
+    <div className="zh-app-loading">
+      <div className="zh-app-loading__panel">
+        <img src="/favicon.svg" alt="logo" className="zh-app-logo" />
+        <div>
+          <div className="zh-app-loading__title">智安哨</div>
+          <div className="zh-app-loading__text">正在加载工作台...</div>
+        </div>
+        <div className="zh-app-loading__spin">
+          <Spin size="small" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function AppShell({
+  page,
+  theme,
+  drawerVisible,
+  apiNotice,
+  children,
+  onPageChange,
+  onThemeChange,
+  onRefresh,
+  onOpenDrawer,
+  onCloseDrawer,
+  onOpenLab
+}: AppShellProps) {
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
+  const menuItems = useMemo(
+    () =>
+      navItems.map((item) => ({
+        key: item.key,
+        icon: item.icon,
+        label: item.label,
+        onClick: () => {
+          onPageChange(item.key);
+          onCloseDrawer();
+        }
+      })),
+    [onCloseDrawer, onPageChange]
+  );
+
+  return (
+    <ConfigProvider
+      theme={{
+        cssVar: { key: 'zhian' },
+        hashed: false,
+        algorithm: theme === 'dark' ? darkAlgorithm : defaultAlgorithm
+      }}
+    >
+      <Layout className="zh-app-root">
+        <Sider breakpoint="lg" collapsedWidth="0" width={280} theme="light" className="desktop-sider zh-app-sider">
+          <div className="zh-app-brand">
+            <img src="/favicon.svg" alt="logo" className="zh-app-logo" />
+            <div>
+              <Typography.Title level={4} className="zh-title-flush">
+                智安哨
+              </Typography.Title>
+              <Typography.Text type="secondary" className="zh-text-meta">
+                LLM Agent Attack Lab
+              </Typography.Text>
+            </div>
+          </div>
+          <Menu mode="inline" theme="light" selectedKeys={[page]} className="zh-app-menu" items={menuItems} />
+        </Sider>
+
+        <Drawer
+          title={
+            <div className="zh-app-drawer-title">
+              <img src="/favicon.svg" alt="logo" className="zh-app-logo zh-app-logo--small" />
+              <Typography.Title level={5} className="zh-title-flush">
+                智安哨
+              </Typography.Title>
+            </div>
+          }
+          placement="left"
+          onClose={onCloseDrawer}
+          open={drawerVisible}
+          styles={{ body: { padding: 0 } }}
+          size="default"
+        >
+          <Menu mode="inline" theme="light" selectedKeys={[page]} className="zh-app-menu" items={menuItems} />
+        </Drawer>
+
+        <Layout className="zh-app-layout">
+          <Header className="zh-app-header">
+            <Space>
+              <UiButton type="text" icon={<MenuIcon size={20} />} onClick={onOpenDrawer} className="mobile-menu-btn" />
+              <Typography.Title level={3} className="zh-app-header-title">
+                {navItems.find((item) => item.key === page)?.label}
+              </Typography.Title>
+            </Space>
+            <Space>
+              <UiButton
+                type="text"
+                icon={theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}
+                onClick={() => onThemeChange(theme === 'light' ? 'dark' : 'light')}
+              >
+                <span className="hide-on-mobile">{theme === 'light' ? '深色模式' : '浅色模式'}</span>
+              </UiButton>
+              <UiButton icon={<Activity size={16} />} onClick={onRefresh}>
+                <span className="hide-on-mobile">刷新数据</span>
+              </UiButton>
+              <UiButton type="primary" icon={<Play size={16} />} onClick={onOpenLab}>
+                <span className="hide-on-mobile">运行剧本</span>
+              </UiButton>
+            </Space>
+          </Header>
+
+          <Content className="main-content zh-main-content">
+            {apiNotice && <UiAlert title={apiNotice} type="warning" showIcon className="zh-mb-24" />}
+
+            <Suspense fallback={<PageFallback />}>{children}</Suspense>
+          </Content>
+        </Layout>
+      </Layout>
+    </ConfigProvider>
+  );
+}

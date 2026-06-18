@@ -1,5 +1,6 @@
 import type { AuditLog, RunResult } from '../../types';
-import { Card, Typography, Space, Timeline, Tag, Descriptions } from 'antd';
+import { Typography, Space, Timeline, Descriptions } from 'antd';
+import { LabelTag, PanelCard } from '../ui';
 
 export function RunEvidenceStrip({
   title,
@@ -12,7 +13,7 @@ export function RunEvidenceStrip({
 }) {
   const log = run.audit_logs[0];
   return (
-    <Card
+    <PanelCard
       size={compact ? 'small' : 'default'}
       type="inner"
       title={
@@ -21,23 +22,23 @@ export function RunEvidenceStrip({
           <Typography.Text type="secondary">{run.scenario.id}</Typography.Text>
         </Space>
       }
-      style={{ marginBottom: 16 }}
+      className="zh-mb-16"
     >
-      <Descriptions size="small" column={{ xs: 1, sm: 2, md: 4 }} bordered style={{ marginBottom: 16 }}>
+      <Descriptions size="small" column={{ xs: 1, sm: 2, md: 4 }} bordered className="zh-mb-16">
         <Descriptions.Item label="决策">
-          <Tag color={log?.decision === '允许' ? 'success' : log?.decision === '拒绝' ? 'error' : 'warning'}>
+          <LabelTag color={log?.decision === '允许' ? 'success' : log?.decision === '拒绝' ? 'error' : 'warning'}>
             {log?.decision ?? '未记录'}
-          </Tag>
+          </LabelTag>
         </Descriptions.Item>
         <Descriptions.Item label="策略">{log?.policy_id ?? '未记录'}</Descriptions.Item>
         <Descriptions.Item label="风险分">{log?.risk_score ?? '-'}</Descriptions.Item>
         <Descriptions.Item label="异常分">{log?.anomaly_score ?? '-'}</Descriptions.Item>
       </Descriptions>
-      <Typography.Paragraph type="secondary" style={{ marginBottom: 16 }}>
+      <Typography.Paragraph type="secondary" className="zh-mb-16">
         {log?.reason ?? '暂无监督判定原因。'}
       </Typography.Paragraph>
       <Typography.Text code>{log?.audit_hash ?? '暂无审计 hash'}</Typography.Text>
-    </Card>
+    </PanelCard>
   );
 }
 
@@ -54,7 +55,7 @@ export function RunAuditTimeline({
     return null;
   }
   return (
-    <Card
+    <PanelCard
       size={compact ? 'small' : 'default'}
       type="inner"
       title={
@@ -63,39 +64,39 @@ export function RunAuditTimeline({
           <Typography.Text type="secondary">{logs.length} 步工具调用</Typography.Text>
         </Space>
       }
-      style={{ marginBottom: 16 }}
+      className="zh-mb-16"
     >
       <Timeline
         items={logs.map((log) => ({
           color: log.decision === '允许' ? 'green' : log.decision === '拒绝' ? 'red' : 'orange',
           content: (
-            <div style={{ marginBottom: 16 }}>
-              <Space style={{ marginBottom: 8 }}>
+            <div className="zh-mb-16">
+              <Space className="zh-mb-8">
                 <Typography.Text strong>{log.tool}</Typography.Text>
-                <Tag color={log.decision === '允许' ? 'success' : log.decision === '拒绝' ? 'error' : 'warning'}>
+                <LabelTag color={log.decision === '允许' ? 'success' : log.decision === '拒绝' ? 'error' : 'warning'}>
                   {log.decision}
-                </Tag>
-                <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                </LabelTag>
+                <Typography.Text type="secondary" className="zh-text-meta">
                   {log.policy_id}
                 </Typography.Text>
               </Space>
               <br />
-              <Space style={{ marginBottom: 8 }}>
-                <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+              <Space className="zh-mb-8">
+                <Typography.Text type="secondary" className="zh-text-meta">
                   风险分: {log.risk_score ?? '-'}
                 </Typography.Text>
-                <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                <Typography.Text type="secondary" className="zh-text-meta">
                   异常分: {log.anomaly_score ?? '-'}
                 </Typography.Text>
               </Space>
               <br />
-              <Typography.Text code style={{ fontSize: 12 }}>
+              <Typography.Text code className="zh-text-meta">
                 {log.audit_hash ? log.audit_hash.slice(0, 16) : '暂无 hash'}
               </Typography.Text>
             </div>
           )
         }))}
       />
-    </Card>
+    </PanelCard>
   );
 }

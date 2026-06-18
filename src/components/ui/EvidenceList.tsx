@@ -36,7 +36,7 @@ export function EvidenceList({ items, emptyText = '暂无数据', className }: E
   const classes = ['zh-evidence-list', className].filter(Boolean).join(' ');
 
   return (
-    <Space direction="vertical" size="middle" className={classes}>
+    <Space orientation="vertical" size="middle" className={classes}>
       {items.map((item) => (
         <PanelCard
           key={item.key}

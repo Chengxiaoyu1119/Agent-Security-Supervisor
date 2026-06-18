@@ -3,7 +3,7 @@ import path from 'node:path';
 
 const root = process.cwd();
 const srcRoot = path.join(root, 'src');
-const allowedSrcDirectories = new Set(['components', 'design', 'fallback', 'pages', 'test', 'types']);
+const allowedSrcDirectories = new Set(['app', 'components', 'design', 'fallback', 'pages', 'test', 'types']);
 const allowedSrcFiles = new Set([
   'App.tsx',
   'api.test.ts',
@@ -17,6 +17,8 @@ const allowedSrcFiles = new Set([
   '\u89c6\u89c9\u7cfb\u7edf.css'
 ]);
 const allowedComponentDirectories = new Set([
+  'alerts',
+  'audit',
   'agent',
   'dashboard',
   'evidence',
@@ -164,15 +166,21 @@ const uiComponentDir = path.join(root, 'src', 'components', 'ui');
 const uiComponentCount = fs.existsSync(uiComponentDir)
   ? fs.readdirSync(uiComponentDir).filter((name) => name.endsWith('.tsx')).length
   : 0;
+const oversizedSourceFiles = summary.filter(
+  (item) => (item.file.endsWith('.ts') || item.file.endsWith('.tsx')) && item.lines > 300
+);
+const inlineStyleHotspots = summary.filter((item) => item.inline_style_count > 24);
 
 const budgets = {
-  app_max_lines: 1000,
+  app_max_lines: 300,
+  source_file_max_lines: 300,
   css_hardcoded_color_max: 25,
-  source_hardcoded_color_max: 80,
-  inline_style_max: 760,
-  ui_component_min: 4,
+  source_hardcoded_color_max: 25,
+  inline_style_max: 80,
+  inline_style_per_file_max: 24,
+  ui_component_min: 12,
   token_file_min_bytes: 300,
-  direct_antd_primitive_outside_ui_max: 330,
+  direct_antd_primitive_outside_ui_max: 0,
   direct_decision_markup_max: 0,
   unexpected_src_entry_max: 0,
   unexpected_component_entry_max: 0,
@@ -184,6 +192,13 @@ const violations = [];
 const appInfo = fileInfo('src/App.tsx');
 if (appInfo.lines > budgets.app_max_lines) {
   violations.push(`App.tsx line budget exceeded: ${appInfo.lines}/${budgets.app_max_lines}`);
+}
+if (oversizedSourceFiles.length) {
+  violations.push(
+    `TS/TSX file line budget exceeded: ${oversizedSourceFiles
+      .map((item) => `${item.file} ${item.lines}/${budgets.source_file_max_lines}`)
+      .join(', ')}`
+  );
 }
 if (cssHardcodedColorCount > budgets.css_hardcoded_color_max) {
   violations.push(`CSS hardcoded color budget exceeded: ${cssHardcodedColorCount}/${budgets.css_hardcoded_color_max}`);
@@ -198,6 +213,13 @@ if (sourceHardcodedColorCount > budgets.source_hardcoded_color_max) {
 }
 if (inlineStyleCount > budgets.inline_style_max) {
   violations.push(`Inline style budget exceeded: ${inlineStyleCount}/${budgets.inline_style_max}`);
+}
+if (inlineStyleHotspots.length) {
+  violations.push(
+    `Inline style per-file budget exceeded: ${inlineStyleHotspots
+      .map((item) => `${item.file} ${item.inline_style_count}/${budgets.inline_style_per_file_max}`)
+      .join(', ')}`
+  );
 }
 if (tokenInfo.bytes < budgets.token_file_min_bytes) {
   violations.push(`Design token file too small: ${tokenInfo.bytes}/${budgets.token_file_min_bytes} bytes`);
@@ -252,6 +274,8 @@ const result = {
   unexpected_component_entries: unexpectedComponentEntries,
   unexpected_page_entries: unexpectedPageEntries,
   unexpected_design_entries: unexpectedDesignEntries,
+  oversized_source_files: oversizedSourceFiles,
+  inline_style_hotspots: inlineStyleHotspots,
   largest_file: maxFile,
   budgets,
   structure_rules: {

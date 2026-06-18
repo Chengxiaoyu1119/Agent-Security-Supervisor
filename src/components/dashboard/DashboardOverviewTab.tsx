@@ -1,53 +1,18 @@
-import React from 'react';
-import { Row, Col, Typography, Space, Flex, Button, Statistic, Divider } from 'antd';
+import { Col, Divider, Flex, Row, Space, Statistic, Typography } from 'antd';
 import {
   Activity,
+  ArrowRight,
+  FlaskConical,
+  GitBranch,
   Play,
-  TerminalSquare,
   Settings2,
   ShieldCheck,
-  GitBranch,
-  FlaskConical,
-  ArrowRight
+  TerminalSquare
 } from 'lucide-react';
-import { ActionRow, MetricCard as Metric, PanelCard } from '../ui';
+import { ActionRow, MetricCard as Metric, PanelCard, UiButton } from '../ui';
 import { SurfaceResearchMatrix } from '../surface/SurfaceResearchMatrix';
 import type { AlertItem, Overview, Scenario } from '../../types';
-
-type AgentNodeProps = {
-  icon: React.ReactNode;
-  title: string;
-  desc: string;
-  active?: boolean;
-  activeTone?: 'primary' | 'success';
-};
-
-const AgentNode = ({ icon, title, desc, active, activeTone = 'primary' }: AgentNodeProps) => (
-  <div
-    style={{
-      background: active ? `var(--ant-color-${activeTone}-bg)` : 'var(--ant-color-bg-container)',
-      border: `1px solid ${active ? `var(--ant-color-${activeTone})` : 'var(--ant-color-border)'}`,
-      padding: '16px 12px',
-      borderRadius: 8,
-      textAlign: 'center',
-      width: 120,
-      boxShadow: active ? `0 0 8px var(--ant-color-${activeTone}-bg)` : 'var(--zh-shadow-hairline)',
-      transition: 'all 0.3s'
-    }}
-  >
-    <div
-      style={{ color: active ? `var(--ant-color-${activeTone})` : 'var(--ant-color-text-secondary)', marginBottom: 12 }}
-    >
-      {icon}
-    </div>
-    <Typography.Text strong style={{ fontSize: 13, display: 'block' }}>
-      {title}
-    </Typography.Text>
-    <Typography.Text type="secondary" style={{ fontSize: 11 }}>
-      {desc}
-    </Typography.Text>
-  </div>
-);
+import { DashboardAgentNode } from './DashboardAgentNode';
 
 type DashboardPipelineNode = {
   label: string;
@@ -84,22 +49,22 @@ export function DashboardOverviewTab({
   onBatchCompare
 }: DashboardOverviewTabProps) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, marginTop: 8 }}>
+    <div className="zh-page-stack zh-mt-8">
       <Row gutter={[24, 24]}>
         <Col span={24}>
           <PanelCard variant="borderless" styles={{ body: { padding: 32 } }}>
             <Flex justify="space-between" align="center" wrap="wrap" gap={24}>
-              <div style={{ flex: 1, minWidth: 300 }}>
+              <div className="zh-dashboard-hero-copy">
                 <Typography.Text type="secondary">命题挑战赛 · 大模型应用安全监督原型</Typography.Text>
-                <Typography.Title level={2} style={{ marginTop: 8, marginBottom: 16 }}>
+                <Typography.Title level={2} className="zh-title-compact">
                   智能体工具调用实时审计与阻断台
                 </Typography.Title>
-                <Typography.Paragraph type="secondary" style={{ fontSize: 16, maxWidth: 600 }}>
+                <Typography.Paragraph type="secondary" className="zh-text-lead">
                   以红队攻击样本驱动监督策略，对邮件、文件、API、代码执行和外部 Agent
                   事件进行风险评分、策略判定、沙箱执行和告警留痕。
                 </Typography.Paragraph>
                 <ActionRow>
-                  <Button
+                  <UiButton
                     type="primary"
                     size="large"
                     icon={<Play size={16} />}
@@ -112,39 +77,36 @@ export function DashboardOverviewTab({
                     disabled={running || !overview.scenarios.length}
                   >
                     {running ? '验证中...' : '一键验证全部剧本'}
-                  </Button>
-                  <Button
+                  </UiButton>
+                  <UiButton
                     size="large"
                     icon={<TerminalSquare size={16} />}
                     onClick={() => priorityScenario && onSelectScenario(priorityScenario.id)}
                     disabled={!priorityScenario}
                   >
                     打开高风险剧本
-                  </Button>
+                  </UiButton>
                 </ActionRow>
               </div>
-              <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap', width: '100%' }}>
-                <PanelCard
-                  variant="borderless"
-                  style={{ background: 'var(--ant-color-error-bg)', minWidth: 160, flex: 1 }}
-                >
+              <div className="zh-dashboard-metric-row">
+                <PanelCard variant="borderless" className="zh-dashboard-metric-panel zh-dashboard-metric-panel--risk">
                   <Typography.Text type="secondary">最高风险分</Typography.Text>
-                  <Typography.Title level={1} style={{ margin: 0, color: 'var(--ant-color-error)' }}>
+                  <Typography.Title level={1} className="zh-title-flush zh-color-error">
                     {maxRiskScore}
                   </Typography.Title>
-                  <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                  <Typography.Text type="secondary" className="zh-text-meta">
                     {latestAlert ? latestAlert.title : '等待攻击演示'}
                   </Typography.Text>
                 </PanelCard>
                 <PanelCard
                   variant="borderless"
-                  style={{ background: 'var(--ant-color-success-bg)', minWidth: 160, flex: 1 }}
+                  className="zh-dashboard-metric-panel zh-dashboard-metric-panel--control"
                 >
                   <Typography.Text type="secondary">防护控制率</Typography.Text>
-                  <Typography.Title level={1} style={{ margin: 0, color: 'var(--ant-color-success)' }}>
+                  <Typography.Title level={1} className="zh-title-flush zh-color-success">
                     {overview.summary.block_rate}%
                   </Typography.Title>
-                  <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                  <Typography.Text type="secondary" className="zh-text-meta">
                     拒绝、询问均计入控制
                   </Typography.Text>
                 </PanelCard>
@@ -161,9 +123,7 @@ export function DashboardOverviewTab({
               <Statistic
                 title={
                   <span>
-                    <span style={{ color: 'var(--ant-color-primary)', marginRight: 8 }}>
-                      {String(index + 1).padStart(2, '0')}
-                    </span>
+                    <span className="zh-color-primary zh-mr-8">{String(index + 1).padStart(2, '0')}</span>
                     {node.label}
                   </span>
                 }
@@ -205,13 +165,13 @@ export function DashboardOverviewTab({
             variant="borderless"
             className="zh-full-height"
             extra={
-              <Button type="link" onClick={() => onSelectScenario(priorityScenario?.id ?? '')}>
+              <UiButton type="link" onClick={() => onSelectScenario(priorityScenario?.id ?? '')}>
                 查看剧本详情
-              </Button>
+              </UiButton>
             }
           >
-            <div style={{ background: 'var(--ant-color-fill-quaternary)', padding: 24, borderRadius: 8 }}>
-              <Typography.Text type="secondary" style={{ fontSize: 12, marginBottom: 12, display: 'block' }}>
+            <div className="zh-soft-block">
+              <Typography.Text type="secondary" className="zh-text-meta zh-mb-12 zh-text-block">
                 红队攻击方 (Red Team Agents)
               </Typography.Text>
               <div
@@ -222,36 +182,36 @@ export function DashboardOverviewTab({
                   marginBottom: 16
                 }}
               >
-                <AgentNode icon={<GitBranch size={20} />} title="规划 Agent" desc="分解攻击剧本" />
+                <DashboardAgentNode icon={<GitBranch size={20} />} title="规划 Agent" desc="分解攻击剧本" />
                 <ArrowRight size={16} color="var(--ant-color-text-tertiary)" />
-                <AgentNode icon={<FlaskConical size={20} />} title="样本生成" desc="构造对抗样本" />
+                <DashboardAgentNode icon={<FlaskConical size={20} />} title="样本生成" desc="构造对抗样本" />
                 <ArrowRight size={16} color="var(--ant-color-text-tertiary)" />
-                <AgentNode icon={<TerminalSquare size={20} />} title="执行 Agent" desc="投递与漏洞利用" active />
+                <DashboardAgentNode
+                  icon={<TerminalSquare size={20} />}
+                  title="执行 Agent"
+                  desc="投递与漏洞利用"
+                  active
+                />
               </div>
-              <Divider
-                dashed
-                style={{ borderColor: 'var(--ant-color-error)', margin: '20px 0' }}
-                titlePlacement="left"
-                plain
-              >
-                <Typography.Text type="danger" style={{ fontSize: 12 }}>
+              <Divider dashed className="zh-attack-divider" titlePlacement="left" plain>
+                <Typography.Text type="danger" className="zh-text-meta">
                   攻击边界 (Attack Surface)
                 </Typography.Text>
               </Divider>
-              <Typography.Text type="secondary" style={{ fontSize: 12, marginBottom: 12, display: 'block' }}>
+              <Typography.Text type="secondary" className="zh-text-meta zh-mb-12 zh-text-block">
                 蓝队防御方 (Blue Team Environment)
               </Typography.Text>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <AgentNode icon={<Settings2 size={20} />} title="目标智能体" desc="受害应用/模型" />
+              <div className="zh-dashboard-pipeline-row">
+                <DashboardAgentNode icon={<Settings2 size={20} />} title="目标智能体" desc="受害应用/模型" />
                 <ArrowRight size={16} color="var(--ant-color-text-tertiary)" />
-                <AgentNode
+                <DashboardAgentNode
                   icon={<ShieldCheck size={20} />}
                   title="行为监督器"
                   desc="实时旁路拦截"
                   activeTone="success"
                 />
                 <ArrowRight size={16} color="var(--ant-color-text-tertiary)" />
-                <AgentNode icon={<Activity size={20} />} title="沙箱与工具" desc="安全隔离执行" />
+                <DashboardAgentNode icon={<Activity size={20} />} title="沙箱与工具" desc="安全隔离执行" />
               </div>
             </div>
           </PanelCard>
@@ -261,7 +221,7 @@ export function DashboardOverviewTab({
             title={
               <Space orientation="vertical" size={0}>
                 <Typography.Text strong>主演示攻击剧本</Typography.Text>
-                <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                <Typography.Text type="secondary" className="zh-text-meta">
                   {overview.scenarios.length} 个可运行
                 </Typography.Text>
               </Space>
@@ -288,8 +248,8 @@ export function DashboardOverviewTab({
                     <div>
                       <Typography.Text strong>{scenario.title}</Typography.Text>
                     </div>
-                    <div style={{ marginTop: 4 }}>
-                      <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                    <div className="zh-mt-4">
+                      <Typography.Text type="secondary" className="zh-text-meta">
                         {scenario.id} · {scenario.target}
                       </Typography.Text>
                     </div>

@@ -1,6 +1,6 @@
-import { Typography, Flex, Button, Alert } from 'antd';
+import { Flex, Typography } from 'antd';
 import { ScrollText } from 'lucide-react';
-import { PanelCard } from '../ui';
+import { PanelCard, UiAlert, UiButton } from '../ui';
 import { SurfaceEvidenceIndexBoard } from '../surface/SurfaceEvidenceIndexBoard';
 import type { AttackSurface, SurfaceEvidencePackIndex, SurfaceEvidencePackWriteResult } from '../../types';
 
@@ -32,23 +32,23 @@ export function DashboardEvidenceTab({
   setSelectedSurfaceId
 }: DashboardEvidenceTabProps) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, marginTop: 8 }}>
+    <div className="zh-page-stack zh-mt-8">
       <PanelCard variant="borderless" styles={{ body: { padding: '16px 24px' } }}>
         <Flex justify="space-between" align="center" wrap="wrap" gap={16}>
           <Typography.Text strong>证据包管理与导出</Typography.Text>
-          <Button
+          <UiButton
             icon={<ScrollText size={16} />}
             onClick={handleExportAllSurfacePacks}
             loading={allPackExporting}
             type="primary"
           >
             生成并导出全部证据包
-          </Button>
+          </UiButton>
         </Flex>
       </PanelCard>
 
       {(allPackExportResult || allPackExportError) && (
-        <Alert
+        <UiAlert
           title={allPackExportError ? '导出失败' : '全部攻击面证据包已生成'}
           description={
             allPackExportError ||

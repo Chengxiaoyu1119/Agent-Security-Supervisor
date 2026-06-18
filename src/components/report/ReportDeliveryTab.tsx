@@ -1,6 +1,6 @@
+import { Col, Descriptions, Row, Space, Typography } from 'antd';
 import { Copy, FileWarning } from 'lucide-react';
-import { Alert, Badge, Button, Col, Descriptions, Row, Space, Typography } from 'antd';
-import { EvidenceCodeBlock, MetricCard as Metric, SectionTitle, PanelCard } from '../ui';
+import { EvidenceCodeBlock, MetricCard as Metric, PanelCard, SectionTitle, UiAlert, UiBadge, UiButton } from '../ui';
 import type { ReportData, SubmissionPackageResult } from '../../types';
 
 type ReportDeliveryTabProps = {
@@ -44,14 +44,14 @@ export function ReportDeliveryTab({
           }
           variant="borderless"
         >
-          <Alert
+          <UiAlert
             type="info"
             showIcon
             title="一键生成初赛提交包"
             description="普通包使用当前历史记录；干净包会重新跑固定攻防对照，更适合最终提交。"
             action={
               <Space orientation="vertical">
-                <Button
+                <UiButton
                   type="primary"
                   onClick={handleCreateCleanSubmissionPackage}
                   disabled={creatingCleanPackage || creatingPackage}
@@ -59,21 +59,21 @@ export function ReportDeliveryTab({
                   icon={<FileWarning size={14} />}
                 >
                   生成干净提交包
-                </Button>
-                <Button
+                </UiButton>
+                <UiButton
                   onClick={handleCreateSubmissionPackage}
                   disabled={creatingPackage || creatingCleanPackage}
                   loading={creatingPackage}
                   icon={<FileWarning size={14} />}
                 >
                   生成普通提交包
-                </Button>
+                </UiButton>
               </Space>
             }
             className="zh-mb-24"
           />
 
-          {packageError && <Alert type="error" title={packageError} className="zh-mb-24" />}
+          {packageError && <UiAlert type="error" title={packageError} className="zh-mb-24" />}
 
           {submissionPackage && (
             <PanelCard
@@ -129,21 +129,21 @@ export function ReportDeliveryTab({
                   type="inner"
                   title={file.title}
                   extra={
-                    <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                    <Typography.Text type="secondary" className="zh-text-meta">
                       {Math.max(1, Math.round(file.size / 1024))} KB
                     </Typography.Text>
                   }
                   actions={[
-                    <Button type="text" size="small" onClick={() => copyPackageFile(file.filename, file.content)}>
+                    <UiButton type="text" size="small" onClick={() => copyPackageFile(file.filename, file.content)}>
                       <Copy size={14} /> {copiedFile === file.filename ? '已复制' : '复制'}
-                    </Button>,
-                    <Button
+                    </UiButton>,
+                    <UiButton
                       type="text"
                       size="small"
                       onClick={() => downloadPackageFile(file.filename, file.content, file.content_type)}
                     >
                       下载
-                    </Button>
+                    </UiButton>
                   ]}
                 >
                   <Typography.Paragraph type="secondary" style={{ minHeight: 44 }}>
@@ -174,13 +174,13 @@ export function ReportDeliveryTab({
                 }}
               >
                 <div style={{ paddingTop: 2 }}>
-                  <Badge status={item.status === '满足' ? 'success' : 'processing'} text={item.status} />
+                  <UiBadge status={item.status === '满足' ? 'success' : 'processing'} text={item.status} />
                 </div>
-                <div style={{ flex: 1 }}>
+                <div className="zh-flex-spacer">
                   <div>
                     <Typography.Text strong>{item.requirement}</Typography.Text>
                   </div>
-                  <div style={{ marginTop: 4 }}>
+                  <div className="zh-mt-4">
                     <Typography.Text type="secondary">{item.evidence}</Typography.Text>
                   </div>
                 </div>

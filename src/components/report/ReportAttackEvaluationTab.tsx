@@ -1,5 +1,5 @@
-import { Badge, Col, Row, Space, Table, Tag, Typography } from 'antd';
-import { DecisionPill, MetricCard as Metric, SectionTitle, PanelCard } from '../ui';
+import { Col, Row, Space, Typography } from 'antd';
+import { DecisionPill, LabelTag, MetricCard as Metric, PanelCard, SectionTitle, UiBadge, UiTable } from '../ui';
 import type { ReportData } from '../../types';
 import { riskLabel } from '../../utils';
 import { ReportDefenseEvidenceBoard } from './ReportDefenseEvidenceBoard';
@@ -54,12 +54,12 @@ export function ReportAttackEvaluationTab({ report, onOpenScenario }: ReportAtta
           </Row>
           <ReportDefenseEvidenceBoard cases={report.attack_effectiveness.cases} onOpenScenario={onOpenScenario} />
 
-          <Table
+          <UiTable
             dataSource={report.attack_effectiveness.cases}
             rowKey="scenario_id"
             size="small"
             pagination={{ pageSize: 10 }}
-            style={{ marginTop: 24 }}
+            className="zh-mt-24"
             columns={[
               {
                 title: '剧本',
@@ -71,25 +71,25 @@ export function ReportAttackEvaluationTab({ report, onOpenScenario }: ReportAtta
                 title: '无防护',
                 key: 'attack_reproduced_without_guard',
                 render: (_, r) => (
-                  <Tag variant="filled" color={r.attack_reproduced_without_guard ? 'error' : 'default'}>
+                  <LabelTag variant="filled" color={r.attack_reproduced_without_guard ? 'error' : 'default'}>
                     {r.attack_reproduced_without_guard ? '已复现' : '未复现'}
-                  </Tag>
+                  </LabelTag>
                 )
               },
               {
                 title: '有防护',
                 key: 'defense_effective_with_guard',
                 render: (_, r) => (
-                  <Tag variant="filled" color={r.defense_effective_with_guard ? 'success' : 'error'}>
+                  <LabelTag variant="filled" color={r.defense_effective_with_guard ? 'success' : 'error'}>
                     {r.defense_effective_with_guard ? '已控制' : '缺证据'}
-                  </Tag>
+                  </LabelTag>
                 )
               },
               {
                 title: '策略',
                 key: 'expected_decision_match',
                 render: (_, r) => (
-                  <Badge
+                  <UiBadge
                     status={r.expected_decision_match ? 'success' : 'warning'}
                     text={r.expected_decision_match ? '匹配' : '不完整'}
                   />
@@ -128,16 +128,16 @@ export function ReportAttackEvaluationTab({ report, onOpenScenario }: ReportAtta
         <div className="zh-column-stack">
           {report.surface_conclusions.conclusions.map((item, idx) => (
             <div key={idx} style={{ padding: '16px 0', borderBottom: '1px solid var(--ant-color-border-secondary)' }}>
-              <div style={{ marginBottom: 8 }}>
+              <div className="zh-mb-8">
                 <Space>
                   <Typography.Text strong>{item.surface_name}</Typography.Text>
-                  <Tag variant="filled" color={item.risk === 'critical' ? 'error' : 'warning'}>
+                  <LabelTag variant="filled" color={item.risk === 'critical' ? 'error' : 'warning'}>
                     {riskLabel[item.risk]}
-                  </Tag>
+                  </LabelTag>
                   <Typography.Text type="secondary">{item.experiment_status}</Typography.Text>
                 </Space>
               </div>
-              <Space orientation="vertical" size={4} style={{ width: '100%' }}>
+              <Space orientation="vertical" size={4} className="zh-full-width">
                 <Typography.Text>{item.key_findings[0]}</Typography.Text>
                 <Space>
                   <Typography.Text code>
@@ -161,7 +161,7 @@ export function ReportAttackEvaluationTab({ report, onOpenScenario }: ReportAtta
         }
         variant="borderless"
       >
-        <Table
+        <UiTable
           dataSource={report.output_filter_evidence.cases}
           rowKey="scenario_id"
           size="small"
@@ -209,7 +209,7 @@ export function ReportAttackEvaluationTab({ report, onOpenScenario }: ReportAtta
         }
         variant="borderless"
       >
-        <Table
+        <UiTable
           dataSource={report.surface_coverage}
           rowKey="id"
           size="small"
@@ -224,9 +224,9 @@ export function ReportAttackEvaluationTab({ report, onOpenScenario }: ReportAtta
               title: '风险',
               dataIndex: 'risk',
               render: (t) => (
-                <Tag variant="filled" color={t === 'critical' ? 'error' : 'warning'}>
+                <LabelTag variant="filled" color={t === 'critical' ? 'error' : 'warning'}>
                   {riskLabel[t]}
-                </Tag>
+                </LabelTag>
               )
             },
             { title: '样本', dataIndex: 'samples' },
@@ -244,7 +244,7 @@ export function ReportAttackEvaluationTab({ report, onOpenScenario }: ReportAtta
         title={<SectionTitle title="攻击剧本证据矩阵" meta={`${report.scenario_matrix.length} 个剧本`} />}
         variant="borderless"
       >
-        <Table
+        <UiTable
           dataSource={report.scenario_matrix}
           rowKey="id"
           size="small"

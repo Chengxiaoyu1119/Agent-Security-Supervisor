@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
-import { Row, Col, Card, Typography, Input, Select, Button, Tag, Space, Descriptions } from 'antd';
+import { Col, Descriptions, Row, Space, Typography } from 'antd';
 import { Play } from 'lucide-react';
 import type { Scenario } from '../../types';
 import { riskLabel } from '../../utils';
-import { EvidenceCodeBlock } from '../ui';
+import { EvidenceCodeBlock, LabelTag, PanelCard, UiButton, UiInput, UiSelect } from '../ui';
 
 export function ScenarioLibrary({
   scenarios,
@@ -47,36 +47,36 @@ export function ScenarioLibrary({
   return (
     <Row gutter={[24, 24]}>
       <Col xs={24} md={8} lg={6}>
-        <Card
+        <PanelCard
           title={
             <Space>
               <Typography.Text strong>攻击剧本目录</Typography.Text>
-              <Tag color="blue">
+              <LabelTag color="blue">
                 {filteredScenarios.length}/{scenarios.length}
-              </Tag>
+              </LabelTag>
             </Space>
           }
           variant="borderless"
           styles={{ body: { padding: 0 } }}
         >
-          <div style={{ padding: 16, borderBottom: '1px solid var(--ant-color-border-secondary)' }}>
-            <Input
+          <div className="zh-filter-panel">
+            <UiInput
               placeholder="搜索剧本、工具、标签..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              style={{ marginBottom: 12 }}
+              className="zh-mb-12"
               allowClear
             />
-            <Select
+            <UiSelect
               value={surfaceFilter}
               onChange={setSurfaceFilter}
-              style={{ width: '100%', marginBottom: 12 }}
+              className="zh-full-width zh-mb-12"
               options={[{ label: '全部攻击面', value: '全部' }, ...surfaces.map((s) => ({ label: s, value: s }))]}
             />
-            <Select
+            <UiSelect
               value={severityFilter}
               onChange={setSeverityFilter}
-              style={{ width: '100%' }}
+              className="zh-full-width"
               options={[
                 { label: '全部风险', value: '全部' },
                 { label: '极高风险', value: 'critical' },
@@ -86,7 +86,7 @@ export function ScenarioLibrary({
               ]}
             />
           </div>
-          <div style={{ maxHeight: 'calc(100vh - 300px)', overflowY: 'auto' }}>
+          <div className="zh-scroll-list zh-scroll-list--scenario">
             <div className="zh-column-stack">
               {filteredScenarios.map((scenario) => {
                 let color = 'default';
@@ -108,19 +108,19 @@ export function ScenarioLibrary({
                     }}
                   >
                     <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <div className="zh-split-row">
                         <Typography.Text
                           strong
                           style={{ color: selected === scenario.id ? 'var(--ant-color-primary)' : 'inherit' }}
                         >
                           {scenario.title}
                         </Typography.Text>
-                        <Tag color={color} style={{ marginRight: 0 }}>
+                        <LabelTag color={color} className="zh-mr-0">
                           {riskLabel[scenario.severity]}
-                        </Tag>
+                        </LabelTag>
                       </div>
-                      <div style={{ marginTop: 4 }}>
-                        <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                      <div className="zh-mt-4">
+                        <Typography.Text type="secondary" className="zh-text-meta">
                           {scenario.id} · {scenario.target}
                         </Typography.Text>
                       </div>
@@ -129,21 +129,17 @@ export function ScenarioLibrary({
                 );
               })}
             </div>
-            {!filteredScenarios.length && (
-              <div style={{ padding: 24, textAlign: 'center', color: 'var(--ant-color-text-description)' }}>
-                没有匹配的攻击剧本。
-              </div>
-            )}
+            {!filteredScenarios.length && <div className="zh-empty-panel">没有匹配的攻击剧本。</div>}
           </div>
-        </Card>
+        </PanelCard>
       </Col>
 
       <Col xs={24} md={16} lg={18}>
         {active ? (
-          <Card
+          <PanelCard
             title={
               <Space orientation="vertical" size={0}>
-                <Typography.Title level={4} style={{ margin: 0 }}>
+                <Typography.Title level={4} className="zh-title-flush">
                   {active.title}
                 </Typography.Title>
                 <Typography.Text type="secondary">
@@ -152,9 +148,9 @@ export function ScenarioLibrary({
               </Space>
             }
             extra={
-              <Button type="primary" icon={<Play size={16} />} onClick={onOpenLab}>
+              <UiButton type="primary" icon={<Play size={16} />} onClick={onOpenLab}>
                 带入实验室
-              </Button>
+              </UiButton>
             }
             variant="borderless"
           >
@@ -183,56 +179,56 @@ export function ScenarioLibrary({
 
             <Row gutter={[24, 24]}>
               <Col span={12}>
-                <Card type="inner" title="智能体攻击脚本" size="small">
-                  <ol style={{ paddingLeft: 20, margin: 0 }}>
+                <PanelCard type="inner" title="智能体攻击脚本" size="small">
+                  <ol className="zh-ordered-list">
                     {active.script_steps.map((step) => (
                       <li key={step}>
                         <Typography.Text>{step}</Typography.Text>
                       </li>
                     ))}
                   </ol>
-                </Card>
+                </PanelCard>
               </Col>
               {active.attack_path?.length ? (
                 <Col span={12}>
-                  <Card type="inner" title="攻击链路" size="small">
-                    <ol style={{ paddingLeft: 20, margin: 0 }}>
+                  <PanelCard type="inner" title="攻击链路" size="small">
+                    <ol className="zh-ordered-list">
                       {active.attack_path.map((step) => (
                         <li key={step}>
                           <Typography.Text>{step}</Typography.Text>
                         </li>
                       ))}
                     </ol>
-                  </Card>
+                  </PanelCard>
                 </Col>
               ) : null}
               {active.success_criteria?.length ? (
                 <Col span={12}>
-                  <Card type="inner" title="成功判据" size="small">
-                    <ol style={{ paddingLeft: 20, margin: 0 }}>
+                  <PanelCard type="inner" title="成功判据" size="small">
+                    <ol className="zh-ordered-list">
                       {active.success_criteria.map((item) => (
                         <li key={item}>
                           <Typography.Text>{item}</Typography.Text>
                         </li>
                       ))}
                     </ol>
-                  </Card>
+                  </PanelCard>
                 </Col>
               ) : null}
             </Row>
 
             {active.tags?.length ? (
-              <div style={{ marginTop: 24 }}>
+              <div className="zh-mt-24">
                 {active.tags.map((tag) => (
-                  <Tag key={tag}>{tag}</Tag>
+                  <LabelTag key={tag}>{tag}</LabelTag>
                 ))}
               </div>
             ) : null}
 
             {active.tool_calls.length > 0 && (
-              <div style={{ marginTop: 24 }}>
+              <div className="zh-mt-24">
                 <Typography.Title level={5}>工具调用参数</Typography.Title>
-                <Space orientation="vertical" style={{ width: '100%' }}>
+                <Space orientation="vertical" className="zh-full-width">
                   {active.tool_calls.map((call) => (
                     <EvidenceCodeBlock key={`${call.tool}-${call.risk_hint}`} flush>
                       {`${call.tool}
@@ -243,13 +239,11 @@ arguments: ${JSON.stringify(call.arguments, null, 2)}`}
                 </Space>
               </div>
             )}
-          </Card>
+          </PanelCard>
         ) : (
-          <Card variant="borderless">
-            <div style={{ padding: 48, textAlign: 'center', color: 'var(--ant-color-text-description)' }}>
-              暂无攻击剧本。
-            </div>
-          </Card>
+          <PanelCard variant="borderless">
+            <div className="zh-empty-panel zh-empty-panel--large">暂无攻击剧本。</div>
+          </PanelCard>
         )}
       </Col>
     </Row>

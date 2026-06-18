@@ -1,6 +1,6 @@
-import { Row, Col, Typography, Button, Input, Select } from 'antd';
+import { Col, Row, Typography } from 'antd';
 import { ClipboardList } from 'lucide-react';
-import { ActionRow, PanelCard } from '../ui';
+import { ActionRow, PanelCard, UiButton, UiInput, UiSelect } from '../ui';
 import { SurfaceCard, SurfaceWorkbench } from '../surface/SurfaceWorkbench';
 import type { AttackSurface, Scenario, SurfaceEvidencePack } from '../../types';
 import { riskLabel } from '../../utils';
@@ -41,19 +41,19 @@ export function DashboardSurfacesTab({
   onBatchCompare
 }: DashboardSurfacesTabProps) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, marginTop: 8 }}>
+    <div className="zh-page-stack zh-mt-8">
       <PanelCard variant="borderless" styles={{ body: { padding: '16px 24px' } }}>
         <ActionRow
           content={
             <div className="zh-toolbar-controls">
-              <Input
+              <UiInput
                 placeholder="名称、入口、资产、检测信号"
                 value={surfaceQuery}
                 onChange={(e) => setSurfaceQuery(e.target.value)}
                 style={{ width: 240 }}
                 prefix={<Typography.Text type="secondary">搜索</Typography.Text>}
               />
-              <Select
+              <UiSelect
                 value={riskFilter}
                 onChange={setRiskFilter}
                 style={{ width: 160 }}
@@ -65,7 +65,7 @@ export function DashboardSurfacesTab({
             </div>
           }
         >
-          <Button
+          <UiButton
             icon={<ClipboardList size={16} />}
             onClick={() =>
               selectedSurfaceScenarios.length &&
@@ -77,7 +77,7 @@ export function DashboardSurfacesTab({
             disabled={running || !selectedSurfaceScenarios.length}
           >
             {running ? '验证中...' : '验证当前面'}
-          </Button>
+          </UiButton>
         </ActionRow>
       </PanelCard>
 

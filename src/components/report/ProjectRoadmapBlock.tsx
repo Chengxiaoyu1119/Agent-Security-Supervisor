@@ -1,6 +1,6 @@
 import React from 'react';
-import { Row, Col, Typography, Tag, Progress, Space } from 'antd';
-import { MetricCard as Metric, PanelCard } from '../ui';
+import { Col, Row, Space, Typography } from 'antd';
+import { LabelTag, MetricCard as Metric, PanelCard, UiProgress } from '../ui';
 import type { ProjectRoadmap } from '../../types';
 
 export function ProjectRoadmapBlock({ roadmap }: { roadmap: ProjectRoadmap }) {
@@ -8,31 +8,31 @@ export function ProjectRoadmapBlock({ roadmap }: { roadmap: ProjectRoadmap }) {
   const topBacklog = roadmap.feature_backlog.slice(0, 5);
   return (
     <PanelCard variant="borderless" className="zh-mb-24">
-      <div style={{ padding: 24, background: 'var(--ant-color-fill-tertiary)', borderRadius: 8, marginBottom: 24 }}>
+      <div className="zh-section-surface">
         <Row align="middle" gutter={16}>
           <Col xs={24} sm={16}>
             <Typography.Text type="secondary" className="zh-meta-block">
               项目方向判断
             </Typography.Text>
-            <Typography.Title level={3} style={{ margin: 0, marginBottom: 8 }}>
+            <Typography.Title level={3} className="zh-title-flush zh-mb-8">
               {roadmap.direction.verdict}
             </Typography.Title>
-            <Typography.Paragraph type="secondary" style={{ margin: 0 }}>
+            <Typography.Paragraph type="secondary" className="zh-title-flush">
               {roadmap.direction.reason}
             </Typography.Paragraph>
           </Col>
-          <Col xs={24} sm={8} style={{ textAlign: 'right' }}>
-            <Typography.Title level={1} style={{ margin: 0, color: 'var(--ant-color-primary)' }}>
+          <Col xs={24} sm={8} className="zh-text-right">
+            <Typography.Title level={1} className="zh-title-flush zh-color-primary">
               {roadmap.summary.overall_score}%
             </Typography.Title>
-            <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+            <Typography.Text type="secondary" className="zh-text-meta">
               综合成熟度
             </Typography.Text>
           </Col>
         </Row>
       </div>
 
-      <Row gutter={[16, 16]} style={{ marginBottom: 32 }}>
+      <Row gutter={[16, 16]} className="zh-mb-32">
         <Col span={6}>
           <Metric
             label="已完成维度"
@@ -53,21 +53,21 @@ export function ProjectRoadmapBlock({ roadmap }: { roadmap: ProjectRoadmap }) {
 
       <Row gutter={[24, 24]}>
         <Col xs={24} lg={12}>
-          <Typography.Title level={5} style={{ marginBottom: 16 }}>
+          <Typography.Title level={5} className="zh-mb-16">
             成熟度维度 ({roadmap.dimensions.length} 项)
           </Typography.Title>
-          <Space orientation="vertical" style={{ width: '100%' }}>
+          <Space orientation="vertical" className="zh-full-width">
             {topDimensions.map((item) => (
               <PanelCard key={item.name} size="small" type="inner">
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+                <div className="zh-split-row zh-mb-8">
                   <Typography.Text strong>{item.name}</Typography.Text>
-                  <Tag
+                  <LabelTag
                     color={item.status === '已完成' ? 'success' : item.status === '高优先级缺口' ? 'error' : 'warning'}
                   >
                     {item.status}
-                  </Tag>
+                  </LabelTag>
                 </div>
-                <Progress
+                <UiProgress
                   percent={Math.min(100, Math.max(0, item.score))}
                   size="small"
                   strokeColor={
@@ -78,7 +78,7 @@ export function ProjectRoadmapBlock({ roadmap }: { roadmap: ProjectRoadmap }) {
                         : 'var(--ant-color-warning)'
                   }
                 />
-                <Typography.Text type="secondary" style={{ fontSize: 13, marginTop: 8, display: 'block' }}>
+                <Typography.Text type="secondary" className="zh-text-body zh-mt-8 zh-text-block">
                   {item.evidence}
                 </Typography.Text>
               </PanelCard>
@@ -86,10 +86,10 @@ export function ProjectRoadmapBlock({ roadmap }: { roadmap: ProjectRoadmap }) {
           </Space>
         </Col>
         <Col xs={24} lg={12}>
-          <Typography.Title level={5} style={{ marginBottom: 16 }}>
+          <Typography.Title level={5} className="zh-mb-16">
             缺少功能优先级 ({roadmap.feature_backlog.length} 项)
           </Typography.Title>
-          <Space orientation="vertical" style={{ width: '100%' }}>
+          <Space orientation="vertical" className="zh-full-width">
             {topBacklog.map((item) => (
               <PanelCard
                 key={item.id}
@@ -99,16 +99,16 @@ export function ProjectRoadmapBlock({ roadmap }: { roadmap: ProjectRoadmap }) {
                   borderLeft: `3px solid var(--ant-color-${item.priority === 'P0' ? 'error' : item.priority === 'P1' ? 'warning' : 'info'})`
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                <div className="zh-split-row zh-mb-4">
                   <Typography.Text strong>{item.title}</Typography.Text>
-                  <Tag color={item.priority === 'P0' ? 'error' : item.priority === 'P1' ? 'warning' : 'default'}>
+                  <LabelTag color={item.priority === 'P0' ? 'error' : item.priority === 'P1' ? 'warning' : 'default'}>
                     {item.priority}
-                  </Tag>
+                  </LabelTag>
                 </div>
-                <Typography.Paragraph type="secondary" style={{ fontSize: 13, margin: '8px 0' }}>
+                <Typography.Paragraph type="secondary" className="zh-text-body zh-my-8">
                   {item.why}
                 </Typography.Paragraph>
-                <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                <Typography.Text type="secondary" className="zh-text-meta">
                   验收标准: {item.acceptance}
                 </Typography.Text>
               </PanelCard>

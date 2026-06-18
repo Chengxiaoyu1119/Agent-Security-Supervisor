@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Button, Card, Flex, Tabs, Typography } from 'antd';
+import { Flex, Typography } from 'antd';
 import { Copy } from 'lucide-react';
+import { PanelCard, UiButton, UiTabs } from '../components/ui';
 import {
   ReportAttackEvaluationTab,
   ReportDeliveryTab,
@@ -83,20 +84,20 @@ export function ReportPanel({
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-      <Card variant="borderless">
+    <div className="zh-page-stack">
+      <PanelCard variant="borderless">
         <Flex justify="space-between" align="center">
-          <Typography.Title level={3} style={{ margin: 0 }}>
+          <Typography.Title level={3} className="zh-title-flush">
             初赛报告材料中心
           </Typography.Title>
-          <Button icon={<Copy size={16} />} onClick={copyReport}>
+          <UiButton icon={<Copy size={16} />} onClick={copyReport}>
             {copied ? '已复制' : '复制 Markdown'}
-          </Button>
+          </UiButton>
         </Flex>
-      </Card>
+      </PanelCard>
 
       {report ? (
-        <Tabs
+        <UiTabs
           defaultActiveKey="1"
           size="large"
           items={[
@@ -138,9 +139,9 @@ export function ReportPanel({
           ]}
         />
       ) : (
-        <Card variant="borderless" style={{ textAlign: 'center', padding: 64 }}>
+        <PanelCard variant="borderless" style={{ textAlign: 'center', padding: 64 }}>
           <Typography.Text type="secondary">正在加载报告...</Typography.Text>
-        </Card>
+        </PanelCard>
       )}
     </div>
   );

@@ -1,5 +1,5 @@
-import { Col, Row, Space, Tag, Typography } from 'antd';
-import { PanelCard } from '../ui';
+import { Col, Row, Space, Typography } from 'antd';
+import { LabelTag, PanelCard } from '../ui';
 import type { Overview } from '../../types';
 import { competitionCapabilityRows } from '../../utils';
 
@@ -14,14 +14,14 @@ export function SettingsBasicsTab({ overview }: SettingsBasicsTabProps) {
         {overview.models.map((model) => (
           <Col xs={24} sm={12} md={8} lg={6} key={model.provider}>
             <PanelCard type="inner" size="small" hoverable className="zh-full-height">
-              <Typography.Text strong style={{ display: 'block' }}>
+              <Typography.Text strong className="zh-text-block">
                 {model.provider}
               </Typography.Text>
               <Typography.Text type="secondary" style={{ fontSize: 13, display: 'block', marginBottom: 4 }}>
                 {model.model}
               </Typography.Text>
-              <div style={{ marginBottom: 8 }}>
-                <Tag
+              <div className="zh-mb-8">
+                <LabelTag
                   variant="filled"
                   color="processing"
                   style={{
@@ -34,7 +34,7 @@ export function SettingsBasicsTab({ overview }: SettingsBasicsTabProps) {
                   }}
                 >
                   {model.endpoint ?? model.mode}
-                </Tag>
+                </LabelTag>
               </div>
               <Typography.Text type="secondary" className="zh-meta-block">
                 {model.configured ? '已配置真实 API' : '未配置，使用模拟兜底'}
@@ -59,7 +59,7 @@ export function SettingsBasicsTab({ overview }: SettingsBasicsTabProps) {
                 <Typography.Text strong>{item.requirement}</Typography.Text>
               </div>
               <div style={{ marginTop: 8 }}>
-                <Space orientation="vertical" size={2} style={{ width: '100%' }}>
+                <Space orientation="vertical" size={2} className="zh-full-width">
                   <Typography.Text type="secondary">{item.implementation}</Typography.Text>
                   <Typography.Text
                     type="secondary"

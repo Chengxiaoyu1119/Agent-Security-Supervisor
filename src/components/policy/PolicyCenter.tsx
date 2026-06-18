@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
+import { Row, Col, Typography, Switch, Space, Descriptions, Flex } from 'antd';
 import { updatePolicyEnabled } from '../../api';
 import type { Policy } from '../../types';
-import { DecisionPill, MetricCard as Metric } from '../ui';
-import { Row, Col, Card, Typography, Switch, Space, Tag, Descriptions, Flex, Alert } from 'antd';
+import { DecisionPill, LabelTag, MetricCard as Metric, PanelCard, UiAlert } from '../ui';
 
 export function PolicyCenter({
   policies,
@@ -31,10 +31,10 @@ export function PolicyCenter({
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+    <div className="zh-page-stack">
       <Flex justify="space-between" align="center" wrap="wrap" gap={16}>
         <Space orientation="vertical" size={4}>
-          <Typography.Title level={2} style={{ margin: 0 }}>
+          <Typography.Title level={2} className="zh-title-flush">
             防御策略中心
           </Typography.Title>
           <Typography.Text type="secondary">
@@ -65,7 +65,7 @@ export function PolicyCenter({
       <Row gutter={[24, 24]}>
         {policies.map((policy) => (
           <Col xs={24} sm={24} md={24} lg={12} xl={12} xxl={8} key={policy.id}>
-            <Card
+            <PanelCard
               variant="borderless"
               style={{
                 height: '100%',
@@ -108,7 +108,7 @@ export function PolicyCenter({
                 <Descriptions size="small" column={2} style={{ marginBottom: 0 }}>
                   <Descriptions.Item
                     label={
-                      <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                      <Typography.Text type="secondary" className="zh-text-meta">
                         层级
                       </Typography.Text>
                     }
@@ -117,7 +117,7 @@ export function PolicyCenter({
                   </Descriptions.Item>
                   <Descriptions.Item
                     label={
-                      <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                      <Typography.Text type="secondary" className="zh-text-meta">
                         攻击面
                       </Typography.Text>
                     }
@@ -126,7 +126,7 @@ export function PolicyCenter({
                   </Descriptions.Item>
                   <Descriptions.Item
                     label={
-                      <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                      <Typography.Text type="secondary" className="zh-text-meta">
                         工具
                       </Typography.Text>
                     }
@@ -140,22 +140,22 @@ export function PolicyCenter({
               {policy.risk_controls?.length ? (
                 <Space size={[0, 8]} wrap style={{ marginBottom: policy.disable_impact ? 16 : 0 }}>
                   {policy.risk_controls.map((item) => (
-                    <Tag key={item} variant="filled" color="processing">
+                    <LabelTag key={item} variant="filled" color="processing">
                       {item}
-                    </Tag>
+                    </LabelTag>
                   ))}
                 </Space>
               ) : null}
 
               {policy.disable_impact && (
-                <Alert
+                <UiAlert
                   type="warning"
                   title={`关闭影响: ${policy.disable_impact}`}
                   showIcon
                   style={{ marginTop: 'auto' }}
                 />
               )}
-            </Card>
+            </PanelCard>
           </Col>
         ))}
       </Row>

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Row, Col, Typography, Space, Alert } from 'antd';
-import { MetricCard as Metric, PanelCard } from '../ui';
+import { Col, Row, Space, Typography } from 'antd';
+import { MetricCard as Metric, PanelCard, UiAlert } from '../ui';
 import type { AnomalyCalibration } from '../../types';
 
 export function AnomalyCalibrationBlock({ calibration }: { calibration: AnomalyCalibration }) {
@@ -12,31 +12,31 @@ export function AnomalyCalibrationBlock({ calibration }: { calibration: AnomalyC
   const reviewItems = calibration.missed_attack_review.slice(0, 4);
   return (
     <PanelCard variant="borderless" className="zh-mb-24">
-      <div style={{ padding: 24, background: 'var(--ant-color-fill-tertiary)', borderRadius: 8, marginBottom: 24 }}>
+      <div className="zh-section-surface">
         <Row align="middle" gutter={16}>
           <Col xs={24} sm={16}>
             <Typography.Text type="secondary" className="zh-meta-block">
               异常检测校准
             </Typography.Text>
-            <Typography.Title level={3} style={{ margin: 0, marginBottom: 8 }}>
+            <Typography.Title level={3} className="zh-title-flush zh-mb-8">
               推荐阈值 anomaly_score ≥ {selected}
             </Typography.Title>
-            <Typography.Paragraph type="secondary" style={{ margin: 0 }}>
+            <Typography.Paragraph type="secondary" className="zh-title-flush">
               {calibration.conclusion || calibration.objective}
             </Typography.Paragraph>
           </Col>
-          <Col xs={24} sm={8} style={{ textAlign: 'right' }}>
-            <Typography.Title level={1} style={{ margin: 0, color: 'var(--ant-color-primary)' }}>
+          <Col xs={24} sm={8} className="zh-text-right">
+            <Typography.Title level={1} className="zh-title-flush zh-color-primary">
               {selected}
             </Typography.Title>
-            <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+            <Typography.Text type="secondary" className="zh-text-meta">
               复核阈值
             </Typography.Text>
           </Col>
         </Row>
       </div>
 
-      <Row gutter={[16, 16]} style={{ marginBottom: 32 }}>
+      <Row gutter={[16, 16]} className="zh-mb-32">
         <Col span={6}>
           <Metric label="攻击召回率" value={`${summary.attack_recall_rate}%`} tone="cyan" />
         </Col>
@@ -57,10 +57,10 @@ export function AnomalyCalibrationBlock({ calibration }: { calibration: AnomalyC
 
       <Row gutter={[24, 24]}>
         <Col xs={24} lg={12}>
-          <Typography.Title level={5} style={{ marginBottom: 16 }}>
+          <Typography.Title level={5} className="zh-mb-16">
             阈值曲线 (召回 / 误报)
           </Typography.Title>
-          <Space orientation="vertical" style={{ width: '100%' }}>
+          <Space orientation="vertical" className="zh-full-width">
             {visibleCurve.map((item) => (
               <PanelCard
                 key={item.threshold}
@@ -92,8 +92,8 @@ export function AnomalyCalibrationBlock({ calibration }: { calibration: AnomalyC
                       />
                     </div>
                   </Col>
-                  <Col span={6} style={{ textAlign: 'right' }}>
-                    <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                  <Col span={6} className="zh-text-right">
+                    <Typography.Text type="secondary" className="zh-text-meta">
                       {item.attack_recall_rate}% / {item.benign_false_alarm_rate}%
                     </Typography.Text>
                   </Col>
@@ -103,28 +103,28 @@ export function AnomalyCalibrationBlock({ calibration }: { calibration: AnomalyC
           </Space>
         </Col>
         <Col xs={24} lg={12}>
-          <Typography.Title level={5} style={{ marginBottom: 16 }}>
+          <Typography.Title level={5} className="zh-mb-16">
             低于阈值但已控制 ({summary.policy_controlled_missed_count} 个)
           </Typography.Title>
           {reviewItems.length ? (
-            <Space orientation="vertical" style={{ width: '100%' }}>
+            <Space orientation="vertical" className="zh-full-width">
               {reviewItems.map((item) => (
                 <PanelCard key={item.id} size="small" type="inner">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                  <div className="zh-split-row zh-mb-4">
                     <Typography.Text strong>{item.id}</Typography.Text>
                     <Typography.Text code>{item.tool}</Typography.Text>
                   </div>
-                  <Typography.Paragraph type="secondary" style={{ fontSize: 13, margin: '8px 0' }}>
+                  <Typography.Paragraph type="secondary" className="zh-text-body zh-my-8">
                     {item.title}
                   </Typography.Paragraph>
-                  <Typography.Text type="secondary" style={{ fontSize: 12 }}>
+                  <Typography.Text type="secondary" className="zh-text-meta">
                     {item.policy_id} / {item.supervisor_decision} / 异常分 {item.anomaly_score}
                   </Typography.Text>
                 </PanelCard>
               ))}
             </Space>
           ) : (
-            <Alert title="没有需要复核的低分攻击样本。" type="info" showIcon />
+            <UiAlert title="没有需要复核的低分攻击样本。" type="info" showIcon />
           )}
         </Col>
       </Row>

@@ -1,5 +1,5 @@
-import { Badge, Col, Flex, Progress, Row, Space, Typography } from 'antd';
-import { MetricCard as Metric, SectionTitle, PanelCard } from '../ui';
+import { Col, Flex, Row, Space, Typography } from 'antd';
+import { MetricCard as Metric, PanelCard, SectionTitle, UiBadge, UiProgress } from '../ui';
 import type { ReportData } from '../../types';
 import { AnomalyCalibrationBlock } from './AnomalyCalibrationBlock';
 import { ProjectRoadmapBlock } from './ProjectRoadmapBlock';
@@ -48,7 +48,7 @@ export function ReportOverviewTab({ report }: ReportOverviewTabProps) {
             variant="borderless"
             className="zh-full-height"
           >
-            <Space orientation="vertical" style={{ width: '100%' }}>
+            <Space orientation="vertical" className="zh-full-width">
               {[
                 {
                   label: '防护控制率',
@@ -88,7 +88,7 @@ export function ReportOverviewTab({ report }: ReportOverviewTabProps) {
                     <Typography.Text>{item.label}</Typography.Text>
                     <Typography.Text strong>{item.value}%</Typography.Text>
                   </Flex>
-                  <Progress
+                  <UiProgress
                     percent={Math.min(100, Math.max(0, item.value))}
                     showInfo={false}
                     strokeColor={item.color}
@@ -101,7 +101,7 @@ export function ReportOverviewTab({ report }: ReportOverviewTabProps) {
         </Col>
         <Col xs={24} lg={12}>
           <PanelCard title="攻击面剧本分布" variant="borderless" className="zh-full-height">
-            <Space orientation="vertical" style={{ width: '100%' }}>
+            <Space orientation="vertical" className="zh-full-width">
               {report.surface_coverage.map((surface) => {
                 const maxCount = Math.max(1, ...report.surface_coverage.map((i) => i.scenario_count));
                 return (
@@ -110,7 +110,7 @@ export function ReportOverviewTab({ report }: ReportOverviewTabProps) {
                       <Typography.Text>{surface.name}</Typography.Text>
                       <Typography.Text strong>{surface.scenario_count}</Typography.Text>
                     </Flex>
-                    <Progress
+                    <UiProgress
                       percent={Math.max(2, Math.round((surface.scenario_count / maxCount) * 100))}
                       showInfo={false}
                       strokeColor="var(--ant-color-primary)"
@@ -144,13 +144,13 @@ export function ReportOverviewTab({ report }: ReportOverviewTabProps) {
                 >
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
                     <div style={{ paddingTop: 4 }}>
-                      <Badge status="processing" />
+                      <UiBadge status="processing" />
                     </div>
                     <div>
                       <div>
                         <Typography.Text strong>{item.name}</Typography.Text>
                       </div>
-                      <div style={{ marginTop: 4 }}>
+                      <div className="zh-mt-4">
                         <Typography.Text type="secondary">{item.evidence}</Typography.Text>
                       </div>
                     </div>
@@ -158,11 +158,7 @@ export function ReportOverviewTab({ report }: ReportOverviewTabProps) {
                   <Typography.Text strong>{item.status}</Typography.Text>
                 </div>
               ))}
-              {!report.deliverables.length && (
-                <div style={{ padding: 24, textAlign: 'center', color: 'var(--ant-color-text-description)' }}>
-                  暂无数据
-                </div>
-              )}
+              {!report.deliverables.length && <div className="zh-empty-panel">暂无数据</div>}
             </div>
           </PanelCard>
         </Col>
@@ -189,9 +185,7 @@ export function ReportOverviewTab({ report }: ReportOverviewTabProps) {
                 </div>
               ))}
               {!report.policy_hits.length && (
-                <div style={{ padding: 24, textAlign: 'center', color: 'var(--ant-color-text-description)' }}>
-                  暂无策略命中记录，先运行一次攻击剧本。
-                </div>
+                <div className="zh-empty-panel">暂无策略命中记录，先运行一次攻击剧本。</div>
               )}
             </div>
           </PanelCard>

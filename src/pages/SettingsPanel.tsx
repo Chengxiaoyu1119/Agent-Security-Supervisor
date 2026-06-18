@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Tabs, Typography } from 'antd';
+import { Typography } from 'antd';
 import {
   DemoReadinessTab,
   ExternalIntegrationTab,
@@ -19,6 +19,7 @@ import {
   evaluateSupervisorEvent,
   evaluateSupervisorBatch
 } from '../api';
+import { UiTabs } from '../components/ui';
 import type {
   SupervisorEvaluation,
   SupervisorBatchEvaluation,
@@ -207,9 +208,9 @@ export function SettingsPanel({ overview, refresh }: { overview: Overview; refre
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+    <div className="zh-page-stack">
       <Typography.Title level={2}>模型与系统设置</Typography.Title>
-      <Tabs
+      <UiTabs
         defaultActiveKey="1"
         size="large"
         items={[

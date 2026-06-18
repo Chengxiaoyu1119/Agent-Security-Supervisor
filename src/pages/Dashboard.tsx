@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Tabs } from 'antd';
 import { fetchSurfaceEvidencePack, fetchSurfaceEvidencePackIndex, writeAllSurfaceEvidencePacks } from '../api';
 import type { SurfaceEvidencePack, SurfaceEvidencePackWriteResult, SurfaceEvidencePackIndex, Overview } from '../types';
 import { DashboardEvidenceTab, DashboardOverviewTab, DashboardSurfacesTab } from '../components/dashboard';
+import { UiTabs } from '../components/ui';
 
 export function Dashboard({
   overview,
@@ -160,8 +160,8 @@ export function Dashboard({
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
-      <Tabs
+    <div className="zh-page-stack">
+      <UiTabs
         defaultActiveKey="overview"
         items={[
           {

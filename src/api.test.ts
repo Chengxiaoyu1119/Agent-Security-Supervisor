@@ -1,8 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { fetchOverview, fetchReport } from './api';
+import { ApiError, fetchOverview, fetchReport, setAuthTokenProvider } from './api';
 import type { Overview, ReportData } from './types';
 
 afterEach(() => {
+  setAuthTokenProvider(null);
   vi.unstubAllGlobals();
 });
 
@@ -32,12 +33,9 @@ describe('api client', () => {
     vi.stubGlobal('fetch', fetchMock);
 
     await expect(fetchOverview()).resolves.toEqual(overview);
-    expect(fetchMock).toHaveBeenCalledWith(
-      '/api/overview',
-      expect.objectContaining({
-        headers: { 'Content-Type': 'application/json' }
-      })
-    );
+    expect(fetchMock).toHaveBeenCalledWith('/api/overview', expect.objectContaining({ headers: expect.any(Headers) }));
+    const init = fetchMock.mock.calls[0]?.[1];
+    expect((init?.headers as Headers).get('Content-Type')).toBe('application/json');
   });
 
   it('falls back to local overview data when the backend is unavailable', async () => {
@@ -61,5 +59,44 @@ describe('api client', () => {
     await expect(fetchReport()).resolves.toEqual(report);
     const init = fetchMock.mock.calls[0]?.[1];
     expect(init?.signal).toBeInstanceOf(AbortSignal);
+  });
+
+  it('adds an authorization header when a token provider is configured', async () => {
+    const report = { markdown: '# report' } as ReportData;
+    const fetchMock = vi.fn<typeof fetch>().mockResolvedValue({
+      ok: true,
+      json: async () => report
+    } as Response);
+
+    vi.stubGlobal('fetch', fetchMock);
+    setAuthTokenProvider(() => 'local-token');
+
+    await expect(fetchReport()).resolves.toEqual(report);
+    const init = fetchMock.mock.calls[0]?.[1];
+    const headers = init?.headers as Headers;
+    expect(headers.get('Authorization')).toBe('Bearer local-token');
+  });
+
+  it('throws a structured ApiError for non-fallback API failures', async () => {
+    const fetchMock = vi.fn<typeof fetch>().mockResolvedValue({
+      ok: false,
+      status: 403,
+      text: async () => 'forbidden'
+    } as Response);
+
+    vi.stubGlobal('fetch', fetchMock);
+
+    try {
+      await fetchReport();
+      throw new Error('Expected fetchReport to reject');
+    } catch (error) {
+      expect(error).toBeInstanceOf(ApiError);
+      expect(error).toMatchObject({
+        code: 'http_error',
+        path: '/api/report',
+        status: 403,
+        body: 'forbidden'
+      });
+    }
   });
 });
