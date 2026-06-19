@@ -2,7 +2,7 @@
   "version": "2.0.0",
   "tasks": [
     {
-      "label": "start:frontend",
+      "label": "start:console",
       "type": "shell",
       "command": "npm run dev -- --strictPort",
       "options": {
@@ -21,7 +21,7 @@
       }
     },
     {
-      "label": "start:backend",
+      "label": "start:api",
       "type": "shell",
       "command": "npm run api",
       "options": {
@@ -40,10 +40,50 @@
       }
     },
     {
+      "label": "start:docs",
+      "type": "shell",
+      "command": "npm run docs:dev",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": true,
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "close": false,
+        "showReuseMessage": false
+      }
+    },
+    {
+      "label": "start:www",
+      "type": "shell",
+      "command": "npm run www:dev",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "isBackground": true,
+      "runOptions": {
+        "instanceLimit": 1
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "close": false,
+        "showReuseMessage": false
+      }
+    },
+    {
       "label": "start:all",
       "dependsOn": [
-        "start:backend",
-        "start:frontend"
+        "start:api",
+        "start:console",
+        "start:docs",
+        "start:www"
       ],
       "dependsOrder": "parallel",
       "isBackground": true,
