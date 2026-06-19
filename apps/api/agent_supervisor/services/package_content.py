@@ -6,10 +6,8 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
+from ..paths import SANDBOX_REPORTS_DIR
 from .package_docs import _adapter_schema
-
-
-BASE_DIR = Path(__file__).resolve().parents[1]
 
 
 def _clean_submission_summary(runs: list[dict[str, Any]], scenarios: list[dict[str, Any]]) -> dict[str, Any]:
@@ -96,7 +94,7 @@ def _file(filename: str, title: str, description: str, content: str | dict[str, 
 
 
 def _external_agent_demo_evidence_files() -> dict[str, str]:
-    report_dir = BASE_DIR / "sandbox" / "reports"
+    report_dir = SANDBOX_REPORTS_DIR
     files: dict[str, str] = {}
     markdown_path = report_dir / "最小外部Agent接入运行证据.md"
     json_path = report_dir / "最小外部Agent接入运行证据.json"
@@ -108,7 +106,7 @@ def _external_agent_demo_evidence_files() -> dict[str, str]:
 
 
 def _copy_demo_screenshots(support_dir: Path) -> list[Path]:
-    report_dir = BASE_DIR / "sandbox" / "reports"
+    report_dir = SANDBOX_REPORTS_DIR
     screenshot_names = [
         "surface-dashboard-desktop-final.png",
         "surface-dashboard-mobile-final.png",
@@ -169,7 +167,7 @@ def _copy_demo_screenshots(support_dir: Path) -> list[Path]:
 
 
 def _copy_multi_agent_self_review_reports(target_dir: Path) -> list[Path]:
-    report_dir = BASE_DIR / "sandbox" / "reports"
+    report_dir = SANDBOX_REPORTS_DIR
     report_names = [
         "多Agent自审优化报告.json",
         "多Agent自审优化报告.md",

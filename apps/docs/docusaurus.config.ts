@@ -1,11 +1,15 @@
 import type { Config } from '@docusaurus/types';
 import type { Preset } from '@docusaurus/preset-classic';
 
+const siteUrl = process.env.AGENT_SUPERVISOR_DOCS_SITE_URL ?? 'https://agent-security-supervisor.local';
+const wwwUrl = process.env.AGENT_SUPERVISOR_WWW_URL ?? 'http://127.0.0.1:4321';
+const consoleUrl = process.env.AGENT_SUPERVISOR_CONSOLE_URL ?? 'http://127.0.0.1:5178';
+
 const config: Config = {
   title: '智安哨文档站',
   tagline: 'Agent Security Supervisor documentation',
   favicon: 'img/logo.svg',
-  url: 'https://agent-security-supervisor.local',
+  url: siteUrl,
   baseUrl: '/',
   organizationName: 'agent-security-supervisor',
   projectName: 'agent-security-supervisor',
@@ -46,8 +50,8 @@ const config: Config = {
       items: [
         { type: 'docSidebar', sidebarId: 'mainSidebar', position: 'left', label: '文档' },
         { to: '/quickstart', label: '快速开始', position: 'left' },
-        { href: 'http://127.0.0.1:4321', label: '官网', position: 'right' },
-        { href: 'http://127.0.0.1:5178', label: '控制台', position: 'right' }
+        { href: wwwUrl, label: '官网', position: 'right' },
+        { href: consoleUrl, label: '控制台', position: 'right' }
       ]
     },
     footer: {

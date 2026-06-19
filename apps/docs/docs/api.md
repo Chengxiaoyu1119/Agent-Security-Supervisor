@@ -25,7 +25,7 @@ title: API 地图
 
 ## API Token
 
-正式部署时可以设置：
+正式部署默认需要 API Token。`npm run api` 会为本地演示显式设置 `AGENT_SUPERVISOR_AUTH_DISABLED=true`，直接部署后端时不要依赖这个开发开关。
 
 ```powershell
 $env:AGENT_SUPERVISOR_API_TOKEN="your-token"
@@ -37,4 +37,14 @@ $env:AGENT_SUPERVISOR_API_TOKEN="your-token"
 Authorization: Bearer your-token
 ```
 
-也兼容旧请求头 `X-Zhian-Api-Token`。
+控制台可以通过 `apps/console/.env` 注入：
+
+```text
+VITE_AGENT_SUPERVISOR_API_TOKEN=your-token
+```
+
+也可以在浏览器控制台临时写入：
+
+```js
+localStorage.setItem("agent-supervisor-api-token", "your-token")
+```

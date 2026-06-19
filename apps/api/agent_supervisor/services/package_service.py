@@ -30,6 +30,7 @@ from ..readiness import (
     write_competition_readiness_report,
 )
 from ..roadmap import build_project_roadmap_markdown
+from ..paths import SUBMISSION_PACKAGES_DIR
 from ..surface_pack import build_surface_evidence_index_markdown, write_all_surface_briefing_sheets
 from .package_content import (
     _checklist,
@@ -72,8 +73,7 @@ from .package_docs import (
 )
 
 
-BASE_DIR = Path(__file__).resolve().parents[1]
-SUBMISSION_ROOT = BASE_DIR / "sandbox" / "submission_packages"
+SUBMISSION_ROOT = SUBMISSION_PACKAGES_DIR
 
 
 def build_competition_package(runs: list[dict[str, Any]] | None = None) -> dict[str, Any]:

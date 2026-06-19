@@ -5,7 +5,6 @@ import urllib.request
 from collections.abc import Callable
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import Any
 
 from .openclaw_plugin_package import (
@@ -17,6 +16,7 @@ from .openclaw_plugin_package import (
     write_openclaw_plugin_package,
     write_openclaw_plugin_validation_report,
 )
+from .paths import SANDBOX_EXAMPLES_DIR
 
 @dataclass
 class GuardedToolResult:
@@ -304,7 +304,7 @@ def build_openclaw_integration_markdown() -> str:
     return "\n".join(lines)
 
 def _load_sample_events() -> list[dict[str, Any]]:
-    sample_path = Path(__file__).resolve().parents[1] / "sandbox" / "examples" / "openclaw-like-events.json"
+    sample_path = SANDBOX_EXAMPLES_DIR / "openclaw-like-events.json"
     try:
         data = json.loads(sample_path.read_text(encoding="utf-8"))
     except OSError:

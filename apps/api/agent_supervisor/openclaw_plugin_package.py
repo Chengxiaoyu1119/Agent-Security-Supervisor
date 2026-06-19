@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from .paths import SANDBOX_REPORTS_DIR
 from .openclaw_plugin_templates import (
     _openclaw_plugin_manifest,
     _openclaw_plugin_package_json,
@@ -144,7 +145,7 @@ def write_openclaw_plugin_package(
     supervisor_url: str = "http://127.0.0.1:8012/api/integrations/openclaw/events",
 ) -> dict[str, Any]:
     with OPENCLAW_PLUGIN_PACKAGE_LOCK:
-        root = Path(output_root) if output_root else Path(__file__).resolve().parents[1] / "sandbox" / "reports"
+        root = Path(output_root) if output_root else SANDBOX_REPORTS_DIR
         package_dir = root / "agent-supervisor-openclaw-guard"
         package_dir.mkdir(parents=True, exist_ok=True)
         files = build_openclaw_plugin_package_files(supervisor_url)
@@ -260,7 +261,7 @@ def write_openclaw_plugin_validation_report(
     *,
     inspect_runtime: bool = False,
 ) -> dict[str, Any]:
-    root = Path(output_root) if output_root else Path(__file__).resolve().parents[1] / "sandbox" / "reports"
+    root = Path(output_root) if output_root else SANDBOX_REPORTS_DIR
     root.mkdir(parents=True, exist_ok=True)
     validation = validate_openclaw_plugin_package(
         output_root=root,

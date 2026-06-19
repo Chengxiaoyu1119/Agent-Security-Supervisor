@@ -7,13 +7,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-BASE_DIR = Path(__file__).resolve().parents[1]
-SANDBOX_DIR = BASE_DIR / "sandbox"
-FIXTURE_WORKSPACE_DIR = SANDBOX_DIR / "fixtures" / "workspace"
-SANDBOX_RUNTIME_DIR = SANDBOX_DIR / "runtime"
-WORKSPACE_DIR = SANDBOX_RUNTIME_DIR / "workspace"
-OUTBOX_DIR = SANDBOX_RUNTIME_DIR / "outbox"
-MEMORY_DIR = SANDBOX_RUNTIME_DIR / "memory"
+from .paths import FIXTURE_WORKSPACE_DIR, MEMORY_DIR, OUTBOX_DIR, WORKSPACE_DIR
+
 MAX_FILE_WRITE_CHARS = 20_000
 
 ALLOWED_CODE_COMMANDS = {

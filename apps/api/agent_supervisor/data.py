@@ -4,15 +4,32 @@ import json
 from copy import deepcopy
 from pathlib import Path
 
+from .paths import RUNTIME_DIR
+
 CONFIG_DIR = Path(__file__).parent / "config"
+POLICY_OVERRIDES_PATH = RUNTIME_DIR / "policy_overrides.json"
 
 def _load_json(filename: str) -> list | dict:
     with open(CONFIG_DIR / filename, "r", encoding="utf-8") as f:
         return json.load(f)
 
-def _save_json(filename: str, data: list | dict) -> None:
-    with open(CONFIG_DIR / filename, "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+def _load_policy_overrides() -> dict[str, bool]:
+    if not POLICY_OVERRIDES_PATH.exists():
+        return {}
+    try:
+        raw = json.loads(POLICY_OVERRIDES_PATH.read_text(encoding="utf-8"))
+    except json.JSONDecodeError:
+        return {}
+    if not isinstance(raw, dict):
+        return {}
+    return {str(key): bool(value) for key, value in raw.items()}
+
+
+def _save_policy_overrides(overrides: dict[str, bool]) -> None:
+    RUNTIME_DIR.mkdir(parents=True, exist_ok=True)
+    tmp_path = POLICY_OVERRIDES_PATH.with_suffix(".tmp")
+    tmp_path.write_text(json.dumps(overrides, ensure_ascii=False, indent=2), encoding="utf-8")
+    tmp_path.replace(POLICY_OVERRIDES_PATH)
 
 def get_attack_surfaces() -> list[dict]:
     return deepcopy(_load_json("attack_surfaces.json"))
@@ -26,26 +43,29 @@ def _enrich_policy(policy: dict, impacts: dict) -> dict:
 def get_policies() -> list[dict]:
     policies = _load_json("policies.json")
     impacts = _load_json("policy_impact.json")
-    return [_enrich_policy(p, impacts) for p in policies]
+    overrides = _load_policy_overrides()
+    return [_enrich_policy({**p, "enabled": overrides.get(p["id"], p["enabled"])}, impacts) for p in policies]
 
 def get_scenarios() -> list[dict]:
     return deepcopy(_load_json("scenarios.json"))
 
 def set_policy_enabled(policy_id: str, enabled: bool) -> dict:
     policies = _load_json("policies.json")
+    overrides = _load_policy_overrides()
     for policy in policies:
         if policy["id"] == policy_id:
-            policy["enabled"] = enabled
-            _save_json("policies.json", policies)
+            overrides[policy_id] = enabled
+            _save_policy_overrides(overrides)
             impacts = _load_json("policy_impact.json")
-            return _enrich_policy(policy, impacts)
+            return _enrich_policy({**policy, "enabled": enabled}, impacts)
     raise KeyError(f"Policy not found: {policy_id}")
 
 def is_policy_enabled(policy_id: str) -> bool:
     policies = _load_json("policies.json")
+    overrides = _load_policy_overrides()
     for policy in policies:
         if policy["id"] == policy_id:
-            return policy["enabled"]
+            return overrides.get(policy_id, policy["enabled"])
     return False
 
 def find_scenario(scenario_id: str) -> dict:

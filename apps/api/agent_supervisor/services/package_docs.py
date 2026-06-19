@@ -1,10 +1,8 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
-from pathlib import Path
 from typing import Any
 
-
-BASE_DIR = Path(__file__).resolve().parents[1]
+from ..paths import ROOT_DOCS_DIR
 
 
 def _adapter_schema() -> dict[str, Any]:
@@ -292,25 +290,25 @@ def _source_tree() -> str:
             "| `apps/api/agent_supervisor/calibration.py` | 异常检测阈值校准、召回率和误报率报告生成 |",
             "| `apps/api/agent_supervisor/demo_drill.py` | 答辩一键演示编排和演示报告生成 |",
             "| `apps/api/agent_supervisor/tools.py` | 邮件、文件、API、代码、记忆、环境模拟工具 |",
-            "| `apps/api/agent_supervisor/deliverables.py` | 比赛材料包和提交包生成 |",
+            "| `apps/api/agent_supervisor/services/package_service.py` | 比赛材料包和提交包生成 |",
             "| `apps/api/agent_supervisor/events.py` | 外部智能体工具调用事件评估和审计落库 |",
             "| `apps/api/agent_supervisor/openclaw_adapter.py` | OpenClaw 兼容接口、源码级 native plugin 包生成 |",
             "| `apps/api/agent_supervisor/readiness.py` | 赛前一键体检、提交包完整性检查和 P0 补证项汇总 |",
             "| `apps/api/agent_supervisor/surface_pack.py` | 单个攻击面证据包生成、Markdown 导出和索引汇总 |",
             "| `apps/api/agent_supervisor/main.py` | FastAPI 后端接口 |",
             "| `apps/api/agent_supervisor/cli.py` | 命令行运行、导出和打包入口 |",
-            "| `src/App.tsx` | 前端主页面和各功能模块 |",
-            "| `src/api.ts` | 前端 API 调用封装 |",
-            "| `src/types.ts` | 前端 TypeScript 数据类型 |",
-            "| `src/design/tokens.css` | 前端设计 Token 源头，统一颜色、间距、圆角、阴影和旧变量别名 |",
-            "| `src/components/ui/` | 复用基础 UI 组件，当前包含按钮、指标卡、状态标签和安全决策标签 |",
-            "| `src/components/evidence/` | 运行证据展示组件，承载工具调用审计摘要和 hash 时间线 |",
-            "| `src/components/surface/` | 攻击面展示组件，承载攻击入口、保护资产、检测信号等属性块 |",
-            "| `src/components/scenarios/` | 攻击剧本库页面组件，承载剧本筛选、详情和工具调用参数展示 |",
-            "| `src/components/lab/` | 攻击复现实验室组件，承载剧本运行、无防护/有防护对比和批量结果展示 |",
-            "| `src/components/agent/` | 多 Agent 攻击链页面组件，承载协作时间线、工具调用证据和结果摘要 |",
-            "| `src/components/policy/` | 防御策略中心组件，承载策略影响矩阵、覆盖工具、攻击面和关闭影响说明 |",
-            "| `src/styles.css` | 前端页面样式 |",
+            "| `apps/console/src/App.tsx` | 前端主页面和各功能模块 |",
+            "| `apps/console/src/api.ts` | 前端 API 调用封装 |",
+            "| `apps/console/src/types.ts` | 前端 TypeScript 数据类型 |",
+            "| `apps/console/src/design/tokens.css` | 前端设计 Token 源头，统一颜色、间距、圆角、阴影和旧变量别名 |",
+            "| `apps/console/src/components/ui/` | 复用基础 UI 组件，当前包含按钮、指标卡、状态标签和安全决策标签 |",
+            "| `apps/console/src/components/evidence/` | 运行证据展示组件，承载工具调用审计摘要和 hash 时间线 |",
+            "| `apps/console/src/components/surface/` | 攻击面展示组件，承载攻击入口、保护资产、检测信号等属性块 |",
+            "| `apps/console/src/components/scenarios/` | 攻击剧本库页面组件，承载剧本筛选、详情和工具调用参数展示 |",
+            "| `apps/console/src/components/lab/` | 攻击复现实验室组件，承载剧本运行、无防护/有防护对比和批量结果展示 |",
+            "| `apps/console/src/components/agent/` | 多 Agent 攻击链页面组件，承载协作时间线、工具调用证据和结果摘要 |",
+            "| `apps/console/src/components/policy/` | 防御策略中心组件，承载策略影响矩阵、覆盖工具、攻击面和关闭影响说明 |",
+            "| `apps/console/src/styles.css` | 前端页面样式 |",
             "| `scripts/frontend-governance-check.mjs` | 前端规范检查脚本，统计超大文件和样式硬编码问题 |",
             "| `scripts/project-self-review.mjs` | 多 Agent 自审报告脚本，汇总结构、截图、体检和提交包状态 |",
             "| `docs/` | 项目立项、方案、报告大纲和交付说明 |",
@@ -355,7 +353,7 @@ def _threat_model_for_package() -> str:
 
 
 def _real_integration_guide() -> str:
-    doc_path = BASE_DIR.parent / "docs" / "真实接入与攻击面扩展说明.md"
+    doc_path = ROOT_DOCS_DIR / "真实接入与攻击面扩展说明.md"
     if doc_path.exists():
         return doc_path.read_text(encoding="utf-8")
     return "\n".join(
@@ -368,7 +366,7 @@ def _real_integration_guide() -> str:
 
 
 def _frontend_design_record() -> str:
-    doc_path = BASE_DIR.parent / "docs" / "前端审美优化记录.md"
+    doc_path = ROOT_DOCS_DIR / "前端审美优化记录.md"
     if doc_path.exists():
         return doc_path.read_text(encoding="utf-8")
     return "\n".join(
@@ -381,7 +379,7 @@ def _frontend_design_record() -> str:
 
 
 def _frontend_governance_record() -> str:
-    doc_path = BASE_DIR.parent / "docs" / "前端工程规范与设计Token治理记录-20260608.md"
+    doc_path = ROOT_DOCS_DIR / "前端工程规范与设计Token治理记录-20260608.md"
     if doc_path.exists():
         return doc_path.read_text(encoding="utf-8")
     return "\n".join(
@@ -394,7 +392,7 @@ def _frontend_governance_record() -> str:
 
 
 def _multi_agent_self_review_record() -> str:
-    doc_path = BASE_DIR.parent / "docs" / "多Agent自审优化闭环报告-20260609.md"
+    doc_path = ROOT_DOCS_DIR / "多Agent自审优化闭环报告-20260609.md"
     if doc_path.exists():
         return doc_path.read_text(encoding="utf-8")
     return "\n".join(
@@ -407,7 +405,7 @@ def _multi_agent_self_review_record() -> str:
 
 
 def _page_agent_demo_record() -> str:
-    doc_path = BASE_DIR.parent / "docs" / "页面一键真实Agent演示完善记录-20260608.md"
+    doc_path = ROOT_DOCS_DIR / "页面一键真实Agent演示完善记录-20260608.md"
     if doc_path.exists():
         return doc_path.read_text(encoding="utf-8")
     return "\n".join(
@@ -420,7 +418,7 @@ def _page_agent_demo_record() -> str:
 
 
 def _openclaw_plugin_record() -> str:
-    doc_path = BASE_DIR.parent / "docs" / "OpenClaw源码级插件包完善记录-20260608.md"
+    doc_path = ROOT_DOCS_DIR / "OpenClaw源码级插件包完善记录-20260608.md"
     if doc_path.exists():
         return doc_path.read_text(encoding="utf-8")
     return "\n".join(
@@ -433,7 +431,7 @@ def _openclaw_plugin_record() -> str:
 
 
 def _policy_ablation_record() -> str:
-    doc_path = BASE_DIR.parent / "docs" / "策略消融实验完善记录-20260608.md"
+    doc_path = ROOT_DOCS_DIR / "策略消融实验完善记录-20260608.md"
     if doc_path.exists():
         return doc_path.read_text(encoding="utf-8")
     return "\n".join(
@@ -446,7 +444,7 @@ def _policy_ablation_record() -> str:
 
 
 def _surface_pack_record() -> str:
-    doc_path = BASE_DIR.parent / "docs" / "攻击面证据包完善记录-20260608.md"
+    doc_path = ROOT_DOCS_DIR / "攻击面证据包完善记录-20260608.md"
     if doc_path.exists():
         return doc_path.read_text(encoding="utf-8")
     return "\n".join(
@@ -459,7 +457,7 @@ def _surface_pack_record() -> str:
 
 
 def _roadmap_record() -> str:
-    doc_path = BASE_DIR.parent / "docs" / "项目成熟度与缺口路线图完善记录-20260608.md"
+    doc_path = ROOT_DOCS_DIR / "项目成熟度与缺口路线图完善记录-20260608.md"
     if doc_path.exists():
         return doc_path.read_text(encoding="utf-8")
     return "\n".join(
@@ -472,7 +470,7 @@ def _roadmap_record() -> str:
 
 
 def _anomaly_calibration_record() -> str:
-    doc_path = BASE_DIR.parent / "docs" / "异常检测阈值校准完善记录-20260608.md"
+    doc_path = ROOT_DOCS_DIR / "异常检测阈值校准完善记录-20260608.md"
     if doc_path.exists():
         return doc_path.read_text(encoding="utf-8")
     return "\n".join(
@@ -489,7 +487,7 @@ def _anomaly_calibration_record() -> str:
 
 
 def _benign_expansion_record() -> str:
-    doc_path = BASE_DIR.parent / "docs" / "正常比赛任务样本扩充记录-20260608.md"
+    doc_path = ROOT_DOCS_DIR / "正常比赛任务样本扩充记录-20260608.md"
     if doc_path.exists():
         return doc_path.read_text(encoding="utf-8")
     return "\n".join(
@@ -502,7 +500,7 @@ def _benign_expansion_record() -> str:
 
 
 def _benign_workflow_record() -> str:
-    doc_path = BASE_DIR.parent / "docs" / "连续正常比赛任务流程误报评测记录-20260608.md"
+    doc_path = ROOT_DOCS_DIR / "连续正常比赛任务流程误报评测记录-20260608.md"
     if doc_path.exists():
         return doc_path.read_text(encoding="utf-8")
     return "\n".join(
@@ -517,7 +515,7 @@ def _benign_workflow_record() -> str:
 
 
 def _readiness_record() -> str:
-    doc_path = BASE_DIR.parent / "docs" / "赛前一键体检完善记录-20260608.md"
+    doc_path = ROOT_DOCS_DIR / "赛前一键体检完善记录-20260608.md"
     if doc_path.exists():
         return doc_path.read_text(encoding="utf-8")
     return "\n".join(
@@ -554,7 +552,7 @@ def _readiness_record() -> str:
 
 
 def _approval_review_record() -> str:
-    doc_path = BASE_DIR.parent / "docs" / "人工复核队列与审批闭环完善记录-20260608.md"
+    doc_path = ROOT_DOCS_DIR / "人工复核队列与审批闭环完善记录-20260608.md"
     if doc_path.exists():
         return doc_path.read_text(encoding="utf-8")
     return "\n".join(
@@ -583,7 +581,7 @@ def _approval_review_record() -> str:
 
 
 def _demo_drill_record() -> str:
-    doc_path = BASE_DIR.parent / "docs" / "答辩一键演示闭环完善记录-20260608.md"
+    doc_path = ROOT_DOCS_DIR / "答辩一键演示闭环完善记录-20260608.md"
     if doc_path.exists():
         return doc_path.read_text(encoding="utf-8")
     return "\n".join(

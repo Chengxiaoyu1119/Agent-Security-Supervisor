@@ -2,6 +2,9 @@
 import HeroScene from '../components/HeroScene.astro';
 import { attackSurfaces, capabilities, integrationCards, pipeline } from '../content/homepage';
 import '../styles/global.css';
+
+const consoleUrl = import.meta.env.PUBLIC_AGENT_SUPERVISOR_CONSOLE_URL ?? 'http://127.0.0.1:5178';
+const docsUrl = import.meta.env.PUBLIC_AGENT_SUPERVISOR_DOCS_URL ?? 'http://127.0.0.1:3000';
 ---
 
 <!doctype html>
@@ -17,7 +20,7 @@ import '../styles/global.css';
     <title>智安哨 Agent Security Supervisor</title>
   </head>
   <body>
-    <HeroScene />
+    <HeroScene consoleUrl={consoleUrl} docsUrl={docsUrl} />
 
     <main>
       <section class="section" id="capabilities">
@@ -99,8 +102,8 @@ import '../styles/global.css';
         <h2>开始查看项目</h2>
         <p>如果你是第一次接触，建议先看文档站的“快速开始”，再进入控制台运行剧本。</p>
         <div>
-          <a href="http://127.0.0.1:3000" class="button button--large button--ghost">查看文档</a>
-          <a href="http://127.0.0.1:5178" class="button button--large">进入控制台</a>
+          <a href={docsUrl} class="button button--large button--ghost">查看文档</a>
+          <a href={consoleUrl} class="button button--large">进入控制台</a>
         </div>
       </section>
     </main>

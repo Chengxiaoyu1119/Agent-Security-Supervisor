@@ -1,5 +1,12 @@
 ---
 import { pipeline, stats } from '../content/homepage';
+
+interface Props {
+  consoleUrl: string;
+  docsUrl: string;
+}
+
+const { consoleUrl, docsUrl } = Astro.props;
 ---
 
 <section class="hero" id="top">
@@ -49,8 +56,8 @@ import { pipeline, stats } from '../content/homepage';
       <a href="#openclaw">OpenClaw</a>
     </div>
     <div class="nav__actions">
-      <a href="http://127.0.0.1:3000" class="button button--ghost">查看文档</a>
-      <a href="http://127.0.0.1:5178" class="button">进入控制台</a>
+      <a href={docsUrl} class="button button--ghost">查看文档</a>
+      <a href={consoleUrl} class="button">进入控制台</a>
     </div>
   </nav>
 
@@ -62,8 +69,8 @@ import { pipeline, stats } from '../content/homepage';
       行为策略、审计报告和 OpenClaw 接入连成一条可复核的安全闭环。
     </p>
     <div class="hero__actions">
-      <a href="http://127.0.0.1:5178" class="button button--large">进入控制台</a>
-      <a href="http://127.0.0.1:3000" class="button button--large button--ghost">阅读文档</a>
+      <a href={consoleUrl} class="button button--large">进入控制台</a>
+      <a href={docsUrl} class="button button--large button--ghost">阅读文档</a>
     </div>
   </div>
 

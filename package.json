@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
   "scripts": {
     "dev": "npm run console:dev",
     "console:dev": "npm --prefix apps/console run dev",
@@ -15,7 +18,7 @@
     "console:test": "npm --prefix apps/console run test",
     "ui:audit": "npm --prefix apps/console run ui:audit",
     "api": "npm run api:dev",
-    "api:dev": "python -X utf8 -m uvicorn apps.api.agent_supervisor.main:app --host 127.0.0.1 --port 8012",
+    "api:dev": "python -X utf8 -m apps.api.dev_server",
     "api:cli": "python -X utf8 -m apps.api.agent_supervisor.cli",
     "cli": "npm run api:cli --",
     "api:check": "python -X utf8 -m compileall apps/api/agent_supervisor",

@@ -47,6 +47,23 @@ describe('api client', () => {
     expect(overview.models.length).toBeGreaterThan(0);
   });
 
+  it('does not hide authorization failures behind fallback data', async () => {
+    const fetchMock = vi.fn<typeof fetch>().mockResolvedValue({
+      ok: false,
+      status: 403,
+      text: async () => 'forbidden'
+    } as Response);
+
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(fetchOverview()).rejects.toMatchObject({
+      code: 'http_error',
+      path: '/api/overview',
+      status: 403,
+      body: 'forbidden'
+    });
+  });
+
   it('uses an abort signal for report loading', async () => {
     const report = { markdown: '# report' } as ReportData;
     const fetchMock = vi.fn<typeof fetch>().mockResolvedValue({

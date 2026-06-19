@@ -31,9 +31,23 @@ import type {
   SurfaceEvidencePackWriteResult
 } from './types';
 import { fallbackOverview, fallbackPolicies, fallbackScenarios } from './fallback';
-import { request } from './app/apiRequest';
+import { ApiError, request } from './app/apiRequest';
 export { ApiError, setAuthTokenProvider } from './app/apiRequest';
 export type { ApiErrorCode, RequestOptions } from './app/apiRequest';
+
+function shouldUseFallback(error: unknown) {
+  if (!(error instanceof ApiError)) {
+    return true;
+  }
+  return error.code === 'network_error' || error.code === 'timeout';
+}
+
+function fallbackOrThrow<T>(error: unknown, fallback: T): T {
+  if (shouldUseFallback(error)) {
+    return fallback;
+  }
+  throw error;
+}
 
 export async function fetchHealth(): Promise<boolean> {
   try {
@@ -47,40 +61,40 @@ export async function fetchHealth(): Promise<boolean> {
 export async function fetchOverview(): Promise<Overview> {
   try {
     return await request<Overview>('/api/overview');
-  } catch {
-    return fallbackOverview;
+  } catch (error) {
+    return fallbackOrThrow(error, fallbackOverview);
   }
 }
 
 export async function fetchScenarios(): Promise<Scenario[]> {
   try {
     return await request<Scenario[]>('/api/scenarios');
-  } catch {
-    return fallbackScenarios;
+  } catch (error) {
+    return fallbackOrThrow(error, fallbackScenarios);
   }
 }
 
 export async function fetchStudentCompetitionAttackMap(): Promise<StudentCompetitionAttackProfile[]> {
   try {
     return await request<StudentCompetitionAttackProfile[]>('/api/student_competition_attack_map');
-  } catch {
-    return fallbackOverview.student_competition_attack_map ?? [];
+  } catch (error) {
+    return fallbackOrThrow(error, fallbackOverview.student_competition_attack_map ?? []);
   }
 }
 
 export async function fetchPolicies(): Promise<Policy[]> {
   try {
     return await request<Policy[]>('/api/policies');
-  } catch {
-    return fallbackPolicies;
+  } catch (error) {
+    return fallbackOrThrow(error, fallbackPolicies);
   }
 }
 
 export async function fetchAuditLogs(limit = 100): Promise<AuditLog[]> {
   try {
     return await request<AuditLog[]>(`/api/audit_logs?limit=${limit}`);
-  } catch {
-    return fallbackOverview.audit_logs;
+  } catch (error) {
+    return fallbackOrThrow(error, fallbackOverview.audit_logs);
   }
 }
 
@@ -91,8 +105,8 @@ export async function verifyRunAuditHash(runId: string): Promise<AuditHashVerifi
 export async function fetchAlerts(limit = 100): Promise<AlertItem[]> {
   try {
     return await request<AlertItem[]>(`/api/alerts?limit=${limit}`);
-  } catch {
-    return fallbackOverview.alerts;
+  } catch (error) {
+    return fallbackOrThrow(error, fallbackOverview.alerts);
   }
 }
 

@@ -208,7 +208,7 @@ def _iter_configured_providers() -> Iterable[dict]:
 
 
 def generate_model_response(prompt: str, scenario_id: str) -> dict:
-    if not _env_bool("MODEL_REAL_API_ENABLED", True):
+    if not _env_bool("MODEL_REAL_API_ENABLED", False):
         return simulate_model_response(prompt, scenario_id)
 
     failures = []

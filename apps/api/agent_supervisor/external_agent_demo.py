@@ -6,11 +6,11 @@ from pathlib import Path
 from typing import Any
 
 from .openclaw_adapter import GuardedToolResult, OpenClawToolGuard
-from .tools import SANDBOX_RUNTIME_DIR, WORKSPACE_DIR, init_sandbox
+from .paths import SANDBOX_REPORTS_DIR, SANDBOX_RUNTIME_DIR, WORKSPACE_DIR
+from .tools import init_sandbox
 
 
-BASE_DIR = Path(__file__).resolve().parents[1]
-REPORT_DIR = BASE_DIR / "sandbox" / "reports"
+REPORT_DIR = SANDBOX_REPORTS_DIR
 RUNTIME_DIR = SANDBOX_RUNTIME_DIR / "external_agent_runtime"
 CONTROL_DECISIONS = {"拒绝", "询问", "隔离"}
 

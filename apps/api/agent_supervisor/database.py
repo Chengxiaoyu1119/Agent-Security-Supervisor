@@ -2,11 +2,10 @@ from __future__ import annotations
 
 import json
 import sqlite3
-from pathlib import Path
 from typing import Any
 
-BASE_DIR = Path(__file__).resolve().parents[1]
-RUNTIME_DIR = BASE_DIR / "runtime"
+from .paths import RUNTIME_DIR
+
 DB_PATH = RUNTIME_DIR / "agent_supervisor.sqlite3"
 
 

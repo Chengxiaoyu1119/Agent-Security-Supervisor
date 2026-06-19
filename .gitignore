@@ -26,6 +26,7 @@ apps/api/sandbox/reports/
 SOUL.md
 scripts/archive/
 apps/api/sandbox/submission_packages/
+apps/api/agent_supervisor/sandbox/
 .codex-ui.log
 .playwright-mcp/
 AGENTS.md

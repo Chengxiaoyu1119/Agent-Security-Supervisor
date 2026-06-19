@@ -9,7 +9,7 @@ title: 快速开始
 
 ## 前置环境
 
-- Node.js 18 或更高版本
+- Node.js 22.12 或更高版本
 - Python 3.10 或更高版本
 
 Node.js 用来启动前端页面、官网和文档站。Python 用来启动 FastAPI 后端。
@@ -33,6 +33,8 @@ npm run api
 ```text
 http://127.0.0.1:8012
 ```
+
+`npm run api` 是本地开发入口，会显式关闭 API Token 校验，方便第一次运行。正式部署时需要设置 `AGENT_SUPERVISOR_API_TOKEN`。
 
 ## 启动控制台
 

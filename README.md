@@ -191,6 +191,11 @@ sequenceDiagram
 
 依赖可以理解为项目运行需要的“工具包”。第一次运行先安装依赖，之后通常不用重复安装。
 
+### 0. 前置环境
+
+- Node.js 22.12 或更高版本。官网使用 Astro 6，旧版 Node 会导致官网构建失败。
+- Python 3.10 或更高版本。后端 API 和命令行工具依赖 Python。
+
 ### 1. 安装依赖
 
 ```bash
@@ -244,6 +249,9 @@ MODEL_REAL_API_ENABLED=true
 MODEL_PROVIDER_PRIORITY=deepseek,zhipu
 MODEL_TIMEOUT_SECONDS=12
 
+AGENT_SUPERVISOR_AUTH_DISABLED=false
+AGENT_SUPERVISOR_API_TOKEN=你的 API Token
+
 DEEPSEEK_API_KEY=你的 DeepSeek Key
 DEEPSEEK_BASE_URL=https://api.deepseek.com
 DEEPSEEK_MODEL=deepseek-v4-pro
@@ -255,9 +263,11 @@ ZHIPU_MODEL=glm-5.1
 
 | 配置项 | 含义 | 不配置时 |
 |---|---|---|
-| `MODEL_REAL_API_ENABLED` | 是否允许调用真实模型 | 使用默认值 `true`，但没 key 会回退 |
+| `MODEL_REAL_API_ENABLED` | 是否允许调用真实模型 | 使用默认值 `false`，默认走本地模拟 |
 | `MODEL_PROVIDER_PRIORITY` | 真实模型优先级 | `deepseek,zhipu` |
 | `MODEL_TIMEOUT_SECONDS` | 请求超时时间 | 12 秒 |
+| `AGENT_SUPERVISOR_AUTH_DISABLED` | 是否关闭 API 鉴权 | 默认 `false`；`npm run api` 会为本地演示显式打开 |
+| `AGENT_SUPERVISOR_API_TOKEN` | API 访问令牌 | 正式部署必须配置 |
 | `DEEPSEEK_API_KEY` | DeepSeek 密钥 | 不调用 DeepSeek |
 | `ZHIPU_API_KEY` | 智谱密钥 | 不调用智谱 |
 
