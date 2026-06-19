@@ -6,8 +6,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-from ..paths import SANDBOX_REPORTS_DIR
-from .package_docs import _adapter_schema
+from ..paths import REPO_ROOT, SANDBOX_REPORTS_DIR
 
 
 def _clean_submission_summary(runs: list[dict[str, Any]], scenarios: list[dict[str, Any]]) -> dict[str, Any]:
@@ -102,6 +101,32 @@ def _external_agent_demo_evidence_files() -> dict[str, str]:
         files["最小外部Agent接入运行证据.md"] = markdown_path.read_text(encoding="utf-8")
     if json_path.exists():
         files["最小外部Agent接入运行证据.json"] = json_path.read_text(encoding="utf-8")
+    return files
+
+
+def _dependency_security_evidence_files() -> dict[str, str]:
+    files: dict[str, str] = {}
+    security_path = REPO_ROOT / "SECURITY.md"
+    markdown_path = SANDBOX_REPORTS_DIR / "依赖安全审计报告.md"
+    json_path = SANDBOX_REPORTS_DIR / "dependency-security-audit.json"
+    if security_path.exists():
+        files["依赖安全说明.md"] = security_path.read_text(encoding="utf-8")
+    if markdown_path.exists():
+        files["依赖安全审计报告.md"] = markdown_path.read_text(encoding="utf-8")
+    if json_path.exists():
+        files["依赖安全审计报告.json"] = json_path.read_text(encoding="utf-8")
+    return files
+
+
+def _openclaw_runtime_attempt_evidence_files() -> dict[str, str]:
+    files: dict[str, str] = {}
+    sources = {
+        "OpenClaw真实运行尝试记录.md": SANDBOX_REPORTS_DIR / "OpenClaw源码级插件包验收报告.md",
+        "OpenClaw真实运行尝试记录.json": SANDBOX_REPORTS_DIR / "OpenClaw源码级插件包验收报告.json",
+    }
+    for filename, source in sources.items():
+        if source.exists():
+            files[filename] = source.read_text(encoding="utf-8")
     return files
 
 

@@ -1,0 +1,58 @@
+[tool.ruff]
+target-version = "py311"
+line-length = 140
+exclude = [
+  ".git",
+  ".venv",
+  "node_modules",
+  "apps/api/runtime",
+  "apps/api/sandbox",
+  "apps/console/dist",
+  "apps/www/dist",
+  "apps/docs/build",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B"]
+ignore = ["E501", "B008"]
+
+[tool.mypy]
+python_version = "3.11"
+explicit_package_bases = true
+ignore_missing_imports = true
+check_untyped_defs = true
+warn_unused_ignores = true
+no_implicit_optional = true
+exclude = [
+  "apps/api/sandbox",
+  "apps/api/runtime",
+]
+
+[[tool.mypy.overrides]]
+module = [
+  "apps.api.agent_supervisor.*",
+  "apps.api.tests.*",
+]
+disallow_untyped_defs = false
+
+[tool.coverage.run]
+branch = true
+include = [
+  "apps/api/agent_supervisor/anomaly.py",
+  "apps/api/agent_supervisor/auth.py",
+  "apps/api/agent_supervisor/data.py",
+  "apps/api/agent_supervisor/risk_score.py",
+  "apps/api/agent_supervisor/supervisor.py",
+]
+omit = [
+  "apps/api/agent_supervisor/config/*",
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+exclude_lines = [
+  "pragma: no cover",
+  "if __name__ == .__main__.:",
+  "raise NotImplementedError",
+]

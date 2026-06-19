@@ -3,8 +3,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from ..auth import require_api_token
 from ..data import get_attack_surfaces, get_policies, get_scenarios, get_student_competition_attack_map, set_policy_enabled
 from ..database import latest_audit_logs, latest_runs
-from ..model_adapter import provider_status
 from ..main_models import PolicyUpdate
+from ..model_adapter import provider_status
 from ..services.package_service import build_competition_package
 
 router = APIRouter(dependencies=[Depends(require_api_token)])

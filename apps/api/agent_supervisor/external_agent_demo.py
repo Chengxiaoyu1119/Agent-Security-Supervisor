@@ -5,10 +5,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from .openclaw_adapter import GuardedToolResult, OpenClawToolGuard
+from .openclaw_adapter import OpenClawToolGuard
 from .paths import SANDBOX_REPORTS_DIR, SANDBOX_RUNTIME_DIR, WORKSPACE_DIR
 from .tools import init_sandbox
-
 
 REPORT_DIR = SANDBOX_REPORTS_DIR
 RUNTIME_DIR = SANDBOX_RUNTIME_DIR / "external_agent_runtime"

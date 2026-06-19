@@ -7,7 +7,6 @@ from typing import Any
 from .data import get_attack_surfaces, get_scenarios
 from .supervisor import decide
 
-
 CONTROL_DECISIONS = {"拒绝", "询问", "隔离"}
 
 

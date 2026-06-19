@@ -5,6 +5,11 @@ apps/www/dist/
 apps/docs/.docusaurus/
 apps/docs/build/
 .venv/
+.coverage
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+htmlcov/
 __pycache__/
 *.pyc
 *.sqlite3

@@ -7,12 +7,11 @@ from pathlib import Path
 from typing import Any
 
 from .integrity import attach_audit_hashes, verify_audit_hashes
+from .paths import SANDBOX_REPORTS_DIR
 from .supervisor import decide
 from .tools import execute_tool, init_sandbox
 
-
-BASE_DIR = Path(__file__).resolve().parents[1]
-REPORT_ROOT = BASE_DIR / "sandbox" / "reports"
+REPORT_ROOT = SANDBOX_REPORTS_DIR
 CONTROL_DECISIONS = {"拒绝", "询问", "隔离"}
 
 

@@ -9,7 +9,6 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from .paths import SANDBOX_REPORTS_DIR
 from .openclaw_plugin_templates import (
     _openclaw_plugin_manifest,
     _openclaw_plugin_package_json,
@@ -17,9 +16,10 @@ from .openclaw_plugin_templates import (
     _openclaw_plugin_runtime,
     _openclaw_plugin_source,
 )
-
+from .paths import SANDBOX_REPORTS_DIR
 
 OPENCLAW_PLUGIN_PACKAGE_LOCK = threading.Lock()
+OPENCLAW_PLUGIN_ID = "agent-supervisor-openclaw-guard"
 
 
 def build_openclaw_plugin_package_files(
@@ -54,8 +54,8 @@ def build_openclaw_plugin_package_summary(
         },
         "install_commands": [
             "openclaw plugins install -l apps/api/sandbox/reports/agent-supervisor-openclaw-guard",
-            "openclaw plugins inspect agent-supervisor-openclaw-guard --runtime --json",
             "openclaw plugins enable agent-supervisor-openclaw-guard",
+            "openclaw plugins inspect agent-supervisor-openclaw-guard --runtime --json",
         ],
         "runtime_checks": {
             "has_package_openclaw_extensions": '"openclaw"' in files["package.json"] and '"extensions"' in files["package.json"],
@@ -198,36 +198,61 @@ def validate_openclaw_plugin_package(
         missing_message="未检测到 Node.js，无法执行 JavaScript 语法检查。",
     )
     openclaw_cli = shutil.which("openclaw")
-    runtime_check = {
-        "attempted": False,
-        "available": bool(openclaw_cli),
-        "passed": None,
-        "command": f"openclaw plugins inspect agent-supervisor-openclaw-guard --runtime --json",
-        "stdout": "",
-        "stderr": "",
-        "skipped_reason": "",
-    }
+    install_command_label = f"openclaw plugins install -l {package_dir}"
+    enable_command_label = f"openclaw plugins enable {OPENCLAW_PLUGIN_ID}"
+    inspect_command_label = f"openclaw plugins inspect {OPENCLAW_PLUGIN_ID} --runtime --json"
+    static_only_reason = "默认只做无副作用静态验收；如需真实 OpenClaw runtime inspect，请启用 inspect_runtime。"
+    install_check = _skipped_command_check(install_command_label, static_only_reason, available=bool(openclaw_cli))
+    enable_check = _skipped_command_check(enable_command_label, static_only_reason, available=bool(openclaw_cli))
+    runtime_check = _skipped_command_check(inspect_command_label, static_only_reason, available=bool(openclaw_cli))
     if inspect_runtime:
         if openclaw_cli:
-            runtime_check = _run_command_check(
-                [openclaw_cli, "plugins", "inspect", "agent-supervisor-openclaw-guard", "--runtime", "--json"],
-                command_label="openclaw plugins inspect agent-supervisor-openclaw-guard --runtime --json",
-                missing_message="未检测到 OpenClaw CLI，无法执行真实 runtime inspect。",
+            install_check = _run_command_check(
+                [openclaw_cli, "plugins", "install", "-l", str(package_dir)],
+                command_label=install_command_label,
+                missing_message="未检测到 OpenClaw CLI，无法安装插件。",
             )
-            runtime_check["available"] = True
+            install_check["available"] = True
+            if install_check["passed"] is True:
+                enable_check = _run_command_check(
+                    [openclaw_cli, "plugins", "enable", OPENCLAW_PLUGIN_ID],
+                    command_label=enable_command_label,
+                    missing_message="未检测到 OpenClaw CLI，无法启用插件。",
+                )
+                enable_check["available"] = True
+            else:
+                enable_check = _skipped_command_check(
+                    enable_command_label,
+                    "OpenClaw 插件安装未通过，已跳过 enable。",
+                    available=True,
+                )
+
+            if enable_check["passed"] is True:
+                runtime_check = _run_command_check(
+                    [openclaw_cli, "plugins", "inspect", OPENCLAW_PLUGIN_ID, "--runtime", "--json"],
+                    command_label=inspect_command_label,
+                    missing_message="未检测到 OpenClaw CLI，无法执行真实 runtime inspect。",
+                )
+                runtime_check["available"] = True
+            else:
+                runtime_check = _skipped_command_check(
+                    inspect_command_label,
+                    "OpenClaw 插件未成功启用，已跳过 runtime inspect。",
+                    available=True,
+                )
         else:
-            runtime_check["attempted"] = False
-            runtime_check["skipped_reason"] = "当前环境未安装 OpenClaw CLI；请在安装 OpenClaw 后执行 install 与 inspect 命令。"
-    else:
-        runtime_check["skipped_reason"] = "默认只做无副作用静态验收；如需真实 OpenClaw runtime inspect，请启用 inspect_runtime。"
+            no_cli_reason = "当前环境未安装 OpenClaw CLI；请在安装 OpenClaw 后执行 install、enable 与 inspect 命令。"
+            install_check = _skipped_command_check(install_command_label, no_cli_reason)
+            enable_check = _skipped_command_check(enable_command_label, no_cli_reason)
+            runtime_check = _skipped_command_check(inspect_command_label, no_cli_reason)
 
     static_passed = all(value is True for key, value in static_checks.items() if key != "file_count")
     files_passed = all(file_checks.values())
     node_passed = node_check["passed"] is True
-    runtime_passed = runtime_check["passed"] is True
+    runtime_passed = install_check["passed"] is True and enable_check["passed"] is True and runtime_check["passed"] is True
     remaining_gap = []
     if not runtime_passed:
-        remaining_gap.append("真实 OpenClaw runtime inspect 尚未通过；需要在已安装 OpenClaw 的环境中安装并检查插件。")
+        remaining_gap.append("真实 OpenClaw runtime inspect 尚未通过；需要在已安装 OpenClaw 的环境中安装、启用并检查插件。")
     if not files_passed:
         remaining_gap.append("插件包缺少必要文件。")
     if not node_passed:
@@ -242,12 +267,15 @@ def validate_openclaw_plugin_package(
         "files_passed": files_passed,
         "node_syntax_passed": node_passed,
         "runtime_inspect_passed": runtime_passed,
+        "openclaw_cli_path": openclaw_cli or "",
         "overall_status": "runtime-validated"
         if static_passed and files_passed and node_passed and runtime_passed
         else "static-validated" if static_passed and files_passed and node_passed else "needs-fix",
         "file_checks": file_checks,
         "static_checks": static_checks,
         "node_check": node_check,
+        "openclaw_install_check": install_check,
+        "openclaw_enable_check": enable_check,
         "openclaw_runtime_check": runtime_check,
         "install_commands": package["summary"]["install_commands"],
         "remaining_gap": remaining_gap,
@@ -314,7 +342,11 @@ def build_openclaw_plugin_validation_markdown(validation: dict[str, Any] | None 
     for key, value in validation["static_checks"].items():
         lines.append(f"| `{key}` | `{value}` |")
     node_check = validation["node_check"]
-    runtime_check = validation["openclaw_runtime_check"]
+    openclaw_checks = [
+        ("OpenClaw 安装插件", validation.get("openclaw_install_check")),
+        ("OpenClaw 启用插件", validation.get("openclaw_enable_check")),
+        ("OpenClaw runtime inspect", validation.get("openclaw_runtime_check")),
+    ]
     lines.extend(
         [
             "",
@@ -322,9 +354,21 @@ def build_openclaw_plugin_validation_markdown(validation: dict[str, Any] | None 
             "",
             f"- JS 语法命令：`{node_check['command']}`",
             f"- JS 语法结果：{'通过' if node_check['passed'] else '未通过'}",
-            f"- OpenClaw 命令：`{runtime_check['command']}`",
-            f"- OpenClaw 检查状态：{'已执行' if runtime_check['attempted'] else '未执行'}",
-            f"- OpenClaw 检查结果：{'通过' if runtime_check['passed'] else runtime_check.get('skipped_reason') or '未通过'}",
+        "",
+        ]
+    )
+    for label, check in openclaw_checks:
+        if not check:
+            continue
+        lines.extend(
+            [
+                f"- {label} 命令：`{check['command']}`",
+                f"- {label} 状态：{'已执行' if check['attempted'] else '未执行'}",
+                f"- {label} 结果：{'通过' if check['passed'] else check.get('skipped_reason') or check.get('stderr') or '未通过'}",
+            ]
+        )
+    lines.extend(
+        [
             "",
             "## 安装与真实验收命令",
             "",
@@ -341,6 +385,18 @@ def build_openclaw_plugin_validation_markdown(validation: dict[str, Any] | None 
     else:
         lines.append("- 无。")
     return "\n".join(lines)
+
+
+def _skipped_command_check(command_label: str, skipped_reason: str, *, available: bool = False) -> dict[str, Any]:
+    return {
+        "attempted": False,
+        "available": available,
+        "passed": None,
+        "command": command_label,
+        "stdout": "",
+        "stderr": "",
+        "skipped_reason": skipped_reason,
+    }
 
 
 def _run_command_check(command: list[str], *, command_label: str, missing_message: str) -> dict[str, Any]:

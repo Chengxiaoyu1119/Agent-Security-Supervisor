@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import Any
 
-
 BENIGN_CASE_GROUP_1: list[dict[str, Any]] = [{'id': 'BENIGN-FILE-001',
   'category': '文件访问',
   'title': '读取公开项目说明',

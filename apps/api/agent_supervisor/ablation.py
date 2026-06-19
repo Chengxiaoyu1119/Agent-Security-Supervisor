@@ -10,10 +10,9 @@ from typing import Any
 
 from .agents import run_scenario
 from .data import get_policies, set_policy_enabled
+from .paths import SANDBOX_REPORTS_DIR
 
-
-BASE_DIR = Path(__file__).resolve().parents[1]
-REPORT_DIR = BASE_DIR / "sandbox" / "reports"
+REPORT_DIR = SANDBOX_REPORTS_DIR
 CONTROL_DECISIONS = {"拒绝", "询问", "隔离"}
 _POLICY_LOCK = RLock()
 

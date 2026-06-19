@@ -3,44 +3,23 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 
 from ..ablation import build_policy_ablation, build_policy_ablation_markdown
-from ..auth import require_api_token
-from ..approvals import (
-    build_approval_review_markdown,
-    decide_approval_review,
-    list_approval_reviews,
-    write_approval_review_report
-)
+from ..approvals import build_approval_review_markdown, decide_approval_review, list_approval_reviews, write_approval_review_report
 from ..assessment import build_attack_effectiveness
+from ..auth import require_api_token
 from ..benign import build_benign_cases_markdown, evaluate_benign_cases, get_benign_cases
-from ..benign_workflows import (
-    build_benign_workflow_markdown,
-    evaluate_benign_workflows,
-    write_benign_workflow_report
-)
-from ..calibration import (
-    build_anomaly_calibration,
-    build_anomaly_calibration_markdown,
-    write_anomaly_calibration_report
-)
+from ..benign_workflows import build_benign_workflow_markdown, evaluate_benign_workflows, write_benign_workflow_report
+from ..calibration import build_anomaly_calibration, build_anomaly_calibration_markdown, write_anomaly_calibration_report
 from ..database import latest_runs
 from ..datasets import build_attack_case_dataset, build_attack_case_markdown
-from ..demo_drill import (
-    build_judge_demo_drill_markdown,
-    load_judge_demo_drill_report,
-    run_judge_demo_drill
-)
+from ..demo_drill import build_judge_demo_drill_markdown, load_judge_demo_drill_report, run_judge_demo_drill
 from ..evidence import (
     build_output_filter_evidence,
     build_output_filter_markdown,
     build_surface_conclusions,
-    build_surface_conclusions_markdown
+    build_surface_conclusions_markdown,
 )
 from ..main_models import ApprovalDecisionRequest
-from ..readiness import (
-    build_competition_readiness,
-    build_competition_readiness_markdown,
-    write_competition_readiness_report
-)
+from ..readiness import build_competition_readiness, build_competition_readiness_markdown, write_competition_readiness_report
 from ..roadmap import build_project_roadmap, build_project_roadmap_markdown, write_project_roadmap
 from ..services.package_service import write_clean_submission_package, write_submission_package
 from ..services.report_service import build_report
@@ -53,7 +32,7 @@ from ..surface_pack import (
     write_all_surface_briefing_sheets,
     write_all_surface_evidence_packs,
     write_surface_briefing_sheet,
-    write_surface_evidence_pack
+    write_surface_evidence_pack,
 )
 
 router = APIRouter(dependencies=[Depends(require_api_token)])

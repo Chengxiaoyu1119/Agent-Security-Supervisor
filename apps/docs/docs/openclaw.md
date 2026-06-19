@@ -18,19 +18,19 @@ POST /api/integrations/openclaw/events
 ## 最小外部 Agent 演示
 
 ```powershell
-npm run cli -- demo-external
+node scripts/agent-supervisor-cli.mjs demo-external
 ```
 
 ## 生成插件包
 
 ```powershell
-npm run cli -- openclaw-plugin --output apps/api/sandbox/reports
+node scripts/agent-supervisor-cli.mjs openclaw-plugin --output apps/api/sandbox/reports
 ```
 
 ## 生成插件包验收报告
 
 ```powershell
-npm run cli -- openclaw-plugin-validate --output apps/api/sandbox/reports
+node scripts/agent-supervisor-cli.mjs openclaw-plugin-validate --output apps/api/sandbox/reports
 ```
 
 如果当前环境安装了 OpenClaw CLI，可以追加 `--inspect-runtime` 做真实 runtime inspect。

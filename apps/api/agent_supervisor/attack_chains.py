@@ -8,10 +8,9 @@ from typing import Any
 
 from .agents import compare_scenario, run_scenario
 from .data import find_scenario
+from .paths import SANDBOX_REPORTS_DIR
 
-
-BASE_DIR = Path(__file__).resolve().parents[1]
-REPORT_DIR = BASE_DIR / "sandbox" / "reports"
+REPORT_DIR = SANDBOX_REPORTS_DIR
 
 
 ATTACK_CHAINS = [
@@ -305,7 +304,7 @@ def build_attack_chain_catalog_markdown() -> str:
             lines.append(
                 f"| {stage['index']} | {stage['name']} | {scenario['id']} | {scenario['surface_id']} | {scenario['target']} | {stage['expected_control']} |"
             )
-        lines.extend(["", f"推荐命令：`npm run cli -- attack-chains --chain {chain['id']} --compare --output apps/api/sandbox/reports`", ""])
+        lines.extend(["", f"推荐命令：`node scripts/agent-supervisor-cli.mjs attack-chains --chain {chain['id']} --compare --output apps/api/sandbox/reports`", ""])
     return "\n".join(lines)
 
 

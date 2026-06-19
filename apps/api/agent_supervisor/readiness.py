@@ -5,21 +5,21 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from .attack_chains import list_attack_chains
 from .approvals import list_approval_reviews
+from .attack_chains import list_attack_chains
 from .benign import evaluate_benign_cases
 from .benign_workflows import evaluate_benign_workflows
 from .calibration import build_anomaly_calibration
 from .data import get_attack_surfaces, get_policies, get_scenarios, get_student_competition_attack_map
-from .datasets import build_attack_case_dataset
 from .database import latest_runs
+from .datasets import build_attack_case_dataset
 from .demo_drill import load_judge_demo_drill_report
-from .openclaw_adapter import validate_openclaw_plugin_package
-from .roadmap import build_project_roadmap
+from .openclaw_plugin_package import validate_openclaw_plugin_package
+from .paths import SANDBOX_REPORTS_DIR, SUBMISSION_PACKAGES_DIR
 from .readiness_checks import (
+    _approval_review_check,
     _attack_dataset_check,
     _attack_surface_check,
-    _approval_review_check,
     _benign_check,
     _benign_workflow_check,
     _calibration_check,
@@ -32,13 +32,11 @@ from .readiness_checks import (
     _student_competition_domain_check,
     _submission_package_check,
     _supervisor_check,
-    build_submission_package_snapshot,
 )
+from .roadmap import build_project_roadmap
 
-
-BASE_DIR = Path(__file__).resolve().parents[1]
-REPORT_ROOT = BASE_DIR / "sandbox" / "reports"
-SUBMISSION_ROOT = BASE_DIR / "sandbox" / "submission_packages"
+REPORT_ROOT = SANDBOX_REPORTS_DIR
+SUBMISSION_ROOT = SUBMISSION_PACKAGES_DIR
 
 
 def build_competition_readiness(
@@ -147,9 +145,9 @@ def build_competition_readiness(
         ],
         "next_actions": next_actions,
         "acceptance_commands": [
-            "npm run cli -- readiness --write --output apps/api/sandbox/reports",
-            "npm run cli -- clean-package --output apps/api/sandbox/submission_packages",
-            "npm run cli -- openclaw-plugin-validate --output apps/api/sandbox/reports --inspect-runtime",
+            "node scripts/agent-supervisor-cli.mjs readiness --write --output apps/api/sandbox/reports",
+            "node scripts/agent-supervisor-cli.mjs clean-package --output apps/api/sandbox/submission_packages",
+            "node scripts/agent-supervisor-cli.mjs openclaw-plugin-validate --output apps/api/sandbox/reports --inspect-runtime",
             "npm run build",
         ],
         "latest_package": latest_package,

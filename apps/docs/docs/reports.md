@@ -20,7 +20,7 @@ title: 证据与报告
 ## 常用命令
 
 ```powershell
-npm run cli -- surface-packs --output apps/api/sandbox/reports
-npm run cli -- assess --run-compare --output apps/api/sandbox/reports/攻防有效性评测.md
-npm run cli -- readiness --write --output apps/api/sandbox/reports
+node scripts/agent-supervisor-cli.mjs surface-packs --output apps/api/sandbox/reports
+node scripts/agent-supervisor-cli.mjs assess --run-compare --output apps/api/sandbox/reports/攻防有效性评测.md
+node scripts/agent-supervisor-cli.mjs readiness --write --output apps/api/sandbox/reports
 ```

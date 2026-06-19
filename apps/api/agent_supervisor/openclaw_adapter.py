@@ -8,15 +8,10 @@ from datetime import datetime, timezone
 from typing import Any
 
 from .openclaw_plugin_package import (
-    build_openclaw_plugin_package_files,
-    build_openclaw_plugin_package_markdown,
     build_openclaw_plugin_package_summary,
-    build_openclaw_plugin_validation_markdown,
-    validate_openclaw_plugin_package,
-    write_openclaw_plugin_package,
-    write_openclaw_plugin_validation_report,
 )
 from .paths import SANDBOX_EXAMPLES_DIR
+
 
 @dataclass
 class GuardedToolResult:
@@ -212,10 +207,10 @@ def build_openclaw_integration_bundle() -> dict[str, Any]:
         "openclaw_plugin_package": plugin_summary,
         "sample_events": sample_events,
         "validation": {
-            "cli": "npm run cli -- demo-external",
-            "real_agent_cli": "npm run cli -- external-agent-demo",
-            "plugin_cli": "npm run cli -- openclaw-plugin --output apps/api/sandbox/reports",
-            "plugin_validation_cli": "npm run cli -- openclaw-plugin-validate --output apps/api/sandbox/reports",
+            "cli": "node scripts/agent-supervisor-cli.mjs demo-external",
+            "real_agent_cli": "node scripts/agent-supervisor-cli.mjs external-agent-demo",
+            "plugin_cli": "node scripts/agent-supervisor-cli.mjs openclaw-plugin --output apps/api/sandbox/reports",
+            "plugin_validation_cli": "node scripts/agent-supervisor-cli.mjs openclaw-plugin-validate --output apps/api/sandbox/reports",
             "powershell": "Invoke-RestMethod -Method Post http://127.0.0.1:8012/api/supervisor/batch_evaluate -Body (Get-Content apps/api/sandbox/examples/openclaw-like-events.json -Raw) -ContentType 'application/json'",
             "expected": {
                 "event_count": len(sample_events),
@@ -229,8 +224,8 @@ def build_openclaw_integration_bundle() -> dict[str, Any]:
             "先发送到 /api/integrations/openclaw/events。",
             "根据返回 decision 执行：允许继续、拒绝阻断、询问暂停、隔离到沙箱。",
             "在智安哨审计页和告警页查看 run_id、audit_id、policy_id、risk_score、audit_hash。",
-            "如使用 OpenClaw 原生接入，运行 `npm run cli -- openclaw-plugin --output apps/api/sandbox/reports` 生成插件包，再用 `openclaw plugins install -l apps/api/sandbox/reports/agent-supervisor-openclaw-guard` 安装。",
-            "运行 `npm run cli -- openclaw-plugin-validate --output apps/api/sandbox/reports` 生成插件包验收报告；安装 OpenClaw 后可追加 `--inspect-runtime` 获取真实 runtime inspect 结果。",
+            "如使用 OpenClaw 原生接入，运行 `node scripts/agent-supervisor-cli.mjs openclaw-plugin --output apps/api/sandbox/reports` 生成插件包，再用 `openclaw plugins install -l apps/api/sandbox/reports/agent-supervisor-openclaw-guard` 安装。",
+            "运行 `node scripts/agent-supervisor-cli.mjs openclaw-plugin-validate --output apps/api/sandbox/reports` 生成插件包验收报告；安装 OpenClaw 后可追加 `--inspect-runtime` 获取真实 runtime inspect 结果。",
         ],
         "safety_boundary": [
             "默认不发送真实邮件。",

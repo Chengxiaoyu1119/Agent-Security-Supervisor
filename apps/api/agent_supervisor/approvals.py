@@ -8,11 +8,10 @@ from typing import Any
 from uuid import uuid4
 
 from .database import get_connection
+from .paths import SANDBOX_REPORTS_DIR
 from .tools import execute_tool
 
-
-BASE_DIR = Path(__file__).resolve().parents[1]
-REPORT_ROOT = BASE_DIR / "sandbox" / "reports"
+REPORT_ROOT = SANDBOX_REPORTS_DIR
 
 PENDING_STATUS = "待复核"
 APPROVED_STATUS = "已批准"

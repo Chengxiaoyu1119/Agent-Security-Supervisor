@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections import Counter
 from datetime import datetime, timezone
+from typing import Any, cast
 
 from ..ablation import build_policy_ablation
 from ..assessment import build_attack_effectiveness
@@ -11,9 +12,9 @@ from ..calibration import build_anomaly_calibration
 from ..data import get_attack_surfaces, get_policies, get_scenarios
 from ..database import latest_runs
 from ..evidence import build_output_filter_evidence, build_surface_conclusions
-from ..model_adapter import provider_status
 from ..roadmap import build_project_roadmap
 from .package_service import build_competition_package
+
 
 def build_report() -> dict:
     runs = latest_runs(500)
@@ -273,12 +274,13 @@ def build_report() -> dict:
             "|---|---|---|---|---|---|---|",
         ]
     )
-    for item in benign_eval["cases"]:
+    for item in cast(list[dict[str, Any]], benign_eval["cases"]):
+        tool_call = cast(dict[str, Any], item["tool_call"])
         lines.append(
             "| {id} | {category} | {tool} | {expected} | {actual} | {fp} | {policy} |".format(
                 id=item["id"],
                 category=item["category"],
-                tool=item["tool_call"]["tool"],
+                tool=tool_call["tool"],
                 expected=item["expected_decision"],
                 actual=item["decision"],
                 fp="是" if item["is_false_positive"] else "否",
@@ -322,14 +324,15 @@ def build_report() -> dict:
             "|---|---:|---:|---:|---|",
         ]
     )
-    for item in surface_conclusion_eval["conclusions"]:
+    for item in cast(list[dict[str, Any]], surface_conclusion_eval["conclusions"]):
+        expected_policies = cast(dict[str, Any], item["expected_policies"])
         lines.append(
             "| {name} | {scenario_count} | {run_count} | {control_rate}% | {policies} |".format(
                 name=item["surface_name"],
                 scenario_count=item["scenario_count"],
                 run_count=item["run_count"],
                 control_rate=item["control_rate"],
-                policies="、".join(item["expected_policies"].keys()) or "default-allow",
+                policies="、".join(expected_policies.keys()) or "default-allow",
             )
         )
 

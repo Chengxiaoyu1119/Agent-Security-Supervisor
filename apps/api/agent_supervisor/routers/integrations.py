@@ -13,7 +13,7 @@ from ..openclaw_plugin_package import (
     build_openclaw_plugin_validation_markdown,
     validate_openclaw_plugin_package,
     write_openclaw_plugin_package,
-    write_openclaw_plugin_validation_report
+    write_openclaw_plugin_validation_report,
 )
 from ..services.package_service import build_competition_package
 

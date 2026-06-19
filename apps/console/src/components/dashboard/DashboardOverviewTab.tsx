@@ -56,7 +56,7 @@ export function DashboardOverviewTab({
             <Flex justify="space-between" align="center" wrap="wrap" gap={24}>
               <div className="zh-dashboard-hero-copy">
                 <Typography.Text type="secondary">命题挑战赛 · 大模型应用安全监督原型</Typography.Text>
-                <Typography.Title level={2} className="zh-title-compact">
+                <Typography.Title level={1} className="zh-title-compact">
                   智能体工具调用实时审计与阻断台
                 </Typography.Title>
                 <Typography.Paragraph type="secondary" className="zh-text-lead">
@@ -91,7 +91,7 @@ export function DashboardOverviewTab({
               <div className="zh-dashboard-metric-row">
                 <PanelCard variant="borderless" className="zh-dashboard-metric-panel zh-dashboard-metric-panel--risk">
                   <Typography.Text type="secondary">最高风险分</Typography.Text>
-                  <Typography.Title level={1} className="zh-title-flush zh-color-error">
+                  <Typography.Title level={2} className="zh-title-flush zh-color-error">
                     {maxRiskScore}
                   </Typography.Title>
                   <Typography.Text type="secondary" className="zh-text-meta">
@@ -103,7 +103,7 @@ export function DashboardOverviewTab({
                   className="zh-dashboard-metric-panel zh-dashboard-metric-panel--control"
                 >
                   <Typography.Text type="secondary">防护控制率</Typography.Text>
-                  <Typography.Title level={1} className="zh-title-flush zh-color-success">
+                  <Typography.Title level={2} className="zh-title-flush zh-color-success">
                     {overview.summary.block_rate}%
                   </Typography.Title>
                   <Typography.Text type="secondary" className="zh-text-meta">

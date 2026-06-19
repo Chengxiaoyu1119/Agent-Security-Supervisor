@@ -5,13 +5,10 @@ from copy import deepcopy
 from datetime import datetime, timezone
 from typing import Any
 
+from .benign_cases_data import BENIGN_CASES
 from .supervisor import decide
 
-
 CONTROL_DECISIONS = {"拒绝", "询问", "隔离"}
-
-
-from .benign_cases_data import BENIGN_CASES
 
 
 def get_benign_cases(category: str | None = None) -> list[dict[str, Any]]:

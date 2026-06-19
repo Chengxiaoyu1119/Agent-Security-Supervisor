@@ -106,8 +106,8 @@ def _safe_path(path: str) -> Path:
     target = (raw if raw.is_absolute() else WORKSPACE_DIR / raw).resolve()
     try:
         target.relative_to(root)
-    except ValueError as exc:
-        raise ValueError("路径越出沙箱目录")
+    except ValueError:
+        raise ValueError("路径越出沙箱目录") from None
     return target
 
 

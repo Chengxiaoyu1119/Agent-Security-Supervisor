@@ -8,7 +8,6 @@ import urllib.request
 from pathlib import Path
 from typing import Iterable
 
-
 DEFAULT_TIMEOUT_SECONDS = 12
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 

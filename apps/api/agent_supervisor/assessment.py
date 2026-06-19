@@ -8,7 +8,6 @@ from .data import get_attack_surfaces, get_scenarios
 from .integrity import verify_audit_hashes
 from .supervisor import decide
 
-
 REQUIREMENT_ALIGNMENT = [
     {
         "id": "risk-report",
@@ -140,7 +139,6 @@ def build_attack_effectiveness(runs: list[dict[str, Any]]) -> dict[str, Any]:
 
 
 def build_requirement_alignment(cases: list[dict[str, Any]] | None = None) -> list[dict[str, Any]]:
-    surfaces = get_attack_surfaces()
     scenarios = get_scenarios()
     scenario_tools = {tool_call["tool"] for scenario in scenarios for tool_call in scenario["tool_calls"]}
     covered_surfaces = {scenario["surface_id"] for scenario in scenarios}

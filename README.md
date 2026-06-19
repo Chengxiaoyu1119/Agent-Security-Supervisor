@@ -277,19 +277,19 @@ CLI 是命令行工具。它适合批量评测、导出报告、生成提交包�
 
 | 目标 | 命令 |
 |---|---|
-| 运行单个攻击剧本 | `npm run cli -- run TOOL-HIJACK-001 on` |
-| 批量运行全部剧本对比 | `npm run cli -- batch --guard compare` |
-| 导出攻防有效性评测 | `python -X utf8 -m apps.api.agent_supervisor.cli assess --run-compare` |
-| 评估外部智能体事件日志 | `python -X utf8 -m apps.api.agent_supervisor.cli evaluate --input apps/api/sandbox/examples/agent-events-batch.json` |
-| 运行 OpenClaw 兼容批量接入演示 | `npm run cli -- demo-external` |
-| 运行最小外部 Agent 工具调度演示 | `npm run cli -- external-agent-demo` |
-| 运行策略消融实验 | `npm run cli -- policy-ablation` |
-| 导出单个攻击面证据包 | `npm run cli -- surface-pack --surface prompt-injection --output apps/api/sandbox/reports` |
-| 一键导出全部攻击面证据包 | `npm run cli -- surface-packs --output apps/api/sandbox/reports` |
-| 生成干净提交包 | `npm run cli -- clean-package` |
-| 赛前一键体检 | `npm run cli -- readiness --write` |
-| OpenClaw 插件包生成 | `npm run cli -- openclaw-plugin` |
-| OpenClaw 插件包验证 | `npm run cli -- openclaw-plugin-validate` |
+| 运行单个攻击剧本 | `node scripts/agent-supervisor-cli.mjs run TOOL-HIJACK-001 on` |
+| 批量运行全部剧本对比 | `node scripts/agent-supervisor-cli.mjs batch --guard compare` |
+| 导出攻防有效性评测 | `node scripts/agent-supervisor-cli.mjs assess --run-compare` |
+| 评估外部智能体事件日志 | `node scripts/agent-supervisor-cli.mjs evaluate --input apps/api/sandbox/examples/agent-events-batch.json` |
+| 运行 OpenClaw 兼容批量接入演示 | `node scripts/agent-supervisor-cli.mjs demo-external` |
+| 运行最小外部 Agent 工具调度演示 | `node scripts/agent-supervisor-cli.mjs external-agent-demo` |
+| 运行策略消融实验 | `node scripts/agent-supervisor-cli.mjs policy-ablation` |
+| 导出单个攻击面证据包 | `node scripts/agent-supervisor-cli.mjs surface-pack --surface prompt-injection --output apps/api/sandbox/reports` |
+| 一键导出全部攻击面证据包 | `node scripts/agent-supervisor-cli.mjs surface-packs --output apps/api/sandbox/reports` |
+| 生成干净提交包 | `node scripts/agent-supervisor-cli.mjs clean-package` |
+| 赛前一键体检 | `node scripts/agent-supervisor-cli.mjs readiness --write` |
+| OpenClaw 插件包生成 | `node scripts/agent-supervisor-cli.mjs openclaw-plugin` |
+| OpenClaw 插件包验证 | `node scripts/agent-supervisor-cli.mjs openclaw-plugin-validate` |
 
 <details>
 <summary><strong>评委演示建议流程</strong></summary>
@@ -350,7 +350,7 @@ flowchart TD
   "tool_call": {
     "tool": "file.read",
     "arguments": {
-      "path": "confidential/customers.csv"
+      "path": "confidential/competition-teams.csv"
     },
     "risk_hint": "sensitive_file"
   },
@@ -415,7 +415,7 @@ agent-security-supervisor/
 | 前端治理检查 | `npm run ui:audit` | 检查前端结构和治理规则 |
 | 项目自审 | `npm run self:review` | 输出项目自审报告到沙箱报告目录 |
 | 后端健康 | `GET /api/health` | 确认 FastAPI 服务正常 |
-| 攻防评测 | `npm run cli -- assess --run-compare` | 对全部剧本跑攻防对比 |
+| 攻防评测 | `node scripts/agent-supervisor-cli.mjs assess --run-compare` | 对全部剧本跑攻防对比 |
 
 ## 常见问题
 

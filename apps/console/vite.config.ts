@@ -4,8 +4,8 @@ import net from 'node:net';
 import { fileURLToPath, URL } from 'node:url';
 import type { Plugin, ViteDevServer } from 'vite';
 
-const backendHost = '127.0.0.1';
-const backendPort = 8012;
+const backendHost = process.env.AGENT_SUPERVISOR_API_HOST || '127.0.0.1';
+const backendPort = Number(process.env.AGENT_SUPERVISOR_API_PORT || '8012');
 
 function isBackendOnline(timeoutMs = 250) {
   return new Promise<boolean>((resolve) => {

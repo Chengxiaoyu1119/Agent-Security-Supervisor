@@ -5,6 +5,25 @@ import '../styles/global.css';
 
 const consoleUrl = import.meta.env.PUBLIC_AGENT_SUPERVISOR_CONSOLE_URL ?? 'http://127.0.0.1:5178';
 const docsUrl = import.meta.env.PUBLIC_AGENT_SUPERVISOR_DOCS_URL ?? 'http://127.0.0.1:3000';
+
+const capabilityProof = [
+  '输入、工具、记忆、环境与外部事件统一建模。',
+  '本地靶场把攻击链变成可重放证据。',
+  '敏感工具调用前完成评分、判定与拦截。',
+  '每次命中保留参数、上下文和复核记录。',
+  '输出攻击控制率、误报率和检测延迟。',
+  '沉淀报告、插件包和比赛验收材料。'
+];
+
+const pipelineDetails = [
+  '接收外部 Agent 的自然语言任务和工具意图。',
+  '把每次工具调用整理成标准化事件。',
+  '标注上下文来源，区分可信与不可信输入。',
+  '融合策略命中、异常分和工具敏感度。',
+  '给出允许、询问、隔离或拒绝的判定。',
+  '在危险动作执行前完成阻断或人工复核。',
+  '生成可回放、可验收、可审计的证据报告。'
+];
 ---
 
 <!doctype html>
@@ -23,74 +42,133 @@ const docsUrl = import.meta.env.PUBLIC_AGENT_SUPERVISOR_DOCS_URL ?? 'http://127.
     <HeroScene consoleUrl={consoleUrl} docsUrl={docsUrl} />
 
     <main>
-      <section class="section" id="capabilities">
-        <div class="section__head">
+      <section class="section section--capabilities" id="capabilities">
+        <div class="section__head reveal">
           <p class="eyebrow">Capabilities</p>
-          <h2>从攻击复现到防御评测的一套闭环</h2>
-          <p>官网只讲项目主线，具体运行、接口和证据材料进入文档站与控制台继续查看。</p>
+          <h2>不是展示概念，而是把攻击到防御跑成闭环</h2>
+          <p>官网主线直接围绕“发现风险、复现攻击、拦截工具、沉淀证据”展开，用户能快速理解系统到底能做什么。</p>
         </div>
-        <div class="card-grid">
-          {capabilities.map((item) => (
-            <article class="capability-card">
-              <span>{item.tag}</span>
-              <h3>{item.title}</h3>
-              <p>{item.description}</p>
-            </article>
-          ))}
-        </div>
-      </section>
 
-      <section class="section section--muted" id="surfaces">
-        <div class="section__head">
-          <p class="eyebrow">Attack Surfaces</p>
-          <h2>7 类智能体攻击面</h2>
-          <p>每类攻击面都配有样本、工具调用脚本、策略命中和报告证据，避免停留在概念展示。</p>
-        </div>
-        <div class="surface-table" role="table" aria-label="攻击面矩阵">
-          <div class="surface-table__row surface-table__row--head" role="row">
-            <span>攻击面</span>
-            <span>风险</span>
-            <span>剧本</span>
-            <span>样本</span>
-            <span>验证重点</span>
+        <div class="capability-lab reveal" data-capability-tabs>
+          <div class="capability-lab__nav" role="tablist" aria-label="核心能力">
+            {capabilities.map((item, index) => (
+              <button
+                type="button"
+                class={`capability-tab ${index === 0 ? 'is-active' : ''}`}
+                data-tab-button={`capability-${index}`}
+                aria-selected={index === 0 ? 'true' : 'false'}
+              >
+                <span>{String(index + 1).padStart(2, '0')}</span>
+                {item.title}
+              </button>
+            ))}
           </div>
-          {attackSurfaces.map((surface) => (
-            <div class="surface-table__row" role="row">
-              <strong>{surface.name}</strong>
-              <span class={`risk risk--${surface.risk}`}>{surface.risk}</span>
-              <span>{surface.scripts}</span>
-              <span>{surface.samples}</span>
-              <p>{surface.focus}</p>
-            </div>
-          ))}
+
+          <div class="capability-lab__stage">
+            {capabilities.map((item, index) => (
+              <article class={`capability-panel ${index === 0 ? 'is-active' : ''}`} data-tab-panel={`capability-${index}`}>
+                <p class="panel-tag">{item.tag}</p>
+                <h3>{item.title}</h3>
+                <p>{item.description}</p>
+                <div class="proof-line">
+                  <span></span>
+                  <strong>{capabilityProof[index]}</strong>
+                </div>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section class="section" id="pipeline">
-        <div class="section__head">
-          <p class="eyebrow">Supervisor Pipeline</p>
-          <h2>工具调用前置监督流水线</h2>
-          <p>监督器不是替 Agent 执行任务，而是在危险动作发生前建立可解释、可审计的安全闸门。</p>
+      <section class="section section--surfaces" id="surfaces">
+        <div class="section__head reveal">
+          <p class="eyebrow">Attack Surfaces</p>
+          <h2>7 类攻击面可以被点开、比较和复核</h2>
+          <p>把原来的表格升级成攻击面实验台：风险等级、样本规模和验证重点放在同一个可交互视图里。</p>
         </div>
-        <div class="pipeline">
-          {pipeline.map((item, index) => (
-            <div class="pipeline__step">
-              <span>{String(index + 1).padStart(2, '0')}</span>
-              <strong>{item}</strong>
-            </div>
-          ))}
+
+        <div class="surface-lab reveal" data-surface-lab>
+          <div class="surface-lab__map" role="tablist" aria-label="攻击面列表">
+            {attackSurfaces.map((surface, index) => (
+              <button
+                type="button"
+                class={`surface-node risk-glow--${surface.risk} ${index === 0 ? 'is-active' : ''}`}
+                data-surface-button={`surface-${index}`}
+                aria-selected={index === 0 ? 'true' : 'false'}
+              >
+                <span>{surface.name}</span>
+                <em>{surface.risk}</em>
+              </button>
+            ))}
+          </div>
+
+          <div class="surface-lab__detail">
+            {attackSurfaces.map((surface, index) => (
+              <article class={`surface-panel ${index === 0 ? 'is-active' : ''}`} data-surface-panel={`surface-${index}`}>
+                <div class="surface-panel__head">
+                  <p class={`risk risk--${surface.risk}`}>{surface.risk}</p>
+                  <h3>{surface.name}</h3>
+                </div>
+                <p>{surface.focus}</p>
+                <div class="surface-panel__stats">
+                  <span><strong>{surface.scripts}</strong> 攻击剧本</span>
+                  <span><strong>{surface.samples}</strong> 样本证据</span>
+                </div>
+                <div class="surface-panel__trace">
+                  <span>sample pack</span>
+                  <span>tool event</span>
+                  <span>policy hit</span>
+                  <span>audit hash</span>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section class="section section--pipeline" id="pipeline">
+        <div class="section__head reveal">
+          <p class="eyebrow">Supervisor Pipeline</p>
+          <h2>每一步都发生在危险工具真正执行之前</h2>
+          <p>监督器不替 Agent 做任务，而是在工具调用前给出可解释的安全判定，并把证据写入审计链路。</p>
+        </div>
+
+        <div class="timeline-lab reveal" data-timeline>
+          <div class="timeline-track" role="tablist" aria-label="监督流水线">
+            {pipeline.map((item, index) => (
+              <button
+                type="button"
+                class={`timeline-step ${index === 0 ? 'is-active' : ''}`}
+                data-timeline-button={`step-${index}`}
+                aria-selected={index === 0 ? 'true' : 'false'}
+              >
+                <span>{String(index + 1).padStart(2, '0')}</span>
+                <strong>{item}</strong>
+              </button>
+            ))}
+          </div>
+          <div class="timeline-panels">
+            {pipeline.map((item, index) => (
+              <article class={`timeline-panel ${index === 0 ? 'is-active' : ''}`} data-timeline-panel={`step-${index}`}>
+                <small>Step {String(index + 1).padStart(2, '0')}</small>
+                <h3>{item}</h3>
+                <p>{pipelineDetails[index]}</p>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 
       <section class="section section--dark" id="openclaw">
-        <div class="section__head">
+        <div class="section__head reveal">
           <p class="eyebrow">Integration</p>
-          <h2>OpenClaw 与外部 Agent 接入</h2>
-          <p>智安哨可以作为外部 Agent 的工具调用防火墙，也可以保留插件包、验收报告和审计证据。</p>
+          <h2>OpenClaw 与外部 Agent 接入不再只是说明文字</h2>
+          <p>外部 Agent 在工具执行前发出事件，智安哨给出监督决策，并把插件包、报告和证据留在本地安全靶场。</p>
         </div>
-        <div class="integration-grid">
-          {integrationCards.map((item) => (
+        <div class="integration-grid reveal">
+          {integrationCards.map((item, index) => (
             <article>
+              <span>{String(index + 1).padStart(2, '0')}</span>
               <h3>{item.title}</h3>
               <p>{item.description}</p>
             </article>
@@ -98,14 +176,76 @@ const docsUrl = import.meta.env.PUBLIC_AGENT_SUPERVISOR_DOCS_URL ?? 'http://127.
         </div>
       </section>
 
-      <section class="cta">
-        <h2>开始查看项目</h2>
-        <p>如果你是第一次接触，建议先看文档站的“快速开始”，再进入控制台运行剧本。</p>
+      <section class="cta reveal">
+        <p class="eyebrow">Start</p>
+        <h2>先看文档，再进入控制台跑一条攻击链</h2>
+        <p>文档适合了解项目边界和运行方式，控制台适合直接查看样本、策略命中、报告和 OpenClaw 接入材料。</p>
         <div>
           <a href={docsUrl} class="button button--large button--ghost">查看文档</a>
           <a href={consoleUrl} class="button button--large">进入控制台</a>
         </div>
       </section>
     </main>
+
+    <script>
+      // @ts-nocheck
+      const activateGroup = (rootSelector, buttonSelector, panelSelector, buttonAttr, panelAttr) => {
+        document.querySelectorAll(rootSelector).forEach((root) => {
+          const buttons = Array.from(root.querySelectorAll(buttonSelector));
+          const panels = Array.from(root.querySelectorAll(panelSelector));
+
+          buttons.forEach((button) => {
+            button.addEventListener('click', () => {
+              const target = button.getAttribute(buttonAttr);
+              buttons.forEach((item) => {
+                item.classList.toggle('is-active', item === button);
+                item.setAttribute('aria-selected', item === button ? 'true' : 'false');
+              });
+              panels.forEach((panel) => {
+                panel.classList.toggle('is-active', panel.getAttribute(panelAttr) === target);
+              });
+            });
+          });
+        });
+      };
+
+      activateGroup('[data-capability-tabs]', '[data-tab-button]', '[data-tab-panel]', 'data-tab-button', 'data-tab-panel');
+      activateGroup('[data-surface-lab]', '[data-surface-button]', '[data-surface-panel]', 'data-surface-button', 'data-surface-panel');
+      activateGroup('[data-timeline]', '[data-timeline-button]', '[data-timeline-panel]', 'data-timeline-button', 'data-timeline-panel');
+
+      const revealItems = document.querySelectorAll('.reveal');
+      const revealObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              revealObserver.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.18 }
+      );
+      revealItems.forEach((item) => revealObserver.observe(item));
+
+      document.querySelectorAll('[data-parallax-root]').forEach((root) => {
+        root.addEventListener('pointermove', (event) => {
+          const rect = root.getBoundingClientRect();
+          root.style.setProperty('--mx', `${((event.clientX - rect.left) / rect.width) * 100}%`);
+          root.style.setProperty('--my', `${((event.clientY - rect.top) / rect.height) * 100}%`);
+        });
+      });
+
+      document.querySelectorAll('[data-tilt]').forEach((card) => {
+        card.addEventListener('pointermove', (event) => {
+          const rect = card.getBoundingClientRect();
+          const x = (event.clientX - rect.left) / rect.width - 0.5;
+          const y = (event.clientY - rect.top) / rect.height - 0.5;
+          card.style.transform = `perspective(1200px) rotateX(${y * -6}deg) rotateY(${x * 8}deg) translateY(-4px)`;
+        });
+        card.addEventListener('pointerleave', () => {
+          card.style.transform = '';
+        });
+      });
+    </script>
   </body>
 </html>

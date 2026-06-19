@@ -2,7 +2,6 @@ from __future__ import annotations
 
 from typing import Any
 
-
 BENIGN_CASE_GROUP_2: list[dict[str, Any]] = [{'id': 'BENIGN-MEMORY-002',
   'category': '记忆工具',
   'title': '读取普通偏好记忆',

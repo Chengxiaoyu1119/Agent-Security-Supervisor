@@ -215,8 +215,8 @@ def _agent_attack_script(scenario: dict[str, Any]) -> dict[str, Any]:
         "attack_path": scenario.get("attack_path", []),
         "tool_calls": scenario["tool_calls"],
         "execution_recipe": {
-            "cli_compare": f"npm run cli -- run {scenario['id']} on",
-            "cli_full_assessment": "npm run cli -- assess --run-compare",
+            "cli_compare": f"node scripts/agent-supervisor-cli.mjs run {scenario['id']} on",
+            "cli_full_assessment": "node scripts/agent-supervisor-cli.mjs assess --run-compare",
             "api_without_guard": {
                 "method": "POST",
                 "path": "/api/run",

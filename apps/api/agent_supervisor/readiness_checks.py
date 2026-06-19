@@ -4,9 +4,9 @@ import json
 from pathlib import Path
 from typing import Any
 
+from .paths import SUBMISSION_PACKAGES_DIR
 
-BASE_DIR = Path(__file__).resolve().parents[1]
-SUBMISSION_ROOT = BASE_DIR / "sandbox" / "submission_packages"
+SUBMISSION_ROOT = SUBMISSION_PACKAGES_DIR
 
 def _check(
     *,
@@ -300,6 +300,8 @@ def _openclaw_static_check(validation: dict[str, Any]) -> dict[str, Any]:
 
 def _openclaw_runtime_check(validation: dict[str, Any]) -> dict[str, Any]:
     runtime = validation["openclaw_runtime_check"]
+    install = validation.get("openclaw_install_check", {})
+    enable = validation.get("openclaw_enable_check", {})
     passed = validation["runtime_inspect_passed"]
     return _check(
         check_id="openclaw-runtime-inspect",
@@ -309,8 +311,13 @@ def _openclaw_runtime_check(validation: dict[str, Any]) -> dict[str, Any]:
         severity="P0",
         weight=8,
         evidence=runtime.get("skipped_reason") or runtime.get("stderr") or "OpenClaw runtime inspect 已通过。",
-        details=runtime,
-        next_action="在安装 OpenClaw CLI 的环境执行：npm run cli -- openclaw-plugin-validate --output apps/api/sandbox/reports --inspect-runtime，并补充截图。",
+        details={
+            "openclaw_cli_path": validation.get("openclaw_cli_path", ""),
+            "install_check": install,
+            "enable_check": enable,
+            "runtime_check": runtime,
+        },
+        next_action="在安装 OpenClaw CLI 的环境执行：node scripts/agent-supervisor-cli.mjs openclaw-plugin-validate --output apps/api/sandbox/reports --inspect-runtime；该命令会自动安装、启用并 runtime inspect 插件。",
         artifact_paths=[validation["package_dir"]],
     )
 

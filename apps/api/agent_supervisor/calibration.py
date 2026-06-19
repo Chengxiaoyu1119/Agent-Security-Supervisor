@@ -10,11 +10,10 @@ from typing import Any
 from .anomaly import detect_tool_anomaly
 from .benign import get_benign_cases
 from .data import get_attack_surfaces, get_scenarios
+from .paths import SANDBOX_REPORTS_DIR
 from .supervisor import decide
 
-
-BASE_DIR = Path(__file__).resolve().parents[1]
-REPORT_ROOT = BASE_DIR / "sandbox" / "reports"
+REPORT_ROOT = SANDBOX_REPORTS_DIR
 CONTROL_DECISIONS = {"拒绝", "询问", "隔离"}
 DEFAULT_MAX_FALSE_ALARM_RATE = 10
 

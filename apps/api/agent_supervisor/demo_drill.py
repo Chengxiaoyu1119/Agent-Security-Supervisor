@@ -7,10 +7,9 @@ from typing import Any
 
 from .approvals import decide_approval_review
 from .events import evaluate_agent_event
+from .paths import SANDBOX_REPORTS_DIR
 
-
-BASE_DIR = Path(__file__).resolve().parents[1]
-REPORT_ROOT = BASE_DIR / "sandbox" / "reports"
+REPORT_ROOT = SANDBOX_REPORTS_DIR
 
 
 def run_judge_demo_drill(output_root: str | Path | None = None) -> dict[str, Any]:

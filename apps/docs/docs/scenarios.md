@@ -20,17 +20,18 @@ title: 攻击剧本
 ## 运行单个剧本
 
 ```powershell
-npm run cli -- run TOOL-HIJACK-001 on
+node scripts/agent-supervisor-cli.mjs run TOOL-HIJACK-001 on
 ```
 
 ## 对比有防护和无防护
 
 ```powershell
-npm run cli -- compare TOOL-HIJACK-001
+node scripts/agent-supervisor-cli.mjs run TOOL-HIJACK-001 off
+node scripts/agent-supervisor-cli.mjs run TOOL-HIJACK-001 on
 ```
 
 ## 批量评测
 
 ```powershell
-npm run cli -- batch-compare
+node scripts/agent-supervisor-cli.mjs batch --guard compare
 ```

@@ -10,11 +10,10 @@ from .benign_workflows import evaluate_benign_workflows
 from .calibration import build_anomaly_calibration
 from .data import get_attack_surfaces, get_scenarios
 from .openclaw_adapter import build_openclaw_plugin_package_summary
+from .paths import SANDBOX_REPORTS_DIR
 from .surface_pack import build_surface_evidence_index
 
-
-BASE_DIR = Path(__file__).resolve().parents[1]
-REPORT_ROOT = BASE_DIR / "sandbox" / "reports"
+REPORT_ROOT = SANDBOX_REPORTS_DIR
 
 
 def build_project_roadmap(runs: list[dict[str, Any]] | None = None) -> dict[str, Any]:
@@ -143,7 +142,6 @@ def _maturity_dimensions(
     openclaw_validation: dict[str, Any] | None,
     benign_workflows: dict[str, Any],
 ) -> list[dict[str, Any]]:
-    requirement_status = {item["id"]: item["status"] for item in requirements}
     summary = surface_index["summary"]
     effectiveness_summary = effectiveness["summary"]
     tool_surfaces = {tool for scenario in get_scenarios() for tool in [call["tool"] for call in scenario["tool_calls"]]}

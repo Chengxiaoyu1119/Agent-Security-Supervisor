@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 import json
-import shutil
 import zipfile
-from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -17,20 +15,20 @@ from ..calibration import build_anomaly_calibration_markdown
 from ..data import get_attack_surfaces, get_policies, get_scenarios
 from ..demo_drill import build_judge_demo_drill_markdown, run_judge_demo_drill
 from ..evidence import build_output_filter_markdown, build_surface_conclusions_markdown
-from ..openclaw_adapter import (
-    build_openclaw_integration_markdown,
+from ..openclaw_adapter import build_openclaw_integration_markdown
+from ..openclaw_plugin_package import (
     build_openclaw_plugin_package_markdown,
     build_openclaw_plugin_validation_markdown,
     write_openclaw_plugin_validation_report,
 )
+from ..paths import SUBMISSION_PACKAGES_DIR
 from ..readiness import (
     build_competition_readiness,
     build_competition_readiness_markdown,
-    build_submission_package_snapshot,
     write_competition_readiness_report,
 )
+from ..readiness_checks import build_submission_package_snapshot
 from ..roadmap import build_project_roadmap_markdown
-from ..paths import SUBMISSION_PACKAGES_DIR
 from ..surface_pack import build_surface_evidence_index_markdown, write_all_surface_briefing_sheets
 from .package_content import (
     _checklist,
@@ -38,17 +36,19 @@ from .package_content import (
     _clean_submission_summary,
     _copy_demo_screenshots,
     _copy_multi_agent_self_review_reports,
+    _dependency_security_evidence_files,
     _experiment_report,
     _external_agent_demo_evidence_files,
     _file,
+    _openclaw_runtime_attempt_evidence_files,
     _risk_report,
     _sample_set,
     _script_library,
     _supervisor_spec,
 )
 from .package_docs import (
-    _adapter_schema,
     _acceptance_checklist,
+    _adapter_schema,
     _anomaly_calibration_record,
     _api_inventory,
     _approval_review_record,
@@ -71,7 +71,6 @@ from .package_docs import (
     _surface_pack_record,
     _threat_model_for_package,
 )
-
 
 SUBMISSION_ROOT = SUBMISSION_PACKAGES_DIR
 
@@ -180,6 +179,8 @@ def write_submission_package(
         "演示截图清单.md": _screenshot_checklist(),
     }
     support_files.update(_external_agent_demo_evidence_files())
+    support_files.update(_dependency_security_evidence_files())
+    support_files.update(_openclaw_runtime_attempt_evidence_files())
     for filename, content in support_files.items():
         path = support_dir / filename
         path.write_text(content, encoding="utf-8")
@@ -188,7 +189,7 @@ def write_submission_package(
     write_all_surface_briefing_sheets(output_root=briefing_dir, runs=runs)
     written_files.extend(sorted(path for path in briefing_dir.rglob("*.html") if path.is_file()))
     plugin_package_dir = support_dir / "OpenClaw源码级插件包"
-    plugin_result = write_openclaw_plugin_validation_report(output_root=plugin_package_dir)
+    write_openclaw_plugin_validation_report(output_root=plugin_package_dir)
     written_files.extend(sorted(path for path in plugin_package_dir.rglob("*") if path.is_file()))
     benign_workflow_dir = support_dir / "连续正常比赛任务流程误报评测"
     write_benign_workflow_report(output_root=benign_workflow_dir)

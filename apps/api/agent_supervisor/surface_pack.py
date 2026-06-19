@@ -8,12 +8,11 @@ from typing import Any
 
 from .data import get_attack_surfaces, get_policies, get_scenarios
 from .datasets import build_attack_case_dataset
+from .paths import SANDBOX_REPORTS_DIR
 from .supervisor import decide
 from .surface_pack_html import render_briefing_sheet_index_html, render_surface_briefing_sheet_html
 
-
-BASE_DIR = Path(__file__).resolve().parents[1]
-REPORT_ROOT = BASE_DIR / "sandbox" / "reports"
+REPORT_ROOT = SANDBOX_REPORTS_DIR
 CONTROL_DECISIONS = {"拒绝", "询问", "隔离"}
 
 
@@ -276,8 +275,8 @@ def build_surface_evidence_index_markdown(runs: list[dict[str, Any]] | None = No
             "",
             "- JSON API?`GET /api/attack_surfaces/{surface_id}/evidence_pack`",
             "- Markdown API?`GET /api/attack_surfaces/{surface_id}/evidence_pack.md`",
-            "- CLI?`npm run cli -- surface-pack --surface prompt-injection --output apps/api/sandbox/reports`",
-            "- ???? CLI?`npm run cli -- surface-packs --output apps/api/sandbox/reports`",
+            "- CLI?`node scripts/agent-supervisor-cli.mjs surface-pack --surface prompt-injection --output apps/api/sandbox/reports`",
+            "- ???? CLI?`node scripts/agent-supervisor-cli.mjs surface-packs --output apps/api/sandbox/reports`",
         ]
     )
     return "\n".join(lines)
@@ -449,7 +448,7 @@ def _evidence_gaps(
                 "title": "对抗样本数量偏少",
                 "evidence": f"当前 {summary['sample_count']} 条样本，剧本 {summary['scenario_count']} 个。",
                 "action": "为每个剧本保留原始输入、间接注入包装和多 Agent 转述包装。",
-                "command": f"npm run cli -- samples --surface {surface['id']} --format md",
+                "command": f"node scripts/agent-supervisor-cli.mjs samples --surface {surface['id']} --format md",
             }
         )
     if summary["run_count"] == 0:
@@ -459,7 +458,7 @@ def _evidence_gaps(
                 "title": "缺少运行证据",
                 "evidence": "当前攻击面还没有写入实验运行记录。",
                 "action": "在页面选择该攻击面并点击“验证当前攻击面”，或运行批量对比命令。",
-                "command": "npm run cli -- batch --guard compare",
+                "command": "node scripts/agent-supervisor-cli.mjs batch --guard compare",
             }
         )
     if summary["guarded_run_count"] < summary["scenario_count"]:
@@ -546,15 +545,15 @@ def _replay_commands(surface_id: str, scenario_ids: list[str]) -> list[dict[str,
         },
         {
             "label": "批量对比 CLI",
-            "value": "npm run cli -- batch --guard compare",
+            "value": "node scripts/agent-supervisor-cli.mjs batch --guard compare",
         },
         {
             "label": "攻击样本导出",
-            "value": f"npm run cli -- samples --surface {surface_id} --format md --output apps/api/sandbox/reports/攻击样本-{surface_id}.md",
+            "value": f"node scripts/agent-supervisor-cli.mjs samples --surface {surface_id} --format md --output apps/api/sandbox/reports/攻击样本-{surface_id}.md",
         },
         {
             "label": "证据包导出",
-            "value": f"npm run cli -- surface-pack --surface {surface_id} --output apps/api/sandbox/reports",
+            "value": f"node scripts/agent-supervisor-cli.mjs surface-pack --surface {surface_id} --output apps/api/sandbox/reports",
         },
         {
             "label": "JSON API",
