@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import hashlib
 import json
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
+from .data import get_policy_settings
 from .database import get_connection
+from .event_stream import publish_runtime_event
 from .paths import SANDBOX_REPORTS_DIR
 from .tools import execute_tool
 
@@ -41,6 +43,10 @@ def create_approval_review(event: dict[str, Any], supervisor_result: dict[str, A
 
     tool_call = event.get("tool_call") or {}
     created_at = _now()
+    settings = get_policy_settings()
+    sla_minutes = int(settings.get("approval_sla_minutes", 30))
+    due_at = (datetime.now(timezone.utc) + timedelta(minutes=sla_minutes)).isoformat()
+    escalation_level = "P1" if supervisor_result.get("risk_level") in {"high", "critical"} else "P2"
     review = {
         "id": str(uuid4()),
         "audit_id": str(audit_log["id"]),
@@ -70,6 +76,10 @@ def create_approval_review(event: dict[str, Any], supervisor_result: dict[str, A
         "comment": "",
         "created_at": created_at,
         "reviewed_at": "",
+        "due_at": due_at,
+        "sla_minutes": sla_minutes,
+        "sla_breached": False,
+        "escalation_level": escalation_level,
         "execution_note": "监督器已暂停该工具调用，等待人工确认后由上游比赛平台决定是否重新发起。",
         "sandbox_replay_requested": False,
         "sandbox_replayed_at": "",
@@ -157,6 +167,16 @@ def decide_approval_review(
     updated["review_hash"] = _review_hash(updated)
     updated["hash_valid"] = True
     _write_review(updated)
+    publish_runtime_event(
+        "approval-decision",
+        {
+            "review_id": review_id,
+            "status": status,
+            "final_decision": final_decision,
+            "operator": updated["operator"],
+            "sandbox_replay": sandbox_replay,
+        },
+    )
     return {
         "updated": True,
         "review": updated,
@@ -277,6 +297,12 @@ def _load_review_by_audit_id(audit_id: str) -> dict[str, Any] | None:
 
 def _restore_hash_state(review: dict[str, Any]) -> dict[str, Any]:
     review["hash_valid"] = review.get("review_hash") == _review_hash(review)
+    due_at = str(review.get("due_at", ""))
+    if review.get("status") == PENDING_STATUS and due_at:
+        try:
+            review["sla_breached"] = datetime.fromisoformat(due_at) < datetime.now(timezone.utc)
+        except ValueError:
+            review["sla_breached"] = False
     return review
 
 
@@ -296,6 +322,7 @@ def _summary(reviews: list[dict[str, Any]]) -> dict[str, Any]:
         "hash_valid_count": sum(1 for item in reviews if item.get("hash_valid")),
         "latest_created_at": max((str(item.get("created_at", "")) for item in reviews), default=""),
         "latest_reviewed_at": max((str(item.get("reviewed_at", "")) for item in reviews if item.get("reviewed_at")), default=""),
+        "sla_breached_count": sum(1 for item in reviews if item.get("sla_breached")),
     }
 
 

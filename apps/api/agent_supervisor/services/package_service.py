@@ -35,12 +35,16 @@ from .package_content import (
     _clean_submission_evidence,
     _clean_submission_summary,
     _copy_demo_screenshots,
+    _copy_formal_submission_documents,
     _copy_multi_agent_self_review_reports,
+    _copy_release_artifacts,
     _dependency_security_evidence_files,
     _experiment_report,
     _external_agent_demo_evidence_files,
     _file,
     _openclaw_runtime_attempt_evidence_files,
+    _real_model_evaluation_evidence_files,
+    _real_model_evaluation_material,
     _risk_report,
     _sample_set,
     _script_library,
@@ -102,6 +106,7 @@ def build_competition_package(runs: list[dict[str, Any]] | None = None) -> dict[
         _file("17_人工复核队列与审批闭环.md", "人工复核队列与审批闭环", "展示“询问”决策如何生成复核单、人工批准/驳回和 review_hash 证据。", build_approval_review_markdown()),
         _file("18_答辩一键演示闭环报告.md", "答辩一键演示闭环报告", "把正常放行、外发复核、批量导出审批和记忆隔离串成现场演示流程。", build_judge_demo_drill_markdown()),
         _file("19_组合攻击链评测.md", "组合攻击链评测", "把提示注入、工具劫持、数据外泄、记忆中毒等单点剧本串成多步红队路径。", build_attack_chain_catalog_markdown()),
+        _file("20_真实模型工具调用盲测报告.md", "真实模型工具调用盲测报告", "验证工具调用来自模型结构化输出，且监督器输入不包含 risk_hint。", _real_model_evaluation_material()),
     ]
 
     demo_ready = sum(1 for surface in surfaces if surface["status"] == "可演示")
@@ -181,6 +186,7 @@ def write_submission_package(
     support_files.update(_external_agent_demo_evidence_files())
     support_files.update(_dependency_security_evidence_files())
     support_files.update(_openclaw_runtime_attempt_evidence_files())
+    support_files.update(_real_model_evaluation_evidence_files())
     for filename, content in support_files.items():
         path = support_dir / filename
         path.write_text(content, encoding="utf-8")
@@ -212,6 +218,8 @@ def write_submission_package(
     self_review_dir = support_dir / "多Agent自审优化"
     written_files.extend(_copy_multi_agent_self_review_reports(self_review_dir))
     written_files.extend(_copy_demo_screenshots(support_dir))
+    written_files.extend(_copy_release_artifacts(support_dir))
+    written_files.extend(_copy_formal_submission_documents(package_dir))
 
     manifest = {
         "project": "智安哨：大模型智能体攻击面研究与行为监督平台",

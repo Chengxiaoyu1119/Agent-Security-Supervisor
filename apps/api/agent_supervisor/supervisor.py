@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from .anomaly import ANOMALY_REJECT_THRESHOLD, ANOMALY_REVIEW_THRESHOLD, detect_tool_anomaly
-from .data import is_policy_enabled
+from .data import get_policy_settings, is_policy_enabled
 from .risk_score import calculate_risk_score
 
 
@@ -48,6 +48,9 @@ def decide(
     context_sources: list[str] | None = None,
 ) -> GuardDecision:
     anomaly = detect_tool_anomaly(tool_call, prompt=prompt, context_sources=context_sources or [])
+    policy_settings = get_policy_settings()
+    anomaly_review_threshold = int(policy_settings.get("anomaly_review_threshold", ANOMALY_REVIEW_THRESHOLD))
+    anomaly_reject_threshold = int(policy_settings.get("anomaly_reject_threshold", ANOMALY_REJECT_THRESHOLD))
 
     def scored(decision: GuardDecision) -> GuardDecision:
         risk = calculate_risk_score(
@@ -153,7 +156,9 @@ def decide(
                     recommendation="将工具返回作为低信任数据隔离，禁止其覆盖安全策略或授权判断。",
                 )
             )
-        if is_policy_enabled("bulk-action-review") and risk_hint == "bulk_export":
+        if is_policy_enabled("bulk-action-review") and (
+            risk_hint == "bulk_export" or "export-all" in endpoint or endpoint.endswith("/export") or "/export/" in endpoint
+        ):
             return scored(
                 GuardDecision(
                     decision="询问",
@@ -261,11 +266,11 @@ def decide(
     if prompt_decision:
         return scored(prompt_decision)
 
-    if is_policy_enabled("anomaly-detection") and anomaly.score >= ANOMALY_REVIEW_THRESHOLD:
+    if is_policy_enabled("anomaly-detection") and anomaly.score >= anomaly_review_threshold:
         return scored(
             GuardDecision(
-                decision="询问" if anomaly.score < ANOMALY_REJECT_THRESHOLD else "拒绝",
-                risk_level="high" if anomaly.score >= ANOMALY_REJECT_THRESHOLD else "medium",
+                decision="询问" if anomaly.score < anomaly_reject_threshold else "拒绝",
+                risk_level="high" if anomaly.score >= anomaly_reject_threshold else "medium",
                 policy_id="anomaly-detection",
                 reason=f"工具调用组合异常，异常分 {anomaly.score}，信号：{'；'.join(anomaly.signals[:4])}。",
                 recommendation="暂停自动执行，要求人工核验上下文来源、参数来源和业务目的。",

@@ -1,33 +1,14 @@
 ---
 import HeroScene from '../components/HeroScene.astro';
-import { attackSurfaces, capabilities, integrationCards, pipeline } from '../content/homepage';
+import { attackSurfaces, capabilities, demoScenarios, integrations, workflowStages } from '../content/homepage';
 import '../styles/global.css';
 
 const consoleUrl = import.meta.env.PUBLIC_AGENT_SUPERVISOR_CONSOLE_URL ?? 'http://127.0.0.1:5178';
 const docsUrl = import.meta.env.PUBLIC_AGENT_SUPERVISOR_DOCS_URL ?? 'http://127.0.0.1:3000';
-
-const capabilityProof = [
-  '输入、工具、记忆、环境与外部事件统一建模。',
-  '本地靶场把攻击链变成可重放证据。',
-  '敏感工具调用前完成评分、判定与拦截。',
-  '每次命中保留参数、上下文和复核记录。',
-  '输出攻击控制率、误报率和检测延迟。',
-  '沉淀报告、插件包和比赛验收材料。'
-];
-
-const pipelineDetails = [
-  '接收外部 Agent 的自然语言任务和工具意图。',
-  '把每次工具调用整理成标准化事件。',
-  '标注上下文来源，区分可信与不可信输入。',
-  '融合策略命中、异常分和工具敏感度。',
-  '给出允许、询问、隔离或拒绝的判定。',
-  '在危险动作执行前完成阻断或人工复核。',
-  '生成可回放、可验收、可审计的证据报告。'
-];
 ---
 
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="dark">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -37,215 +18,392 @@ const pipelineDetails = [
     />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <title>智安哨 Agent Security Supervisor</title>
+    <script is:inline>
+      const savedTheme = localStorage.getItem('ass-theme');
+      const preferredTheme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+      document.documentElement.dataset.theme = savedTheme || preferredTheme;
+    </script>
   </head>
   <body>
     <HeroScene consoleUrl={consoleUrl} docsUrl={docsUrl} />
 
     <main>
-      <section class="section section--capabilities" id="capabilities">
-        <div class="section__head reveal">
-          <p class="eyebrow">Capabilities</p>
+      <section class="section workflow-section" id="workflow">
+        <div class="section-heading">
+          <p class="eyebrow">Workflow</p>
           <h2>不是展示概念，而是把攻击到防御跑成闭环</h2>
-          <p>官网主线直接围绕“发现风险、复现攻击、拦截工具、沉淀证据”展开，用户能快速理解系统到底能做什么。</p>
+          <p>官网主线围绕真实监督链路展开：发现风险、标准化事件、执行前判定、留存证据。</p>
         </div>
 
-        <div class="capability-lab reveal" data-capability-tabs>
-          <div class="capability-lab__nav" role="tablist" aria-label="核心能力">
-            {capabilities.map((item, index) => (
-              <button
-                type="button"
-                class={`capability-tab ${index === 0 ? 'is-active' : ''}`}
-                data-tab-button={`capability-${index}`}
-                aria-selected={index === 0 ? 'true' : 'false'}
-              >
-                <span>{String(index + 1).padStart(2, '0')}</span>
-                {item.title}
-              </button>
-            ))}
-          </div>
-
-          <div class="capability-lab__stage">
-            {capabilities.map((item, index) => (
-              <article class={`capability-panel ${index === 0 ? 'is-active' : ''}`} data-tab-panel={`capability-${index}`}>
-                <p class="panel-tag">{item.tag}</p>
-                <h3>{item.title}</h3>
-                <p>{item.description}</p>
-                <div class="proof-line">
-                  <span></span>
-                  <strong>{capabilityProof[index]}</strong>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section class="section section--surfaces" id="surfaces">
-        <div class="section__head reveal">
-          <p class="eyebrow">Attack Surfaces</p>
-          <h2>7 类攻击面可以被点开、比较和复核</h2>
-          <p>把原来的表格升级成攻击面实验台：风险等级、样本规模和验证重点放在同一个可交互视图里。</p>
-        </div>
-
-        <div class="surface-lab reveal" data-surface-lab>
-          <div class="surface-lab__map" role="tablist" aria-label="攻击面列表">
-            {attackSurfaces.map((surface, index) => (
-              <button
-                type="button"
-                class={`surface-node risk-glow--${surface.risk} ${index === 0 ? 'is-active' : ''}`}
-                data-surface-button={`surface-${index}`}
-                aria-selected={index === 0 ? 'true' : 'false'}
-              >
-                <span>{surface.name}</span>
-                <em>{surface.risk}</em>
-              </button>
-            ))}
-          </div>
-
-          <div class="surface-lab__detail">
-            {attackSurfaces.map((surface, index) => (
-              <article class={`surface-panel ${index === 0 ? 'is-active' : ''}`} data-surface-panel={`surface-${index}`}>
-                <div class="surface-panel__head">
-                  <p class={`risk risk--${surface.risk}`}>{surface.risk}</p>
-                  <h3>{surface.name}</h3>
-                </div>
-                <p>{surface.focus}</p>
-                <div class="surface-panel__stats">
-                  <span><strong>{surface.scripts}</strong> 攻击剧本</span>
-                  <span><strong>{surface.samples}</strong> 样本证据</span>
-                </div>
-                <div class="surface-panel__trace">
-                  <span>sample pack</span>
-                  <span>tool event</span>
-                  <span>policy hit</span>
-                  <span>audit hash</span>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section class="section section--pipeline" id="pipeline">
-        <div class="section__head reveal">
-          <p class="eyebrow">Supervisor Pipeline</p>
-          <h2>每一步都发生在危险工具真正执行之前</h2>
-          <p>监督器不替 Agent 做任务，而是在工具调用前给出可解释的安全判定，并把证据写入审计链路。</p>
-        </div>
-
-        <div class="timeline-lab reveal" data-timeline>
-          <div class="timeline-track" role="tablist" aria-label="监督流水线">
-            {pipeline.map((item, index) => (
-              <button
-                type="button"
-                class={`timeline-step ${index === 0 ? 'is-active' : ''}`}
-                data-timeline-button={`step-${index}`}
-                aria-selected={index === 0 ? 'true' : 'false'}
-              >
-                <span>{String(index + 1).padStart(2, '0')}</span>
-                <strong>{item}</strong>
-              </button>
-            ))}
-          </div>
-          <div class="timeline-panels">
-            {pipeline.map((item, index) => (
-              <article class={`timeline-panel ${index === 0 ? 'is-active' : ''}`} data-timeline-panel={`step-${index}`}>
-                <small>Step {String(index + 1).padStart(2, '0')}</small>
-                <h3>{item}</h3>
-                <p>{pipelineDetails[index]}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section class="section section--dark" id="openclaw">
-        <div class="section__head reveal">
-          <p class="eyebrow">Integration</p>
-          <h2>OpenClaw 与外部 Agent 接入不再只是说明文字</h2>
-          <p>外部 Agent 在工具执行前发出事件，智安哨给出监督决策，并把插件包、报告和证据留在本地安全靶场。</p>
-        </div>
-        <div class="integration-grid reveal">
-          {integrationCards.map((item, index) => (
+        <div class="workflow-board">
+          {workflowStages.map((item, index) => (
             <article>
               <span>{String(index + 1).padStart(2, '0')}</span>
-              <h3>{item.title}</h3>
-              <p>{item.description}</p>
+              <div>
+                <p>{item.meta}</p>
+                <h3>{item.title}</h3>
+                <small>{item.body}</small>
+              </div>
             </article>
           ))}
         </div>
       </section>
 
-      <section class="cta reveal">
-        <p class="eyebrow">Start</p>
-        <h2>先看文档，再进入控制台跑一条攻击链</h2>
-        <p>文档适合了解项目边界和运行方式，控制台适合直接查看样本、策略命中、报告和 OpenClaw 接入材料。</p>
+      <section class="section capability-section" id="capabilities" data-capability-tabs>
+        <div class="section-heading section-heading--split">
+          <div>
+            <p class="eyebrow">Capabilities</p>
+            <h2>官网应该像产品，而不是论文摘要</h2>
+          </div>
+          <p>这里把能力做成可切换的产品视图，用户能直接理解系统到底能做什么。</p>
+        </div>
+
+        <div class="capability-shell">
+          <div class="capability-tabs" role="tablist" aria-label="核心能力">
+            {capabilities.map((item, index) => (
+              <button
+                type="button"
+                class={index === 0 ? 'is-active' : ''}
+                data-capability-tab={index}
+                data-capability-item-title={item.title}
+                data-capability-item-description={item.description}
+                data-capability-item-detail={item.detail}
+                aria-selected={index === 0 ? 'true' : 'false'}
+              >
+                <span>{String(index + 1).padStart(2, '0')}</span>
+                <strong>{item.title}</strong>
+              </button>
+            ))}
+          </div>
+
+          <article class="capability-panel">
+            <p class="eyebrow">Selected Capability</p>
+            <h3 data-capability-title>{capabilities[0].title}</h3>
+            <p data-capability-description>{capabilities[0].description}</p>
+            <div class="capability-proof">
+              <span>验证方式</span>
+              <strong data-capability-detail>{capabilities[0].detail}</strong>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section demo-section" id="demo">
+        <div class="section-heading section-heading--split">
+          <div>
+            <p class="eyebrow">Live Demo</p>
+            <h2>选择事件，查看监督器如何判定</h2>
+          </div>
+          <p>这是官网内置的轻量交互，完整攻击剧本和证据链在控制台运行。</p>
+        </div>
+
+        <div class="supervisor-demo" data-supervisor-demo>
+          <div class="demo-sidebar">
+            {demoScenarios.map((scenario, index) => (
+              <button
+                type="button"
+                class={index === 0 ? 'is-active' : ''}
+                data-demo-scenario={scenario.id}
+                data-source={scenario.source}
+                data-tool={scenario.tool}
+                data-score={scenario.score}
+                data-decision={scenario.decision}
+                data-tone={scenario.tone}
+                data-reason={scenario.reason}
+                data-evidence={scenario.evidence}
+                aria-pressed={index === 0 ? 'true' : 'false'}
+              >
+                <span>{String(index + 1).padStart(2, '0')}</span>
+                <strong>{scenario.label}</strong>
+                <small>{scenario.tool}</small>
+              </button>
+            ))}
+          </div>
+
+          <div class="event-panel">
+            <p class="eyebrow">Incoming Event</p>
+            <dl>
+              <div>
+                <dt>上下文来源</dt>
+                <dd data-demo-source>不可信文档</dd>
+              </div>
+              <div>
+                <dt>目标工具</dt>
+                <dd><code data-demo-tool>file.read</code></dd>
+              </div>
+              <div>
+                <dt>监督状态</dt>
+                <dd data-demo-status>等待运行</dd>
+              </div>
+            </dl>
+            <button type="button" class="button button--primary demo-run" data-demo-run>运行监督</button>
+          </div>
+
+          <div class="decision-panel" data-demo-result aria-live="polite" data-tone="danger">
+            <div class="decision-score">
+              <span>风险分</span>
+              <strong data-demo-score>97</strong>
+            </div>
+            <div>
+              <p class="eyebrow">Decision</p>
+              <h3 data-demo-decision>拒绝</h3>
+              <p data-demo-reason>文档内容试图覆盖系统规则，并诱导读取受保护文件。</p>
+              <small data-demo-evidence>策略命中 3 项 · 异常分 88 · audit hash 已生成</small>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section surface-section" id="surfaces">
+        <div class="section-heading">
+          <p class="eyebrow">Attack Surfaces</p>
+          <h2>7 类攻击面可以点开、比较和复核</h2>
+          <p>这里把原来的表格升级成攻击面工作台：左侧选择对象，右侧只保留当前重点。</p>
+        </div>
+
+        <div class="surface-workbench" data-surface-workbench>
+          <div class="surface-list" role="list">
+            {attackSurfaces.map((surface, index) => (
+              <button
+                type="button"
+                class={index === 0 ? 'is-active' : ''}
+                data-surface-name={surface.name}
+                data-surface-risk={surface.risk}
+                data-surface-scripts={surface.scripts}
+                data-surface-samples={surface.samples}
+                data-surface-focus={surface.focus}
+                aria-pressed={index === 0 ? 'true' : 'false'}
+              >
+                <strong>{surface.name}</strong>
+                <span class={`risk risk--${surface.risk}`}>{surface.risk}</span>
+              </button>
+            ))}
+          </div>
+
+          <article class="surface-detail">
+            <p class="eyebrow">Current Surface</p>
+            <div class="surface-detail__heading">
+              <h3 data-surface-output-title>{attackSurfaces[0].name}</h3>
+              <span class={`risk risk--${attackSurfaces[0].risk}`} data-surface-output-risk>
+                {attackSurfaces[0].risk}
+              </span>
+            </div>
+            <p data-surface-output-focus>{attackSurfaces[0].focus}</p>
+            <dl>
+              <div>
+                <dt>攻击剧本</dt>
+                <dd data-surface-output-scripts>{attackSurfaces[0].scripts}</dd>
+              </div>
+              <div>
+                <dt>样本证据</dt>
+                <dd data-surface-output-samples>{attackSurfaces[0].samples}</dd>
+              </div>
+            </dl>
+            <ul>
+              <li>样本、工具参数和触发条件绑定展示</li>
+              <li>策略命中、异常分和最终动作同步记录</li>
+              <li>可导出复核报告与 OpenClaw 验收材料</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section class="section integration-section" id="openclaw">
+        <div class="section-heading section-heading--split">
+          <div>
+            <p class="eyebrow">OpenClaw</p>
+            <h2>作为外部 Agent 的工具调用监督层</h2>
+          </div>
+          <p>接入方式保持简单，把复杂策略、风险解释和证据沉淀留在智安哨内部。</p>
+        </div>
+
+        <div class="integration-lanes">
+          {integrations.map((item, index) => (
+            <article>
+              <span>{String(index + 1).padStart(2, '0')}</span>
+              <h3>{item.title}</h3>
+              <p>{item.body}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section class="section final-cta">
         <div>
-          <a href={docsUrl} class="button button--large button--ghost">查看文档</a>
-          <a href={consoleUrl} class="button button--large">进入控制台</a>
+          <p class="eyebrow">Start</p>
+          <h2>进入控制台，运行完整攻击剧本和监督策略</h2>
+        </div>
+        <div class="final-cta__actions">
+          <a href={docsUrl} class="button button--quiet-light button--large">阅读文档</a>
+          <a href={consoleUrl} class="button button--primary button--large">进入控制台</a>
         </div>
       </section>
     </main>
 
     <script>
       // @ts-nocheck
-      const activateGroup = (rootSelector, buttonSelector, panelSelector, buttonAttr, panelAttr) => {
-        document.querySelectorAll(rootSelector).forEach((root) => {
-          const buttons = Array.from(root.querySelectorAll(buttonSelector));
-          const panels = Array.from(root.querySelectorAll(panelSelector));
+      const root = document.documentElement;
+      const themeToggle = document.querySelector('[data-theme-toggle]');
+      const themeLabel = document.querySelector('[data-theme-label]');
 
-          buttons.forEach((button) => {
-            button.addEventListener('click', () => {
-              const target = button.getAttribute(buttonAttr);
-              buttons.forEach((item) => {
-                item.classList.toggle('is-active', item === button);
-                item.setAttribute('aria-selected', item === button ? 'true' : 'false');
-              });
-              panels.forEach((panel) => {
-                panel.classList.toggle('is-active', panel.getAttribute(panelAttr) === target);
-              });
-            });
-          });
-        });
+      const syncThemeLabel = () => {
+        if (!themeLabel) return;
+        themeLabel.textContent = root.dataset.theme === 'dark' ? '浅色' : '深色';
       };
 
-      activateGroup('[data-capability-tabs]', '[data-tab-button]', '[data-tab-panel]', 'data-tab-button', 'data-tab-panel');
-      activateGroup('[data-surface-lab]', '[data-surface-button]', '[data-surface-panel]', 'data-surface-button', 'data-surface-panel');
-      activateGroup('[data-timeline]', '[data-timeline-button]', '[data-timeline-panel]', 'data-timeline-button', 'data-timeline-panel');
+      syncThemeLabel();
 
-      const revealItems = document.querySelectorAll('.reveal');
-      const revealObserver = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('is-visible');
-              revealObserver.unobserve(entry.target);
-            }
+      themeToggle?.addEventListener('click', () => {
+        const nextTheme = root.dataset.theme === 'dark' ? 'light' : 'dark';
+        root.dataset.theme = nextTheme;
+        localStorage.setItem('ass-theme', nextTheme);
+        syncThemeLabel();
+      });
+
+      const hero = document.querySelector('.hero');
+      const canAnimateHero =
+        hero &&
+        window.matchMedia('(pointer: fine)').matches &&
+        !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (canAnimateHero) {
+        let heroFrame = 0;
+        const syncHeroDepth = (event) => {
+          window.cancelAnimationFrame(heroFrame);
+          heroFrame = window.requestAnimationFrame(() => {
+            const rect = hero.getBoundingClientRect();
+            const x = (event.clientX - rect.left) / rect.width - 0.5;
+            const y = (event.clientY - rect.top) / rect.height - 0.5;
+            hero.style.setProperty('--hero-shift-x', `${(x * -12).toFixed(2)}px`);
+            hero.style.setProperty('--hero-shift-y', `${(y * -8).toFixed(2)}px`);
           });
-        },
-        { threshold: 0.18 }
-      );
-      revealItems.forEach((item) => revealObserver.observe(item));
+        };
 
-      document.querySelectorAll('[data-parallax-root]').forEach((root) => {
-        root.addEventListener('pointermove', (event) => {
-          const rect = root.getBoundingClientRect();
-          root.style.setProperty('--mx', `${((event.clientX - rect.left) / rect.width) * 100}%`);
-          root.style.setProperty('--my', `${((event.clientY - rect.top) / rect.height) * 100}%`);
+        hero.addEventListener('pointermove', syncHeroDepth, { passive: true });
+        hero.addEventListener('pointerleave', () => {
+          hero.style.setProperty('--hero-shift-x', '0px');
+          hero.style.setProperty('--hero-shift-y', '0px');
         });
-      });
+      }
 
-      document.querySelectorAll('[data-tilt]').forEach((card) => {
-        card.addEventListener('pointermove', (event) => {
-          const rect = card.getBoundingClientRect();
-          const x = (event.clientX - rect.left) / rect.width - 0.5;
-          const y = (event.clientY - rect.top) / rect.height - 0.5;
-          card.style.transform = `perspective(1200px) rotateX(${y * -6}deg) rotateY(${x * 8}deg) translateY(-4px)`;
+      const heroSupervisor = document.querySelector('[data-hero-supervisor]');
+      if (heroSupervisor) {
+        const heroCaseButtons = [...heroSupervisor.querySelectorAll('[data-hero-case]')];
+        const heroFields = {
+          status: heroSupervisor.querySelector('[data-hero-status]'),
+          score: heroSupervisor.querySelector('[data-hero-score]'),
+          meter: heroSupervisor.querySelector('[data-hero-meter]'),
+          note: heroSupervisor.querySelector('[data-hero-note]'),
+          attack: heroSupervisor.querySelector('[data-hero-attack]'),
+          tool: heroSupervisor.querySelector('[data-hero-tool]'),
+          decision: heroSupervisor.querySelector('[data-hero-decision]'),
+          evidence: heroSupervisor.querySelector('[data-hero-evidence]')
+        };
+
+        const syncHeroCase = (button) => {
+          heroCaseButtons.forEach((item) => {
+            const active = item === button;
+            item.classList.toggle('is-active', active);
+            item.setAttribute('aria-pressed', active ? 'true' : 'false');
+          });
+
+          heroSupervisor.dataset.state = button.dataset.status;
+          heroFields.status.textContent = button.dataset.status;
+          heroFields.score.textContent = button.dataset.score;
+          heroFields.meter.style.width = `${button.dataset.progress}%`;
+          heroFields.note.textContent = button.dataset.note;
+          heroFields.attack.textContent = button.dataset.attack;
+          heroFields.tool.textContent = button.dataset.tool;
+          heroFields.decision.textContent = button.dataset.decision;
+          heroFields.evidence.textContent = button.dataset.evidence;
+        };
+
+        heroCaseButtons.forEach((button) => button.addEventListener('click', () => syncHeroCase(button)));
+        syncHeroCase(heroCaseButtons[0]);
+      }
+
+      const capabilityRoot = document.querySelector('[data-capability-tabs]');
+      if (capabilityRoot) {
+        const buttons = [...capabilityRoot.querySelectorAll('[data-capability-tab]')];
+        buttons.forEach((button) => {
+          button.addEventListener('click', () => {
+            buttons.forEach((entry) => {
+              const active = entry === button;
+              entry.classList.toggle('is-active', active);
+              entry.setAttribute('aria-selected', active ? 'true' : 'false');
+            });
+            capabilityRoot.querySelector('[data-capability-title]').textContent = button.dataset.capabilityItemTitle;
+            capabilityRoot.querySelector('[data-capability-description]').textContent =
+              button.dataset.capabilityItemDescription;
+            capabilityRoot.querySelector('[data-capability-detail]').textContent = button.dataset.capabilityItemDetail;
+          });
         });
-        card.addEventListener('pointerleave', () => {
-          card.style.transform = '';
+      }
+
+      const demoRoot = document.querySelector('[data-supervisor-demo]');
+      if (demoRoot) {
+        const scenarioButtons = [...demoRoot.querySelectorAll('[data-demo-scenario]')];
+        const runButton = demoRoot.querySelector('[data-demo-run]');
+        let selectedScenario = scenarioButtons[0];
+
+        const syncScenario = (button) => {
+          selectedScenario = button;
+          scenarioButtons.forEach((item) => {
+            const active = item === button;
+            item.classList.toggle('is-active', active);
+            item.setAttribute('aria-pressed', active ? 'true' : 'false');
+          });
+          demoRoot.querySelector('[data-demo-source]').textContent = button.dataset.source;
+          demoRoot.querySelector('[data-demo-tool]').textContent = button.dataset.tool;
+          demoRoot.querySelector('[data-demo-status]').textContent = '等待运行';
+        };
+
+        scenarioButtons.forEach((button) => button.addEventListener('click', () => syncScenario(button)));
+
+        runButton?.addEventListener('click', () => {
+          const status = demoRoot.querySelector('[data-demo-status]');
+          const result = demoRoot.querySelector('[data-demo-result]');
+          runButton.disabled = true;
+          runButton.textContent = '监督中...';
+          status.textContent = '正在评分';
+          result.classList.add('is-running');
+
+          window.setTimeout(() => {
+            demoRoot.querySelector('[data-demo-score]').textContent = selectedScenario.dataset.score;
+            demoRoot.querySelector('[data-demo-decision]').textContent = selectedScenario.dataset.decision;
+            demoRoot.querySelector('[data-demo-reason]').textContent = selectedScenario.dataset.reason;
+            demoRoot.querySelector('[data-demo-evidence]').textContent = selectedScenario.dataset.evidence;
+            result.dataset.tone = selectedScenario.dataset.tone;
+            result.classList.remove('is-running');
+            status.textContent = '判定完成';
+            runButton.disabled = false;
+            runButton.textContent = '再次运行';
+          }, 560);
         });
-      });
+      }
+
+      const surfaceRoot = document.querySelector('[data-surface-workbench]');
+      if (surfaceRoot) {
+        const surfaceButtons = [...surfaceRoot.querySelectorAll('[data-surface-name]')];
+        surfaceButtons.forEach((button) => {
+          button.addEventListener('click', () => {
+            surfaceButtons.forEach((item) => {
+              const active = item === button;
+              item.classList.toggle('is-active', active);
+              item.setAttribute('aria-pressed', active ? 'true' : 'false');
+            });
+
+            surfaceRoot.querySelector('[data-surface-output-title]').textContent = button.dataset.surfaceName;
+            surfaceRoot.querySelector('[data-surface-output-focus]').textContent = button.dataset.surfaceFocus;
+            surfaceRoot.querySelector('[data-surface-output-scripts]').textContent = button.dataset.surfaceScripts;
+            surfaceRoot.querySelector('[data-surface-output-samples]').textContent = button.dataset.surfaceSamples;
+
+            const risk = surfaceRoot.querySelector('[data-surface-output-risk]');
+            risk.textContent = button.dataset.surfaceRisk;
+            risk.className = `risk risk--${button.dataset.surfaceRisk}`;
+          });
+        });
+      }
     </script>
   </body>
 </html>

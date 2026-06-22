@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from ..ablation import build_policy_ablation, build_policy_ablation_markdown
 from ..approvals import build_approval_review_markdown, decide_approval_review, list_approval_reviews, write_approval_review_report
 from ..assessment import build_attack_effectiveness
-from ..auth import require_api_token
+from ..auth import current_security_role, require_api_token, require_role
 from ..benign import build_benign_cases_markdown, evaluate_benign_cases, get_benign_cases
 from ..benign_workflows import build_benign_workflow_markdown, evaluate_benign_workflows, write_benign_workflow_report
 from ..calibration import build_anomaly_calibration, build_anomaly_calibration_markdown, write_anomaly_calibration_report
@@ -18,9 +18,14 @@ from ..evidence import (
     build_surface_conclusions,
     build_surface_conclusions_markdown,
 )
-from ..main_models import ApprovalDecisionRequest
+from ..main_models import ApprovalDecisionRequest, RealModelEvaluationRequest
 from ..readiness import build_competition_readiness, build_competition_readiness_markdown, write_competition_readiness_report
 from ..roadmap import build_project_roadmap, build_project_roadmap_markdown, write_project_roadmap
+from ..runtime_evaluation import (
+    build_real_model_evaluation,
+    build_real_model_evaluation_markdown,
+    write_real_model_evaluation_report,
+)
 from ..services.package_service import write_clean_submission_package, write_submission_package
 from ..services.report_service import build_report
 from ..surface_pack import (
@@ -36,6 +41,22 @@ from ..surface_pack import (
 )
 
 router = APIRouter(dependencies=[Depends(require_api_token)])
+
+
+@router.get("/api/evaluations/real_model")
+def real_model_evaluation(force_real: bool = True) -> dict:
+    return build_real_model_evaluation(force_real=force_real)
+
+
+@router.get("/api/evaluations/real_model.md")
+def real_model_evaluation_markdown(force_real: bool = True) -> Response:
+    data = build_real_model_evaluation(force_real=force_real)
+    return Response(build_real_model_evaluation_markdown(data), media_type="text/markdown; charset=utf-8")
+
+
+@router.post("/api/evaluations/real_model/write")
+def write_real_model_evaluation(request: RealModelEvaluationRequest) -> dict:
+    return write_real_model_evaluation_report(force_real=request.force_real)
 
 @router.get("/api/approvals")
 def approval_reviews(status: str = "全部", limit: int = Query(100, ge=1, le=500)) -> dict:
@@ -60,7 +81,12 @@ def write_approval_reviews() -> dict:
 
 
 @router.post("/api/approvals/{review_id}/decision")
-def approval_review_decision(review_id: str, request: ApprovalDecisionRequest) -> dict:
+def approval_review_decision(
+    review_id: str,
+    request: ApprovalDecisionRequest,
+    role: str = Depends(current_security_role),
+) -> dict:
+    require_role("analyst", role)
     try:
         return decide_approval_review(
             review_id,

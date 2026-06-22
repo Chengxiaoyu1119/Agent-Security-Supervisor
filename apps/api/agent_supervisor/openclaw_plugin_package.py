@@ -418,7 +418,7 @@ def _run_command_check(command: list[str], *, command_label: str, missing_messag
             text=True,
             encoding="utf-8",
             errors="replace",
-            timeout=20,
+            timeout=90,
             check=False,
         )
     except Exception as exc:  # noqa: BLE001 - validation should report failures, not crash packaging

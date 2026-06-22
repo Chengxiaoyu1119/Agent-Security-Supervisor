@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
 import { Row, Col, Typography, Switch, Space, Descriptions, Flex } from 'antd';
-import { updatePolicyEnabled } from '@/api';
+import { updatePolicyDetail, updatePolicyEnabled } from '@/api';
 import type { Policy } from '@/types';
-import { DecisionPill, LabelTag, MetricCard as Metric, PanelCard, UiAlert } from '../ui';
+import { DecisionPill, LabelTag, MetricCard as Metric, PanelCard, UiAlert, UiButton, UiInput, UiSelect } from '../ui';
 
 export function PolicyCenter({
   policies,
@@ -23,6 +23,8 @@ export function PolicyCenter({
   );
   const [savingPolicyId, setSavingPolicyId] = useState('');
   const [policyError, setPolicyError] = useState('');
+  const [editingPolicyId, setEditingPolicyId] = useState('');
+  const [policyDraft, setPolicyDraft] = useState<Partial<Policy>>({});
 
   async function togglePolicy(id: string) {
     const current = policies.find((policy) => policy.id === id);
@@ -38,6 +40,37 @@ export function PolicyCenter({
     } catch {
       setPolicies(previousPolicies);
       setPolicyError('策略状态保存失败，页面已恢复到保存前状态。');
+    } finally {
+      setSavingPolicyId('');
+    }
+  }
+
+  function startEdit(policy: Policy) {
+    setEditingPolicyId(policy.id);
+    setPolicyDraft({
+      description: policy.description,
+      decision: policy.decision,
+      layer: policy.layer
+    });
+    setPolicyError('');
+  }
+
+  async function savePolicyDetail(policy: Policy) {
+    setSavingPolicyId(policy.id);
+    setPolicyError('');
+    try {
+      const savedPolicy = await updatePolicyDetail(policy.id, {
+        description: String(policyDraft.description ?? policy.description),
+        decision: policyDraft.decision ?? policy.decision,
+        layer: String(policyDraft.layer ?? policy.layer ?? ''),
+        operator: 'security-admin',
+        comment: '通过策略中心编辑策略详情'
+      });
+      setPolicies(policies.map((item) => (item.id === policy.id ? savedPolicy : item)));
+      setEditingPolicyId('');
+      setPolicyDraft({});
+    } catch (error) {
+      setPolicyError(error instanceof Error ? error.message : '策略详情保存失败。');
     } finally {
       setSavingPolicyId('');
     }
@@ -105,9 +138,54 @@ export function PolicyCenter({
                 />
               </div>
 
-              <Typography.Paragraph type="secondary" className="zh-policy-card__description">
-                {policy.description}
-              </Typography.Paragraph>
+              {editingPolicyId === policy.id ? (
+                <Space orientation="vertical" size="small" className="zh-full-width zh-mb-16">
+                  <UiInput.TextArea
+                    value={String(policyDraft.description ?? '')}
+                    onChange={(event) => setPolicyDraft({ ...policyDraft, description: event.target.value })}
+                    autoSize={{ minRows: 3, maxRows: 5 }}
+                  />
+                  <Row gutter={[12, 12]}>
+                    <Col xs={24} sm={12}>
+                      <UiSelect
+                        className="zh-full-width"
+                        value={policyDraft.decision}
+                        onChange={(value) => setPolicyDraft({ ...policyDraft, decision: value as Policy['decision'] })}
+                        options={[
+                          { label: '允许', value: '允许' },
+                          { label: '询问', value: '询问' },
+                          { label: '拒绝', value: '拒绝' },
+                          { label: '隔离', value: '隔离' }
+                        ]}
+                      />
+                    </Col>
+                    <Col xs={24} sm={12}>
+                      <UiInput
+                        value={String(policyDraft.layer ?? '')}
+                        onChange={(event) => setPolicyDraft({ ...policyDraft, layer: event.target.value })}
+                        placeholder="策略层级"
+                      />
+                    </Col>
+                  </Row>
+                  <Space wrap>
+                    <UiButton
+                      size="small"
+                      type="primary"
+                      loading={savingPolicyId === policy.id}
+                      onClick={() => void savePolicyDetail(policy)}
+                    >
+                      保存策略
+                    </UiButton>
+                    <UiButton size="small" onClick={() => setEditingPolicyId('')}>
+                      取消
+                    </UiButton>
+                  </Space>
+                </Space>
+              ) : (
+                <Typography.Paragraph type="secondary" className="zh-policy-card__description">
+                  {policy.description}
+                </Typography.Paragraph>
+              )}
 
               <div
                 className={`zh-policy-card__meta${
@@ -159,6 +237,13 @@ export function PolicyCenter({
               {policy.disable_impact && (
                 <UiAlert type="warning" title={`关闭影响: ${policy.disable_impact}`} showIcon className="zh-mt-auto" />
               )}
+              {editingPolicyId !== policy.id ? (
+                <div className="zh-mt-16">
+                  <UiButton size="small" onClick={() => startEdit(policy)}>
+                    编辑策略
+                  </UiButton>
+                </div>
+              ) : null}
             </PanelCard>
           </Col>
         ))}

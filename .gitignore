@@ -2,6 +2,7 @@ node_modules/
 dist/
 apps/www/.astro/
 apps/www/dist/
+apps/www/.dev-server*.log
 apps/docs/.docusaurus/
 apps/docs/build/
 .venv/
@@ -23,6 +24,7 @@ apps/api/sandbox/outbox/
 apps/api/sandbox/memory/
 apps/api/sandbox/external_agent_runtime/
 apps/api/sandbox/reports/
+apps/api/sandbox/release/
 .env
 .env.*
 !.env.example

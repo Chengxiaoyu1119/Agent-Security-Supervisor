@@ -40,6 +40,13 @@ export function setAuthTokenProvider(provider: AuthTokenProvider | null) {
   authTokenProvider = provider;
 }
 
+export type RuntimeEvent = {
+  id: string;
+  type: string;
+  created_at: string;
+  payload: Record<string, unknown>;
+};
+
 function hasJsonBody(init: RequestInit | undefined) {
   return Boolean(init?.body) && !(init?.body instanceof FormData);
 }
@@ -151,4 +158,47 @@ export async function request<T>(path: string, init?: RequestInit, options: Requ
   }
 
   throw lastError ?? new ApiError('Network request failed', { code: 'network_error', path });
+}
+
+export async function subscribeRuntimeEvents(
+  onEvent: (event: RuntimeEvent) => void,
+  signal: AbortSignal
+): Promise<void> {
+  const path = '/api/events/stream';
+  const response = await fetch(path, {
+    headers: await buildRequestHeaders({ Accept: 'text/event-stream' }, undefined, {}),
+    signal
+  });
+  if (!response.ok || !response.body) {
+    const body = await readErrorBody(response);
+    throw new ApiError(body || `HTTP ${response.status}`, {
+      code: 'http_error',
+      path,
+      status: response.status,
+      body
+    });
+  }
+
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+  while (!signal.aborted) {
+    const { value, done } = await reader.read();
+    if (done) break;
+    buffer += decoder.decode(value, { stream: true });
+    const frames = buffer.split('\n\n');
+    buffer = frames.pop() ?? '';
+    for (const frame of frames) {
+      const data = frame
+        .split('\n')
+        .find((line) => line.startsWith('data: '))
+        ?.slice(6);
+      if (!data) continue;
+      try {
+        onEvent(JSON.parse(data) as RuntimeEvent);
+      } catch {
+        continue;
+      }
+    }
+  }
 }

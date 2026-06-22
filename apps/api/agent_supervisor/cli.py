@@ -34,6 +34,7 @@ from .external_agent_demo import run_minimal_external_agent_demo
 from .openclaw_plugin_package import write_openclaw_plugin_package, write_openclaw_plugin_validation_report
 from .readiness import build_competition_readiness, build_competition_readiness_markdown, write_competition_readiness_report
 from .roadmap import write_project_roadmap
+from .runtime_evaluation import write_real_model_evaluation_report
 from .services.package_service import write_clean_submission_package, write_submission_package
 from .surface_pack import (
     write_all_surface_briefing_sheets,
@@ -332,6 +333,14 @@ def cmd_anomaly_calibration(args: argparse.Namespace) -> None:
     print(json.dumps(result, ensure_ascii=False, indent=2))
 
 
+def cmd_real_model_eval(args: argparse.Namespace) -> None:
+    result = write_real_model_evaluation_report(
+        output_root=args.output,
+        force_real=not args.local_only,
+    )
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+
+
 def cmd_openclaw_plugin(args: argparse.Namespace) -> None:
     result = write_openclaw_plugin_package(output_root=args.output, supervisor_url=args.supervisor_url)
     print(json.dumps(result, ensure_ascii=False, indent=2))
@@ -607,6 +616,11 @@ def build_parser() -> argparse.ArgumentParser:
     anomaly_calibration.add_argument("--output", default="apps/api/sandbox/reports")
     anomaly_calibration.add_argument("--max-false-alarm-rate", type=int, default=10, help="允许的正常比赛任务误报率上限，默认 10%")
     anomaly_calibration.set_defaults(func=cmd_anomaly_calibration)
+
+    real_model_eval = sub.add_parser("real-model-eval", help="运行真实模型结构化工具调用盲测并生成报告")
+    real_model_eval.add_argument("--output", default="apps/api/sandbox/reports")
+    real_model_eval.add_argument("--local-only", action="store_true", help="只运行本地模拟规划器，不调用已配置的真实模型")
+    real_model_eval.set_defaults(func=cmd_real_model_eval)
 
     openclaw_plugin = sub.add_parser("openclaw-plugin", help="生成可安装到 OpenClaw 的源码级 native plugin 包")
     openclaw_plugin.add_argument("--output", default="apps/api/sandbox/reports")

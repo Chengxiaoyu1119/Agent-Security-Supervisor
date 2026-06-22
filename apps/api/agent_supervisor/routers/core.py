@@ -1,9 +1,20 @@
+from typing import Any
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 
-from ..auth import require_api_token
-from ..data import get_attack_surfaces, get_policies, get_scenarios, get_student_competition_attack_map, set_policy_enabled
-from ..database import latest_audit_logs, latest_runs
-from ..main_models import PolicyUpdate
+from ..auth import current_security_role, require_api_token, require_role
+from ..data import (
+    get_attack_surfaces,
+    get_policies,
+    get_policy_settings,
+    get_scenarios,
+    get_student_competition_attack_map,
+    update_policy,
+    update_policy_settings,
+)
+from ..database import latest_audit_logs, latest_runs, list_policy_versions, runtime_metrics_snapshot
+from ..main_models import PolicySettingsUpdate, PolicyUpdate
+from ..memory_governance import memory_governance_snapshot, rollback_latest_memory, update_memory_status
 from ..model_adapter import provider_status
 from ..services.package_service import build_competition_package
 
@@ -13,6 +24,18 @@ router = APIRouter(dependencies=[Depends(require_api_token)])
 @router.get("/api/health")
 def health() -> dict:
     return {"ok": True, "service": "agent-security-supervisor"}
+
+
+@router.get("/api/auth/context")
+def auth_context(role: str = Depends(current_security_role)) -> dict:
+    return {
+        "role": role,
+        "permissions": {
+            "can_edit_policy": role == "admin",
+            "can_review_approval": role in {"admin", "analyst"},
+            "can_view": role in {"admin", "analyst", "observer"},
+        },
+    }
 
 
 @router.get("/api/overview")
@@ -53,16 +76,85 @@ def policies() -> list[dict]:
 
 
 @router.patch("/api/policies/{policy_id}")
-def update_policy(policy_id: str, request: PolicyUpdate) -> dict:
+def update_policy_endpoint(
+    policy_id: str,
+    request: PolicyUpdate,
+    role: str = Depends(current_security_role),
+) -> dict:
+    require_role("admin", role)
+    updates: dict[str, Any] = request.dict(exclude_none=True)
+    operator = str(updates.pop("operator", "security-admin"))
+    comment = str(updates.pop("comment", ""))
     try:
-        return set_policy_enabled(policy_id, request.enabled)
+        return update_policy(policy_id, updates, operator=operator, comment=comment)
     except KeyError as exc:
         raise HTTPException(status_code=404, detail=f"未知策略：{policy_id}") from exc
+
+
+@router.get("/api/policy_config")
+def policy_config() -> dict:
+    return {
+        "policies": get_policies(),
+        "settings": get_policy_settings(),
+        "versions": list_policy_versions(limit=20),
+    }
+
+
+@router.patch("/api/policy_settings")
+def update_policy_settings_endpoint(
+    request: PolicySettingsUpdate,
+    role: str = Depends(current_security_role),
+) -> dict:
+    require_role("admin", role)
+    return update_policy_settings(request.dict(exclude_none=True))
+
+
+@router.get("/api/policies/versions")
+def policy_versions(policy_id: str | None = None, limit: int = Query(100, ge=1, le=500)) -> list[dict]:
+    return list_policy_versions(policy_id=policy_id, limit=limit)
 
 
 @router.get("/api/models")
 def models() -> list[dict]:
     return provider_status()
+
+
+@router.get("/api/observability/metrics")
+def observability_metrics(limit: int = Query(500, ge=10, le=2000)) -> dict:
+    return runtime_metrics_snapshot(limit=limit)
+
+
+@router.get("/api/memory_governance")
+def memory_governance(limit: int = Query(80, ge=1, le=500)) -> dict:
+    return memory_governance_snapshot(limit=limit)
+
+
+@router.patch("/api/memory_governance/{memory_id}")
+def memory_status_update(
+    memory_id: str,
+    request: dict[str, Any],
+    role: str = Depends(current_security_role),
+) -> dict:
+    require_role("analyst", role)
+    try:
+        return update_memory_status(
+            memory_id,
+            str(request.get("status", "")),
+            operator=str(request.get("operator", "security-analyst")),
+        )
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=f"未知记忆：{memory_id}") from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.post("/api/memory_governance/rollback_latest")
+def memory_rollback_latest(
+    request: dict[str, Any] | None = None,
+    role: str = Depends(current_security_role),
+) -> dict:
+    require_role("analyst", role)
+    return rollback_latest_memory(operator=str((request or {}).get("operator", "security-analyst")))
 
 
 @router.get("/api/audit_logs")

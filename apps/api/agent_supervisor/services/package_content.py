@@ -130,6 +130,32 @@ def _openclaw_runtime_attempt_evidence_files() -> dict[str, str]:
     return files
 
 
+def _real_model_evaluation_material() -> str:
+    markdown_path = SANDBOX_REPORTS_DIR / "真实模型工具调用盲测报告.md"
+    if markdown_path.exists():
+        return markdown_path.read_text(encoding="utf-8")
+    return "\n".join(
+        [
+            "# 真实模型工具调用盲测报告",
+            "",
+            "当前提交包生成时未检测到已写入的盲测报告。",
+            "请先执行 `node scripts/agent-supervisor-cli.mjs real-model-eval --output apps/api/sandbox/reports` 生成证据。",
+        ]
+    )
+
+
+def _real_model_evaluation_evidence_files() -> dict[str, str]:
+    files: dict[str, str] = {}
+    sources = {
+        "真实模型工具调用盲测报告.md": SANDBOX_REPORTS_DIR / "真实模型工具调用盲测报告.md",
+        "真实模型工具调用盲测报告.json": SANDBOX_REPORTS_DIR / "真实模型工具调用盲测报告.json",
+    }
+    for filename, source in sources.items():
+        if source.exists():
+            files[filename] = source.read_text(encoding="utf-8")
+    return files
+
+
 def _copy_demo_screenshots(support_dir: Path) -> list[Path]:
     report_dir = SANDBOX_REPORTS_DIR
     screenshot_names = [
@@ -200,6 +226,46 @@ def _copy_multi_agent_self_review_reports(target_dir: Path) -> list[Path]:
     copied: list[Path] = []
     for name in report_names:
         source = report_dir / name
+        if not source.exists():
+            continue
+        target_dir.mkdir(parents=True, exist_ok=True)
+        target = target_dir / name
+        shutil.copy2(source, target)
+        copied.append(target)
+    return copied
+
+
+def _copy_release_artifacts(support_dir: Path) -> list[Path]:
+    target_dir = support_dir / "Windows一键运行"
+    sources = [
+        REPO_ROOT / "apps" / "api" / "sandbox" / "release" / "dist" / "zhian-supervisor-launcher.exe",
+        REPO_ROOT / "scripts" / "启动智安哨.cmd",
+        REPO_ROOT / "scripts" / "启动智安哨.ps1",
+        REPO_ROOT / "scripts" / "生成智安哨Windows启动器.ps1",
+    ]
+    copied: list[Path] = []
+    for source in sources:
+        if not source.exists():
+            continue
+        target_dir.mkdir(parents=True, exist_ok=True)
+        target = target_dir / source.name
+        shutil.copy2(source, target)
+        copied.append(target)
+    return copied
+
+
+def _copy_formal_submission_documents(package_dir: Path) -> list[Path]:
+    target_dir = package_dir / "03_正式提交材料草稿"
+    source_dir = REPO_ROOT / "docs" / "信息安全"
+    source_names = [
+        "作品报告-智安哨-待完善队伍信息.docx",
+        "作品报告-智安哨-待完善队伍信息.pdf",
+        "作品原创性声明-智安哨-待签署.docx",
+        "提交材料清单-智安哨.md",
+    ]
+    copied: list[Path] = []
+    for name in source_names:
+        source = source_dir / name
         if not source.exists():
             continue
         target_dir.mkdir(parents=True, exist_ok=True)

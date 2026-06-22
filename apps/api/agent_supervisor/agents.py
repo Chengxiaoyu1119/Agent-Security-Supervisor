@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from time import perf_counter
 from uuid import uuid4
 
 from .data import find_scenario, get_scenarios
 from .database import write_run
+from .event_stream import publish_runtime_event
 from .integrity import attach_audit_hashes
 from .model_adapter import generate_model_response
 from .supervisor import decide
@@ -45,9 +47,12 @@ def run_scenario(scenario_id: str, guard_enabled: bool = True, persist: bool = T
     asked_count = 0
     isolated_count = 0
     executed_risky = False
+    decision_latencies: list[float] = []
 
     for index, tool_call in enumerate(scenario["tool_calls"], start=1):
+        decision_started = perf_counter()
         decision = decide(tool_call, guard_enabled, scenario["adversarial_prompt"])
+        decision_latencies.append((perf_counter() - decision_started) * 1000)
         if decision.decision == "拒绝":
             blocked_count += 1
         if decision.decision == "询问":
@@ -105,14 +110,15 @@ def run_scenario(scenario_id: str, guard_enabled: bool = True, persist: bool = T
     if guard_enabled and (blocked_count or asked_count or isolated_count):
         attack_success = False
 
-    detection_latency_ms = 42 + len(scenario["tool_calls"]) * 17 + (0 if guard_enabled else 31)
+    detection_latency_ms = round(sum(decision_latencies), 3)
     metrics = {
         "attack_success_rate": 100 if attack_success else 0,
         "blocked_count": blocked_count,
         "asked_count": asked_count,
         "isolated_count": isolated_count,
         "detection_latency_ms": detection_latency_ms,
-        "false_positive_rate": 0 if scenario["severity"] in {"high", "critical"} else 5,
+        "false_positive_rate": 0,
+        "false_positive_applicable": False,
     }
     attach_audit_hashes(audit_logs, seed=f"{run_id}:{created_at}")
     agent_trace.append(
@@ -137,6 +143,17 @@ def run_scenario(scenario_id: str, guard_enabled: bool = True, persist: bool = T
     }
     if persist:
         write_run(result)
+        publish_runtime_event(
+            "scenario-run",
+            {
+                "run_id": run_id,
+                "scenario_id": scenario_id,
+                "guard_enabled": guard_enabled,
+                "attack_success": attack_success,
+                "metrics": metrics,
+                "alert_count": len(alerts),
+            },
+        )
     return result
 
 

@@ -1,40 +1,93 @@
 export const stats = [
-  { value: '7', label: '攻击面', note: '覆盖提示注入、工具劫持、数据泄露等核心风险' },
-  { value: '22', label: '攻击剧本', note: '每个剧本都有对抗样本、越狱用例和工具脚本' },
-  { value: '13', label: '防御策略', note: '拒绝、询问、隔离、允许四类监督决策' },
-  { value: 'OpenClaw', label: '兼容接入', note: '提供事件入口、插件包和最小外部 Agent 演示' }
+  { value: '7', label: '攻击面', note: '覆盖智能体输入、工具、记忆与环境风险' },
+  { value: '22', label: '攻击剧本', note: '每个剧本包含样本、参数和复核证据' },
+  { value: '13', label: '防御策略', note: '按工具、数据、上下文和行为联合判定' },
+  { value: '4', label: '监督动作', note: '允许、询问、隔离、拒绝' }
+];
+
+export const workflowStages = [
+  {
+    id: 'ingest',
+    title: '接收事件',
+    body: '把外部 Agent 的目标、上下文、工具名和参数统一成标准工具调用事件。',
+    meta: 'before_tool_call'
+  },
+  {
+    id: 'classify',
+    title: '标注来源',
+    body: '区分系统指令、用户意图、不可信文档、邮件和外部事件，避免上下文混淆。',
+    meta: 'context boundary'
+  },
+  {
+    id: 'score',
+    title: '融合评分',
+    body: '把策略命中、异常行为、敏感资源和历史证据融合成可解释风险分。',
+    meta: 'policy + anomaly'
+  },
+  {
+    id: 'decide',
+    title: '执行前判定',
+    body: '在真实工具执行前返回允许、询问、隔离或拒绝，并留下审计哈希。',
+    meta: 'decision gate'
+  }
 ];
 
 export const capabilities = [
   {
-    title: '攻击面研究',
-    description: '把 LLM Agent 的输入、工具、记忆、环境、外部事件拆成可评估的攻击面。',
-    tag: 'Research'
+    title: '攻击复现实验台',
+    description: '内置提示注入、工具劫持、数据泄露、记忆中毒等样本，适合快速复现和讲解风险。',
+    detail: '每个样本都保留触发条件、工具参数、期望拦截点和验证结果。'
   },
   {
-    title: '攻击复现',
-    description: '用本地靶场复现提示注入、工具劫持、记忆中毒、环境污染等攻击路径。',
-    tag: 'Replay'
+    title: '工具调用防火墙',
+    description: '在文件、邮件、API、代码执行、记忆写入之前做风险判断，避免 Agent 直接越权操作。',
+    detail: '支持按工具、路径、目标域、参数形态和上下文来源组合策略。'
   },
   {
-    title: '工具调用监督',
-    description: '在文件、邮件、API、代码执行、记忆读写前做风险评分和策略判定。',
-    tag: 'Guard'
+    title: '审计证据链',
+    description: '把策略命中、异常分、参数快照、人工复核和 audit hash 组织成可追溯记录。',
+    detail: '用于赛后报告、插件验收和团队内部复盘。'
   },
   {
-    title: '证据留痕',
-    description: '记录策略命中、参数、风险分、异常分、audit hash 和人工复核结果。',
-    tag: 'Audit'
-  },
-  {
-    title: '防御评测',
+    title: '防御评测报告',
     description: '比较无防护和有防护运行结果，输出攻击控制率、误报率和检测延迟。',
-    tag: 'Evaluate'
+    detail: '报告面向评审和工程落地，不只展示概念。'
+  }
+];
+
+export const demoScenarios = [
+  {
+    id: 'tool-hijack',
+    label: '工具调用劫持',
+    source: '不可信文档',
+    tool: 'file.read',
+    score: '97',
+    decision: '拒绝',
+    tone: 'danger',
+    reason: '文档内容试图覆盖系统规则，并诱导读取受保护文件。',
+    evidence: '策略命中 3 项 · 异常分 88 · audit hash 已生成'
   },
   {
-    title: '比赛交付',
-    description: '生成攻击面证据包、评测报告、赛前体检和 OpenClaw 插件验收材料。',
-    tag: 'Deliver'
+    id: 'data-export',
+    label: '批量数据外发',
+    source: '外部任务',
+    tool: 'api.call',
+    score: '84',
+    decision: '询问',
+    tone: 'warning',
+    reason: '请求包含批量导出意图，需要人工确认数据范围和接收方。',
+    evidence: '策略命中 2 项 · 目标域待确认 · 参数已留痕'
+  },
+  {
+    id: 'safe-query',
+    label: '正常资料查询',
+    source: '可信用户',
+    tool: 'file.read',
+    score: '18',
+    decision: '允许',
+    tone: 'success',
+    reason: '读取范围位于公开目录，参数与当前任务目标一致。',
+    evidence: '未命中高风险策略 · 调用范围正常 · 事件已记录'
   }
 ];
 
@@ -48,27 +101,17 @@ export const attackSurfaces = [
   { name: '环境感知污染', risk: 'medium', scripts: 3, samples: 12, focus: '伪造环境变量、配置和工具返回内容' }
 ];
 
-export const pipeline = [
-  '外部 Agent 任务',
-  '工具调用事件',
-  '上下文来源标注',
-  '风险评分',
-  '策略判定',
-  '拒绝 / 询问 / 隔离',
-  '审计报告'
-];
-
-export const integrationCards = [
+export const integrations = [
   {
-    title: '兼容事件入口',
-    description: '外部 Agent 在工具执行前发送标准化事件，监督器返回是否允许继续执行。'
+    title: '标准事件入口',
+    body: '外部 Agent 在工具执行前提交事件，智安哨返回动作和解释。'
   },
   {
     title: 'OpenClaw 插件包',
-    description: '生成 native plugin 源码包，把 before_tool_call 作为工具调用前置闸门。'
+    body: '生成 native plugin 源码包，把 before_tool_call 做成前置闸门。'
   },
   {
     title: '本地安全靶场',
-    description: '所有攻击样本只作用于本地沙箱和模拟比赛数据，不攻击真实外部系统。'
+    body: '攻击样本只作用于本地沙箱和模拟比赛数据，不攻击真实外部系统。'
   }
 ];

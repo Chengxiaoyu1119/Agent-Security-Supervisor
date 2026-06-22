@@ -2,6 +2,7 @@ import { Col, Flex, Row, Space, Steps, Typography } from 'antd';
 import { LabelTag, PanelCard, UiButton } from '../ui';
 import { OpenClawPluginPanel } from './OpenClawPluginPanel';
 import type {
+  AgentIntegrationBundle,
   OpenClawIntegrationBundle,
   OpenClawPluginPackageResult,
   OpenClawPluginValidationWriteResult
@@ -9,6 +10,7 @@ import type {
 
 type ExternalIntegrationTabProps = {
   integrationBundle: OpenClawIntegrationBundle | null;
+  agentIntegrationBundle: AgentIntegrationBundle | null;
   openClawPluginPackage: OpenClawPluginPackageResult | null;
   openClawPluginValidation: OpenClawPluginValidationWriteResult | null;
   writingOpenClawPlugin: boolean;
@@ -19,6 +21,7 @@ type ExternalIntegrationTabProps = {
 
 export function ExternalIntegrationTab({
   integrationBundle,
+  agentIntegrationBundle,
   openClawPluginPackage,
   openClawPluginValidation,
   writingOpenClawPlugin,
@@ -71,6 +74,54 @@ export function ExternalIntegrationTab({
             </PanelCard>
           </Col>
         </Row>
+
+        {agentIntegrationBundle && (
+          <PanelCard
+            title={
+              <Space>
+                通用 Agent Runtime 接入包
+                <LabelTag variant="filled" color="green">
+                  {agentIntegrationBundle.version}
+                </LabelTag>
+              </Space>
+            }
+            className="zh-mb-24 zh-settings-muted-body"
+            type="inner"
+            variant="borderless"
+          >
+            <Typography.Paragraph>{agentIntegrationBundle.purpose}</Typography.Paragraph>
+            <Row gutter={[16, 16]} className="zh-mb-24">
+              {agentIntegrationBundle.examples.map((example) => (
+                <Col xs={24} md={12} xl={6} key={example.id}>
+                  <PanelCard size="small" bodyPadding={12} className="zh-full-height">
+                    <Typography.Text strong className="zh-text-block">
+                      {example.name}
+                    </Typography.Text>
+                    <Typography.Text type="secondary" className="zh-meta-block">
+                      {example.framework}
+                    </Typography.Text>
+                    <LabelTag variant="filled" color={example.status === 'ready' ? 'success' : 'blue'}>
+                      {example.status}
+                    </LabelTag>
+                  </PanelCard>
+                </Col>
+              ))}
+            </Row>
+            <Flex justify="space-between" align="center" wrap="wrap" gap={16}>
+              <Typography.Text code className="zh-settings-code-wrap zh-settings-code-md">
+                POST /api/supervisor/evaluate
+              </Typography.Text>
+              <Space wrap>
+                <UiButton size="small" href="/api/integrations/agents/bundle" target="_blank">
+                  查看通用接入包
+                </UiButton>
+                <UiButton size="small" href="/api/integrations/agents/bundle.md" target="_blank">
+                  查看 Markdown
+                </UiButton>
+              </Space>
+            </Flex>
+          </PanelCard>
+        )}
 
         {integrationBundle && (
           <PanelCard

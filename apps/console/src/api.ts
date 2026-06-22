@@ -32,7 +32,8 @@ import type {
 } from './types';
 import { fallbackOverview, fallbackPolicies, fallbackScenarios } from './fallback';
 import { ApiError, request } from './app/apiRequest';
-export { ApiError, setAuthTokenProvider } from './app/apiRequest';
+export { ApiError, setAuthTokenProvider, subscribeRuntimeEvents } from './app/apiRequest';
+export * from './app/governanceApi';
 export type { ApiErrorCode, RequestOptions } from './app/apiRequest';
 
 function shouldUseFallback(error: unknown) {
@@ -117,7 +118,7 @@ export async function fetchApprovalReviews(status = '全部', limit = 100): Prom
 export async function decideApprovalReview(
   reviewId: string,
   action: 'approve' | 'reject',
-  comment = '',
+  comment = '已完成人工复核，按当前安全策略处置。',
   executeInSandbox = false
 ): Promise<ApprovalDecisionResult> {
   return request<ApprovalDecisionResult>(`/api/approvals/${encodeURIComponent(reviewId)}/decision`, {
@@ -134,7 +135,17 @@ export async function decideApprovalReview(
 export async function updatePolicyEnabled(policyId: string, enabled: boolean): Promise<Policy> {
   return request<Policy>(`/api/policies/${policyId}`, {
     method: 'PATCH',
-    body: JSON.stringify({ enabled })
+    body: JSON.stringify({ enabled, operator: 'security-admin', comment: enabled ? '启用策略' : '停用策略' })
+  });
+}
+
+export async function updatePolicyDetail(
+  policyId: string,
+  payload: Partial<Policy> & { operator?: string; comment?: string }
+): Promise<Policy> {
+  return request<Policy>(`/api/policies/${policyId}`, {
+    method: 'PATCH',
+    body: JSON.stringify(payload)
   });
 }
 

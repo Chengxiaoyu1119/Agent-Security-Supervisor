@@ -34,6 +34,10 @@ export interface ApprovalReview {
   comment: string;
   created_at: string;
   reviewed_at: string;
+  due_at?: string;
+  sla_minutes?: number;
+  sla_breached?: boolean;
+  escalation_level?: string;
   execution_note: string;
   sandbox_replay_requested?: boolean;
   sandbox_replayed_at?: string;
@@ -57,6 +61,7 @@ export interface ApprovalReviewList {
     hash_valid_count: number;
     latest_created_at: string;
     latest_reviewed_at: string;
+    sla_breached_count?: number;
   };
   reviews: ApprovalReview[];
 }

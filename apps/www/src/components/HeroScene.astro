@@ -1,5 +1,5 @@
 ---
-import { pipeline, stats } from '../content/homepage';
+import { stats } from '../content/homepage';
 
 interface Props {
   consoleUrl: string;
@@ -7,129 +7,155 @@ interface Props {
 }
 
 const { consoleUrl, docsUrl } = Astro.props;
-
-const liveEvents = [
-  { time: '00:01', title: 'file.read', note: 'untrusted prompt source', state: 'flagged' },
-  { time: '00:03', title: 'risk_score', note: 'policy + anomaly fusion', state: '97' },
-  { time: '00:05', title: 'decision', note: 'block before tool call', state: 'sealed' }
-];
 ---
 
-<section class="hero" id="top" data-parallax-root>
-  <div class="hero__backdrop" aria-hidden="true">
-    <span class="hero__beam hero__beam--one"></span>
-    <span class="hero__beam hero__beam--two"></span>
-    <span class="hero__mesh"></span>
-  </div>
+<header class="hero" id="top">
+  <div class="hero__image" aria-hidden="true"></div>
 
   <nav class="nav" aria-label="主导航">
     <a href="#top" class="brand">
-      <img src="/favicon.svg" alt="智安哨" />
+      <img src="/favicon.svg" alt="" />
       <span>
         <strong>智安哨</strong>
         <em>Agent Security Supervisor</em>
       </span>
     </a>
+
     <div class="nav__links">
+      <a href="#workflow">工作流程</a>
       <a href="#capabilities">核心能力</a>
+      <a href="#demo">监督演示</a>
       <a href="#surfaces">攻击面</a>
-      <a href="#pipeline">监督流水线</a>
       <a href="#openclaw">OpenClaw</a>
     </div>
+
     <div class="nav__actions">
-      <a href={docsUrl} class="button button--ghost">查看文档</a>
-      <a href={consoleUrl} class="button">进入控制台</a>
+      <button class="theme-toggle" type="button" data-theme-toggle aria-label="切换明暗主题">
+        <span class="theme-toggle__dot" aria-hidden="true"></span>
+        <span data-theme-label>浅色</span>
+      </button>
+      <a href={docsUrl} class="button button--quiet">查看文档</a>
+      <a href={consoleUrl} class="button button--primary">进入控制台</a>
     </div>
   </nav>
 
-  <div class="hero__layout">
-    <div class="hero__copy reveal">
-      <p class="hero__kicker"><span></span>Tool-call firewall for LLM agents</p>
-      <h1>把 Agent 的危险动作拦在工具调用前</h1>
-      <p class="lead">
-        智安哨把攻击样本、沙箱工具、策略命中、人工复核和审计证据串成一套可复现的监督闭环，
-        让每次敏感调用都有理由、有证据、有回放。
+  <div class="hero__body">
+    <div class="hero__copy">
+      <p class="eyebrow">Agent Tool-Call Security</p>
+      <h1>把 Agent 的危险动作挡在工具调用前</h1>
+      <p class="hero__lead">
+        智安哨把攻击样本、策略判定、沙箱执行和审计证据组织成一套监督闭环。
+        每一次文件、邮件、API、代码执行和外部 Agent 事件，都先经过可解释的安全判定。
       </p>
       <div class="hero__actions">
-        <a href={consoleUrl} class="button button--large">进入控制台</a>
-        <a href={docsUrl} class="button button--large button--ghost">阅读文档</a>
-      </div>
-      <div class="hero__signals" aria-label="核心监督信号">
-        <span>before_tool_call</span>
-        <span>risk fusion</span>
-        <span>audit hash</span>
+        <a href={consoleUrl} class="button button--primary button--large">打开控制台</a>
+        <a href="#demo" class="button button--quiet button--large">查看监督演示</a>
       </div>
     </div>
 
-    <div class="hero__visual reveal" aria-hidden="true">
-      <div class="cockpit" data-tilt>
-        <div class="cockpit__topbar">
+    <div class="hero-console" aria-label="监督面板预览" data-hero-supervisor data-state="blocked">
+      <div class="hero-console__bar">
+        <strong>Live Supervisor</strong>
+        <em data-hero-status>blocked</em>
+      </div>
+
+      <div class="hero-switcher" aria-label="切换监督事件">
+        <button
+          type="button"
+          class="is-active"
+          data-hero-case
+          data-score="97"
+          data-status="blocked"
+          data-attack="工具调用劫持"
+          data-tool="file.read / api.call"
+          data-decision="拒绝执行"
+          data-evidence="audit sealed"
+          data-note="策略命中 3 项，异常分 88，阻断真实工具执行。"
+          data-progress="97"
+          aria-pressed="true"
+        >
+          <span>01</span>
+          <strong>工具劫持</strong>
+        </button>
+        <button
+          type="button"
+          data-hero-case
+          data-score="84"
+          data-status="review"
+          data-attack="批量数据外发"
+          data-tool="api.call / export"
+          data-decision="人工确认"
+          data-evidence="scope pending"
+          data-note="目标域和数据范围未确认，进入人工复核队列。"
+          data-progress="84"
+          aria-pressed="false"
+        >
+          <span>02</span>
+          <strong>数据外发</strong>
+        </button>
+        <button
+          type="button"
+          data-hero-case
+          data-score="18"
+          data-status="allowed"
+          data-attack="正常资料查询"
+          data-tool="file.read"
+          data-decision="允许执行"
+          data-evidence="logged"
+          data-note="请求范围位于公开目录，参数和任务目标一致。"
+          data-progress="18"
+          aria-pressed="false"
+        >
+          <span>03</span>
+          <strong>可信读取</strong>
+        </button>
+      </div>
+
+      <div class="hero-console__body">
+        <div class="risk-summary">
+          <span>Risk Score</span>
+          <strong data-hero-score>97</strong>
+          <div class="risk-meter" aria-hidden="true">
+            <i data-hero-meter style="width: 97%"></i>
+          </div>
+          <small data-hero-note>策略命中 3 项，异常分 88，阻断真实工具执行。</small>
+        </div>
+
+        <div class="decision-table">
           <div>
-            <span></span>
-            <span></span>
-            <span></span>
+            <span>Attack</span>
+            <strong data-hero-attack>工具调用劫持</strong>
+            <small data-hero-tool>file.read / api.call</small>
           </div>
-          <strong>Live Supervisor</strong>
-          <em>online</em>
-        </div>
-
-        <div class="cockpit__body">
-          <div class="risk-core">
-            <span class="risk-core__ring"></span>
-            <span class="risk-core__ring risk-core__ring--slow"></span>
-            <div>
-              <small>Risk Score</small>
-              <strong>97</strong>
-              <p>critical tool-call hijack</p>
-            </div>
+          <div>
+            <span>Decision</span>
+            <strong data-hero-decision>拒绝执行</strong>
+            <small>before tool call</small>
           </div>
-
-          <div class="decision-stack">
-            <article>
-              <small>Attack</small>
-              <strong>工具调用劫持</strong>
-              <p>code.run / file.read / api.call</p>
-            </article>
-            <article>
-              <small>Decision</small>
-              <strong>拒绝执行</strong>
-              <p>策略命中 + 异常分融合</p>
-            </article>
-            <article>
-              <small>Evidence</small>
-              <strong>audit sealed</strong>
-              <p>参数、上下文、复核链路留痕</p>
-            </article>
+          <div>
+            <span>Evidence</span>
+            <strong data-hero-evidence>audit sealed</strong>
+            <small>参数、上下文、复核链路留痕</small>
           </div>
-        </div>
-
-        <div class="event-stream">
-          {liveEvents.map((event) => (
-            <div>
-              <b>{event.time}</b>
-              <span>
-                <strong>{event.title}</strong>
-                <small>{event.note}</small>
-              </span>
-              <em>{event.state}</em>
-            </div>
-          ))}
         </div>
       </div>
-
-      <div class="orbit-strip">
-        {pipeline.slice(1, 6).map((item) => <span>{item}</span>)}
+      <div class="hero-console__timeline">
+        <span>00:01 event normalized</span>
+        <span>00:03 policy fused</span>
+        <span>00:05 decision returned</span>
       </div>
     </div>
   </div>
 
-  <div class="metrics-grid reveal" aria-label="项目核心指标">
+  <dl class="hero__metrics" aria-label="项目核心指标">
     {stats.map((item) => (
-      <article>
-        <strong>{item.value}</strong>
-        <span>{item.label}</span>
-        <p>{item.note}</p>
-      </article>
+      <div>
+        <dt>{item.value}</dt>
+        <dd>
+          <strong>{item.label}</strong>
+          <span>{item.note}</span>
+        </dd>
+      </div>
     ))}
-  </div>
-</section>
+  </dl>
+</header>

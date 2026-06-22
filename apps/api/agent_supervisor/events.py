@@ -1,11 +1,14 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from time import perf_counter
 from typing import Any
 from uuid import uuid4
 
 from .approvals import create_approval_review
+from .correlation import assess_cross_agent_chain
 from .database import write_run
+from .event_stream import publish_runtime_event
 from .integrity import attach_audit_hashes
 from .supervisor import decide
 from .tools import execute_tool
@@ -31,12 +34,27 @@ def evaluate_agent_event(
     context_sources = event.get("context_sources", [])
     if not isinstance(context_sources, list):
         context_sources = []
+    decision_started = perf_counter()
     decision = decide(
         tool_call,
         guard_enabled=guard_enabled,
         prompt=model_input,
         context_sources=[str(item) for item in context_sources],
     )
+    chain_assessment = assess_cross_agent_chain(event, tool_call)
+    if guard_enabled and chain_assessment["escalated"]:
+        chain_signals = [f"跨 Agent 关联：{item}" for item in chain_assessment["signals"]]
+        decision.anomaly_signals = [*decision.anomaly_signals, *chain_signals]
+        decision.risk_factors = [*decision.risk_factors, *chain_signals]
+        decision.risk_score = max(decision.risk_score, 88)
+        decision.anomaly_score = max(decision.anomaly_score, 72)
+        if decision.decision == "允许":
+            decision.decision = "询问"
+            decision.risk_level = "high"
+            decision.policy_id = "cross-agent-chain"
+            decision.reason = "同一会话内出现敏感读取、批量导出或记忆访问后继续发送结果，疑似跨 Agent 分步外泄链。"
+            decision.recommendation = "暂停自动执行，人工确认前序数据来源、当前收件人和业务授权。"
+    detection_latency_ms = round((perf_counter() - decision_started) * 1000, 3)
     should_execute = execute_in_sandbox and decision.decision in {"允许", "隔离"}
     tool_output = (
         execute_tool(tool_call, decision.decision)
@@ -64,6 +82,7 @@ def evaluate_agent_event(
         "risk_factors": decision.risk_factors,
         "anomaly_score": decision.anomaly_score,
         "anomaly_signals": decision.anomaly_signals,
+        "cross_agent_chain": chain_assessment,
         "tool_output": tool_output,
         "timestamp": created_at,
         "source_app": event.get("source_app", "generic-agent"),
@@ -154,8 +173,9 @@ def evaluate_agent_event(
             "blocked_count": blocked_count,
             "asked_count": asked_count,
             "isolated_count": isolated_count,
-            "detection_latency_ms": 39,
-            "false_positive_rate": 0 if decision.risk_level in HIGH_RISK_LEVELS else 5,
+            "detection_latency_ms": detection_latency_ms,
+            "false_positive_rate": 0,
+            "false_positive_applicable": False,
         },
     }
     write_run(result)
@@ -187,11 +207,27 @@ def evaluate_agent_event(
             "risk_factors": decision.risk_factors,
             "anomaly_score": decision.anomaly_score,
             "anomaly_signals": decision.anomaly_signals,
+            "cross_agent_chain": chain_assessment,
         },
         "audit_log": audit_log,
         "alert": alert,
     }
     response["approval_review"] = create_approval_review(event, response)
+    publish_runtime_event(
+        "supervisor-decision",
+        {
+            "run_id": run_id,
+            "audit_id": audit_id,
+            "decision": decision.decision,
+            "risk_level": decision.risk_level,
+            "risk_score": decision.risk_score,
+            "anomaly_score": decision.anomaly_score,
+            "policy_id": decision.policy_id,
+            "tool": tool_call["tool"],
+            "alert": alert,
+            "approval_review": response["approval_review"],
+        },
+    )
     return response
 
 

@@ -7,7 +7,8 @@ import {
   fetchOverview,
   fetchPolicies,
   fetchReport,
-  fetchScenarios
+  fetchScenarios,
+  subscribeRuntimeEvents
 } from '../api';
 import type {
   AlertItem,
@@ -46,6 +47,8 @@ export function useAppData(page: PageKey) {
   const [report, setReport] = useState<ReportData | null>(null);
   const [apiNotice, setApiNotice] = useState('');
   const [apiAvailable, setApiAvailable] = useState<boolean | null>(null);
+  const [realtimeStatus, setRealtimeStatus] = useState<'connected' | 'reconnecting' | 'offline'>('offline');
+  const [lastRealtimeEvent, setLastRealtimeEvent] = useState('');
 
   const refresh = useCallback(async () => {
     const backendHealthy = await fetchHealth();
@@ -58,6 +61,7 @@ export function useAppData(page: PageKey) {
     setAlerts(data.alerts);
     setPolicies(nextPolicies);
     if (!backendHealthy) {
+      setRealtimeStatus('offline');
       setApiNotice('当前后端未连接，页面会使用内置样本数据；启动 FastAPI 后可写入真实实验日志。');
     } else if (!data.recent_runs.length) {
       setApiNotice('后端已连接，目前暂无真实实验日志；运行脚本后这里会展示最新结果。');
@@ -125,6 +129,49 @@ export function useAppData(page: PageKey) {
     }
   }, [loadAlerts, loadAuditLogs, loadReport, page]);
 
+  useEffect(() => {
+    if (!apiAvailable) {
+      return;
+    }
+    let stopped = false;
+    let refreshTimer: number | undefined;
+    let controller: AbortController | undefined;
+
+    const connect = async () => {
+      while (!stopped) {
+        controller = new AbortController();
+        setRealtimeStatus('reconnecting');
+        try {
+          setRealtimeStatus('connected');
+          await subscribeRuntimeEvents((event) => {
+            setLastRealtimeEvent(event.type);
+            if (refreshTimer !== undefined) {
+              window.clearTimeout(refreshTimer);
+            }
+            refreshTimer = window.setTimeout(() => {
+              void refresh();
+            }, 180);
+          }, controller.signal);
+        } catch {
+          if (!stopped) {
+            setRealtimeStatus('reconnecting');
+          }
+        }
+        if (!stopped) {
+          await new Promise((resolve) => window.setTimeout(resolve, 1500));
+        }
+      }
+    };
+    void connect();
+    return () => {
+      stopped = true;
+      controller?.abort();
+      if (refreshTimer !== undefined) {
+        window.clearTimeout(refreshTimer);
+      }
+    };
+  }, [apiAvailable, refresh]);
+
   const activeScenario = useMemo(
     () => scenarios.find((scenario) => scenario.id === selectedScenario) ?? scenarios[0],
     [scenarios, selectedScenario]
@@ -159,6 +206,8 @@ export function useAppData(page: PageKey) {
     report,
     apiNotice,
     apiAvailable,
+    realtimeStatus,
+    lastRealtimeEvent,
     setApiNotice,
     refresh,
     loadReport,

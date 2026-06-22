@@ -14,6 +14,8 @@ type AppShellProps = {
   theme: AppTheme;
   drawerVisible: boolean;
   apiNotice: string;
+  realtimeStatus: 'connected' | 'reconnecting' | 'offline';
+  lastRealtimeEvent: string;
   children: ReactNode;
   onPageChange: (page: PageKey) => void;
   onThemeChange: (theme: AppTheme) => void;
@@ -53,6 +55,8 @@ export function AppShell({
   theme,
   drawerVisible,
   apiNotice,
+  realtimeStatus,
+  lastRealtimeEvent,
   children,
   onPageChange,
   onThemeChange,
@@ -136,6 +140,15 @@ export function AppShell({
               </Typography.Title>
             </Space>
             <Space>
+              <span
+                className={`zh-realtime-status zh-realtime-status--${realtimeStatus}`}
+                title={lastRealtimeEvent ? `最近事件：${lastRealtimeEvent}` : '监督事件实时连接状态'}
+              >
+                <span className="zh-realtime-status__dot" />
+                <span className="hide-on-mobile">
+                  {realtimeStatus === 'connected' ? '实时已连接' : realtimeStatus === 'reconnecting' ? '实时重连中' : '实时离线'}
+                </span>
+              </span>
               <UiButton
                 type="text"
                 icon={theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}

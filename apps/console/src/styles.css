@@ -729,6 +729,44 @@ html[data-theme='dark'] * {
   font-size: 18px !important;
 }
 
+.zh-realtime-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 96px;
+  font-size: 12px;
+  color: var(--zh-text-secondary);
+}
+
+.zh-realtime-status__dot {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 8px;
+  border-radius: 50%;
+  background: var(--zh-risk-critical);
+}
+
+.zh-realtime-status--connected .zh-realtime-status__dot {
+  background: var(--zh-risk-low);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--zh-risk-low) 18%, transparent);
+}
+
+.zh-realtime-status--reconnecting .zh-realtime-status__dot {
+  background: var(--zh-risk-high);
+}
+
+.zh-settings-switch-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 32px;
+}
+
+.zh-settings-memory-copy {
+  flex: 1 1 360px;
+  min-width: 0;
+}
+
 .zh-app-header.zh-app-header--light {
   background: var(--zh-bg-panel);
   border-bottom-color: var(--zh-border-subtle);

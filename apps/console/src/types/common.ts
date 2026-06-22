@@ -22,3 +22,86 @@ export interface Policy {
   demo_scenarios?: string[];
   disable_impact?: string;
 }
+
+export interface PolicySettings {
+  anomaly_review_threshold: number;
+  anomaly_reject_threshold: number;
+  approval_sla_minutes: number;
+  high_risk_auto_escalation: boolean;
+}
+
+export interface PolicyVersion {
+  id: number;
+  policy_id: string;
+  operator: string;
+  comment: string;
+  created_at: string;
+  before: Record<string, unknown>;
+  after: Record<string, unknown>;
+}
+
+export interface PolicyConfig {
+  policies: Policy[];
+  settings: PolicySettings;
+  versions: PolicyVersion[];
+}
+
+export interface AuthContext {
+  role: 'admin' | 'analyst' | 'observer' | string;
+  permissions: {
+    can_edit_policy: boolean;
+    can_review_approval: boolean;
+    can_view: boolean;
+  };
+}
+
+export interface ObservabilityMetrics {
+  generated_at: string;
+  window: Record<string, number>;
+  summary: {
+    run_count: number;
+    controlled_count: number;
+    control_rate: number;
+    attack_success_count: number;
+    avg_detection_latency_ms: number;
+    max_detection_latency_ms: number;
+    audit_log_count: number;
+    pending_review_count: number;
+    resolved_review_count: number;
+    policy_version_count: number;
+  };
+  decision_distribution: Record<string, number>;
+  policy_hit_distribution: Record<string, number>;
+  tool_distribution: Record<string, number>;
+}
+
+export interface MemoryGovernanceItem {
+  id: string;
+  source: string;
+  content: string;
+  status: 'active' | 'quarantined' | 'removed' | string;
+  isolated: boolean;
+  trust_score: number;
+  created_at: string;
+  updated_at?: string;
+  updated_by?: string;
+}
+
+export interface MemoryGovernance {
+  generated_at: string;
+  summary: {
+    total: number;
+    active_count: number;
+    quarantined_count: number;
+    removed_count: number;
+    avg_trust_score: number;
+  };
+  status_distribution: Record<string, number>;
+  source_distribution: Record<string, number>;
+  items_window?: {
+    limit: number;
+    returned: number;
+    total: number;
+  };
+  items: MemoryGovernanceItem[];
+}

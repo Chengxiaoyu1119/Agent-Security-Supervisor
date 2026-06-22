@@ -6,10 +6,18 @@ import type { Overview } from '../types';
 vi.mock('../api', () => ({
   fetchAttackCaseDataset: vi.fn().mockResolvedValue(null),
   fetchOpenClawIntegrationBundle: vi.fn().mockResolvedValue(null),
+  fetchAgentIntegrationBundle: vi.fn().mockResolvedValue(null),
+  fetchAuthContext: vi.fn().mockResolvedValue(null),
+  fetchMemoryGovernance: vi.fn().mockResolvedValue(null),
+  fetchObservabilityMetrics: vi.fn().mockResolvedValue(null),
+  fetchPolicyConfig: vi.fn().mockResolvedValue({ settings: null }),
   fetchCompetitionReadiness: vi.fn().mockResolvedValue(null),
   fetchDemoDrill: vi.fn().mockResolvedValue(null),
+  rollbackLatestMemory: vi.fn(),
   runDemoDrill: vi.fn(),
   runExternalAgentDemo: vi.fn(),
+  updateMemoryStatus: vi.fn(),
+  updatePolicySettings: vi.fn(),
   writeCompetitionReadiness: vi.fn(),
   writeOpenClawPluginPackage: vi.fn(),
   writeOpenClawPluginValidation: vi.fn(),
@@ -61,6 +69,7 @@ describe('SettingsPanel', () => {
     expect(screen.getByRole('tab', { name: '🤖 基础配置与成果对齐' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: '🎯 演示体验与赛前体检' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: '🔗 外部接入与开放集成' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: '🧭 运行治理中心' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: '🛠️ 测试与手工调试' })).toBeInTheDocument();
   });
 });

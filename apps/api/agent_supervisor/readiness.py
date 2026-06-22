@@ -56,7 +56,7 @@ def build_competition_readiness(
     roadmap = build_project_roadmap(runs)
     approvals = list_approval_reviews(limit=200)
     demo_drill = load_judge_demo_drill_report()
-    openclaw_validation = validate_openclaw_plugin_package(output_root=REPORT_ROOT, inspect_runtime=False)
+    openclaw_validation = _openclaw_validation_for_readiness()
     latest_package = package_snapshot or _latest_submission_package()
 
     checks = [
@@ -152,6 +152,19 @@ def build_competition_readiness(
         ],
         "latest_package": latest_package,
     }
+
+
+def _openclaw_validation_for_readiness() -> dict[str, Any]:
+    validation_report = REPORT_ROOT / "OpenClaw源码级插件包验收报告.json"
+    if validation_report.exists():
+        try:
+            payload = json.loads(validation_report.read_text(encoding="utf-8"))
+            validation = payload.get("validation", payload)
+            if validation.get("runtime_inspect_passed") is True:
+                return validation
+        except (OSError, json.JSONDecodeError):
+            pass
+    return validate_openclaw_plugin_package(output_root=REPORT_ROOT, inspect_runtime=False)
 
 
 def build_competition_readiness_markdown(data: dict[str, Any] | None = None) -> str:

@@ -1,8 +1,11 @@
 from typing import Any
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Response
+from fastapi.responses import StreamingResponse
 
+from ..agent_integrations import build_agent_integration_bundle, build_agent_integration_markdown
 from ..auth import require_api_token
+from ..event_stream import stream_runtime_events
 from ..events import evaluate_agent_event
 from ..external_agent_demo import run_minimal_external_agent_demo
 from ..main_models import AgentToolEvent, BatchAgentToolEvents
@@ -19,9 +22,32 @@ from ..services.package_service import build_competition_package
 
 router = APIRouter(dependencies=[Depends(require_api_token)])
 
+
+@router.get("/api/events/stream")
+def runtime_event_stream() -> StreamingResponse:
+    return StreamingResponse(
+        stream_runtime_events(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",
+        },
+    )
+
 @router.get("/api/integrations/openclaw/schema")
 def openclaw_schema() -> dict:
     return build_competition_package([])["adapter_schema"]
+
+
+@router.get("/api/integrations/agents/bundle")
+def agent_integration_bundle() -> dict:
+    return build_agent_integration_bundle()
+
+
+@router.get("/api/integrations/agents/bundle.md")
+def agent_integration_bundle_markdown() -> Response:
+    return Response(build_agent_integration_markdown(), media_type="text/markdown; charset=utf-8")
 
 
 @router.get("/api/integrations/openclaw/adapter.py")

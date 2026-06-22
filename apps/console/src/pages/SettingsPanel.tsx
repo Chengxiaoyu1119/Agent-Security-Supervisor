@@ -1,211 +1,19 @@
-import { useEffect, useState } from 'react';
 import { Typography } from 'antd';
 import {
   DemoReadinessTab,
   ExternalIntegrationTab,
+  RuntimeGovernanceTab,
   SettingsBasicsTab,
   SupervisorDebugTab
 } from '../components/settings';
-import {
-  fetchAttackCaseDataset,
-  fetchOpenClawIntegrationBundle,
-  writeOpenClawPluginPackage,
-  writeOpenClawPluginValidation,
-  fetchCompetitionReadiness,
-  writeCompetitionReadiness,
-  fetchDemoDrill,
-  runDemoDrill,
-  runExternalAgentDemo,
-  evaluateSupervisorEvent,
-  evaluateSupervisorBatch
-} from '../api';
+import { useRuntimeGovernanceController } from '../components/settings/useRuntimeGovernanceController';
+import { useSettingsPanelController } from '../components/settings/useSettingsPanelController';
 import { UiTabs } from '../components/ui';
-import type {
-  SupervisorEvaluation,
-  SupervisorBatchEvaluation,
-  ExternalAgentDemoResult,
-  OpenClawIntegrationBundle,
-  OpenClawPluginPackageResult,
-  OpenClawPluginValidationWriteResult,
-  CompetitionReadiness,
-  CompetitionReadinessWriteResult,
-  DemoDrillResult,
-  AttackCaseDataset,
-  Overview
-} from '../types';
-import { externalEventSample, externalBatchEventSample } from '../utils';
+import type { Overview } from '../types';
 
 export function SettingsPanel({ overview, refresh }: { overview: Overview; refresh: () => Promise<unknown> }) {
-  const [eventJson, setEventJson] = useState(JSON.stringify(externalEventSample, null, 2));
-  const [batchJson, setBatchJson] = useState(JSON.stringify(externalBatchEventSample, null, 2));
-  const [evaluation, setEvaluation] = useState<SupervisorEvaluation | null>(null);
-  const [batchEvaluation, setBatchEvaluation] = useState<SupervisorBatchEvaluation | null>(null);
-  const [externalAgentDemo, setExternalAgentDemo] = useState<ExternalAgentDemoResult | null>(null);
-  const [attackDataset, setAttackDataset] = useState<AttackCaseDataset | null>(null);
-  const [integrationBundle, setIntegrationBundle] = useState<OpenClawIntegrationBundle | null>(null);
-  const [demoDrill, setDemoDrill] = useState<DemoDrillResult | null>(null);
-  const [openClawPluginPackage, setOpenClawPluginPackage] = useState<OpenClawPluginPackageResult | null>(null);
-  const [openClawPluginValidation, setOpenClawPluginValidation] = useState<OpenClawPluginValidationWriteResult | null>(
-    null
-  );
-  const [competitionReadiness, setCompetitionReadiness] = useState<CompetitionReadiness | null>(null);
-  const [competitionReadinessOutput, setCompetitionReadinessOutput] = useState<CompetitionReadinessWriteResult | null>(
-    null
-  );
-  const [evaluating, setEvaluating] = useState(false);
-  const [batchEvaluating, setBatchEvaluating] = useState(false);
-  const [runningExternalAgentDemo, setRunningExternalAgentDemo] = useState(false);
-  const [runningDemoDrill, setRunningDemoDrill] = useState(false);
-  const [writingOpenClawPlugin, setWritingOpenClawPlugin] = useState(false);
-  const [validatingOpenClawPlugin, setValidatingOpenClawPlugin] = useState(false);
-  const [checkingReadiness, setCheckingReadiness] = useState(false);
-  const [evaluateError, setEvaluateError] = useState('');
-
-  useEffect(() => {
-    Promise.all([
-      fetchAttackCaseDataset()
-        .then(setAttackDataset)
-        .catch(() => undefined),
-      fetchOpenClawIntegrationBundle()
-        .then(setIntegrationBundle)
-        .catch(() => undefined),
-      fetchDemoDrill()
-        .then(setDemoDrill)
-        .catch(() => undefined),
-      fetchCompetitionReadiness()
-        .then(setCompetitionReadiness)
-        .catch(() => undefined)
-    ]);
-  }, []);
-
-  async function handleEvaluateEvent() {
-    setEvaluating(true);
-    setEvaluateError('');
-    try {
-      const parsed = JSON.parse(eventJson) as Record<string, unknown>;
-      const result = await evaluateSupervisorEvent(parsed);
-      setEvaluation(result);
-      await refresh();
-    } catch (error) {
-      setEvaluateError(error instanceof Error ? error.message : '事件 JSON 解析或监督接口调用失败');
-    } finally {
-      setEvaluating(false);
-    }
-  }
-
-  async function handleBatchEvaluate() {
-    setBatchEvaluating(true);
-    setEvaluateError('');
-    try {
-      const parsed = JSON.parse(batchJson) as unknown;
-      const events = Array.isArray(parsed)
-        ? parsed
-        : typeof parsed === 'object' && parsed !== null && Array.isArray((parsed as { events?: unknown }).events)
-          ? (parsed as { events: unknown[] }).events
-          : null;
-      if (!events) {
-        throw new Error('批量事件必须是 JSON 数组，或形如 { "events": [...] } 的对象。');
-      }
-      const result = await evaluateSupervisorBatch(events as Record<string, unknown>[]);
-      setBatchEvaluation(result);
-      await refresh();
-    } catch (error) {
-      setEvaluateError(error instanceof Error ? error.message : '批量事件 JSON 解析或监督接口调用失败');
-    } finally {
-      setBatchEvaluating(false);
-    }
-  }
-
-  async function handleRunExternalAgentDemo() {
-    setRunningExternalAgentDemo(true);
-    setEvaluateError('');
-    try {
-      const result = await runExternalAgentDemo();
-      setExternalAgentDemo(result);
-      await refresh();
-    } catch (error) {
-      setEvaluateError(error instanceof Error ? error.message : '外部 Agent 演示运行失败');
-    } finally {
-      setRunningExternalAgentDemo(false);
-    }
-  }
-
-  async function handleRunDemoDrill() {
-    setRunningDemoDrill(true);
-    setEvaluateError('');
-    try {
-      const result = await runDemoDrill();
-      setDemoDrill(result);
-      await refresh();
-    } catch (error) {
-      setEvaluateError(error instanceof Error ? error.message : '答辩一键演示运行失败');
-    } finally {
-      setRunningDemoDrill(false);
-    }
-  }
-
-  async function handleWriteOpenClawPlugin() {
-    setWritingOpenClawPlugin(true);
-    setEvaluateError('');
-    try {
-      const result = await writeOpenClawPluginPackage();
-      setOpenClawPluginPackage(result);
-    } catch (error) {
-      setEvaluateError(error instanceof Error ? error.message : 'OpenClaw 插件包生成失败');
-    } finally {
-      setWritingOpenClawPlugin(false);
-    }
-  }
-
-  async function handleValidateOpenClawPlugin() {
-    setValidatingOpenClawPlugin(true);
-    setEvaluateError('');
-    try {
-      const result = await writeOpenClawPluginValidation();
-      setOpenClawPluginValidation(result);
-      setOpenClawPluginPackage(result.validation.package);
-    } catch (error) {
-      setEvaluateError(error instanceof Error ? error.message : 'OpenClaw 插件包验收失败');
-    } finally {
-      setValidatingOpenClawPlugin(false);
-    }
-  }
-
-  async function handleRunReadiness() {
-    setCheckingReadiness(true);
-    setEvaluateError('');
-    try {
-      const result = await writeCompetitionReadiness();
-      setCompetitionReadinessOutput(result);
-      setCompetitionReadiness(result.readiness);
-    } catch (error) {
-      setEvaluateError(error instanceof Error ? error.message : '赛前一键体检运行失败');
-    } finally {
-      setCheckingReadiness(false);
-    }
-  }
-
-  function loadSingleExternalSample() {
-    setEventJson(JSON.stringify(externalEventSample, null, 2));
-    setEvaluation(null);
-    setEvaluateError('');
-  }
-
-  function loadBatchExternalSample() {
-    setBatchJson(JSON.stringify(externalBatchEventSample, null, 2));
-    setBatchEvaluation(null);
-    setEvaluateError('');
-  }
-
-  function clearExternalResults() {
-    setEvaluation(null);
-    setBatchEvaluation(null);
-    setExternalAgentDemo(null);
-    setOpenClawPluginPackage(null);
-    setOpenClawPluginValidation(null);
-    setCompetitionReadinessOutput(null);
-    setEvaluateError('');
-  }
+  const { state, actions } = useSettingsPanelController(refresh);
+  const governance = useRuntimeGovernanceController(actions.setEvaluateError);
 
   return (
     <div className="zh-page-stack">
@@ -225,14 +33,14 @@ export function SettingsPanel({ overview, refresh }: { overview: Overview; refre
             children: (
               <DemoReadinessTab
                 overview={overview}
-                attackDataset={attackDataset}
-                demoDrill={demoDrill}
-                runningDemoDrill={runningDemoDrill}
-                handleRunDemoDrill={handleRunDemoDrill}
-                competitionReadiness={competitionReadiness}
-                competitionReadinessOutput={competitionReadinessOutput}
-                checkingReadiness={checkingReadiness}
-                handleRunReadiness={handleRunReadiness}
+                attackDataset={state.attackDataset}
+                demoDrill={state.demoDrill}
+                runningDemoDrill={state.runningDemoDrill}
+                handleRunDemoDrill={actions.handleRunDemoDrill}
+                competitionReadiness={state.competitionReadiness}
+                competitionReadinessOutput={state.competitionReadinessOutput}
+                checkingReadiness={state.checkingReadiness}
+                handleRunReadiness={actions.handleRunReadiness}
               />
             )
           },
@@ -241,38 +49,58 @@ export function SettingsPanel({ overview, refresh }: { overview: Overview; refre
             label: '🔗 外部接入与开放集成',
             children: (
               <ExternalIntegrationTab
-                integrationBundle={integrationBundle}
-                openClawPluginPackage={openClawPluginPackage}
-                openClawPluginValidation={openClawPluginValidation}
-                writingOpenClawPlugin={writingOpenClawPlugin}
-                validatingOpenClawPlugin={validatingOpenClawPlugin}
-                handleWriteOpenClawPlugin={handleWriteOpenClawPlugin}
-                handleValidateOpenClawPlugin={handleValidateOpenClawPlugin}
+                integrationBundle={state.integrationBundle}
+                agentIntegrationBundle={state.agentIntegrationBundle}
+                openClawPluginPackage={state.openClawPluginPackage}
+                openClawPluginValidation={state.openClawPluginValidation}
+                writingOpenClawPlugin={state.writingOpenClawPlugin}
+                validatingOpenClawPlugin={state.validatingOpenClawPlugin}
+                handleWriteOpenClawPlugin={actions.handleWriteOpenClawPlugin}
+                handleValidateOpenClawPlugin={actions.handleValidateOpenClawPlugin}
               />
             )
           },
           {
             key: '4',
+            label: '🧭 运行治理中心',
+            children: (
+              <RuntimeGovernanceTab
+                authContext={governance.authContext}
+                policySettings={governance.policySettings}
+                metrics={governance.observabilityMetrics}
+                memoryGovernance={governance.memoryGovernance}
+                savingSettings={governance.savingSettings}
+                refreshingGovernance={governance.refreshingGovernance}
+                onSettingsChange={governance.setPolicySettings}
+                onSaveSettings={governance.handleSavePolicySettings}
+                onRefreshGovernance={governance.handleRefreshGovernance}
+                onMemoryStatus={governance.handleMemoryStatus}
+                onRollbackMemory={governance.handleRollbackMemory}
+              />
+            )
+          },
+          {
+            key: '5',
             label: '🛠️ 测试与手工调试',
             children: (
               <SupervisorDebugTab
-                externalAgentDemo={externalAgentDemo}
-                runningExternalAgentDemo={runningExternalAgentDemo}
-                handleRunExternalAgentDemo={handleRunExternalAgentDemo}
-                eventJson={eventJson}
-                setEventJson={setEventJson}
-                batchJson={batchJson}
-                setBatchJson={setBatchJson}
-                evaluation={evaluation}
-                batchEvaluation={batchEvaluation}
-                evaluating={evaluating}
-                batchEvaluating={batchEvaluating}
-                evaluateError={evaluateError}
-                handleEvaluateEvent={handleEvaluateEvent}
-                handleBatchEvaluate={handleBatchEvaluate}
-                loadSingleExternalSample={loadSingleExternalSample}
-                loadBatchExternalSample={loadBatchExternalSample}
-                clearExternalResults={clearExternalResults}
+                externalAgentDemo={state.externalAgentDemo}
+                runningExternalAgentDemo={state.runningExternalAgentDemo}
+                handleRunExternalAgentDemo={actions.handleRunExternalAgentDemo}
+                eventJson={state.eventJson}
+                setEventJson={actions.setEventJson}
+                batchJson={state.batchJson}
+                setBatchJson={actions.setBatchJson}
+                evaluation={state.evaluation}
+                batchEvaluation={state.batchEvaluation}
+                evaluating={state.evaluating}
+                batchEvaluating={state.batchEvaluating}
+                evaluateError={state.evaluateError}
+                handleEvaluateEvent={actions.handleEvaluateEvent}
+                handleBatchEvaluate={actions.handleBatchEvaluate}
+                loadSingleExternalSample={actions.loadSingleExternalSample}
+                loadBatchExternalSample={actions.loadBatchExternalSample}
+                clearExternalResults={actions.clearExternalResults}
               />
             )
           }

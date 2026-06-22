@@ -54,6 +54,9 @@ export function ApprovalReviewQueue({
         <Col span={6}>
           <Statistic title="hash 有效" value={`${queue.summary.hash_valid_count}/${queue.summary.total}`} />
         </Col>
+        <Col span={6}>
+          <Statistic title="SLA 超时" value={queue.summary.sla_breached_count ?? 0} />
+        </Col>
       </Row>
       {error ? (
         <Typography.Text type="danger" className="zh-text-block zh-mb-12">
@@ -70,6 +73,11 @@ export function ApprovalReviewQueue({
                 </LabelTag>
                 <Typography.Text strong>{review.tool}</Typography.Text>
                 <Typography.Text code>{review.policy_id}</Typography.Text>
+                {review.escalation_level ? (
+                  <LabelTag variant="filled" color={review.sla_breached ? 'error' : 'warning'}>
+                    {review.escalation_level} · {review.sla_breached ? '已超时' : `${review.sla_minutes ?? 30} 分钟`}
+                  </LabelTag>
+                ) : null}
               </Space>
               <div className="zh-mt-4">
                 <Typography.Text type="secondary">{review.reason}</Typography.Text>

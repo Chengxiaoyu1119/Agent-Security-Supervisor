@@ -9,7 +9,23 @@ class RunRequest(BaseModel):
 
 
 class PolicyUpdate(BaseModel):
-    enabled: bool
+    enabled: bool | None = None
+    name: str | None = Field(default=None, max_length=120)
+    description: str | None = Field(default=None, max_length=1000)
+    decision: Literal["允许", "拒绝", "询问", "隔离"] | None = None
+    layer: str | None = Field(default=None, max_length=80)
+    risk_controls: list[str] | None = Field(default=None, max_length=20)
+    operator: str = Field(default="security-admin", max_length=80)
+    comment: str = Field(default="", max_length=500)
+
+
+class PolicySettingsUpdate(BaseModel):
+    anomaly_review_threshold: int | None = Field(default=None, ge=1, le=100)
+    anomaly_reject_threshold: int | None = Field(default=None, ge=1, le=100)
+    approval_sla_minutes: int | None = Field(default=None, ge=1, le=1440)
+    high_risk_auto_escalation: bool | None = None
+    operator: str = Field(default="security-admin", max_length=80)
+    comment: str = Field(default="", max_length=500)
 
 
 class BatchCompareRequest(BaseModel):
@@ -42,5 +58,9 @@ class BatchAgentToolEvents(BaseModel):
 class ApprovalDecisionRequest(BaseModel):
     action: Literal["approve", "reject", "批准", "驳回"]
     operator: str = Field(default="operator", max_length=80)
-    comment: str = Field(default="", max_length=2000)
+    comment: str = Field(..., min_length=1, max_length=2000)
     execute_in_sandbox: bool = False
+
+
+class RealModelEvaluationRequest(BaseModel):
+    force_real: bool = True
