@@ -7,7 +7,8 @@
     "node": ">=22.0.0"
   },
   "scripts": {
-    "dev": "vite --host 127.0.0.1 --port 4321 --strictPort",
+    "dev": "node ../../scripts/start-www-dev.mjs",
+    "dev:raw": "vite --host 127.0.0.1 --port 4321 --strictPort",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview --host 127.0.0.1 --port 4321 --strictPort"
   },
