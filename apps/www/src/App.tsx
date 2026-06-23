@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import {
   ArrowRight,
   Blocks,
@@ -7,10 +7,8 @@ import {
   Gauge,
   GitBranch,
   LockKeyhole,
-  Moon,
   Play,
   ShieldCheck,
-  Sun,
   TerminalSquare,
   Zap
 } from 'lucide-react';
@@ -22,25 +20,11 @@ const consoleUrl =
 const docsUrl =
   import.meta.env.VITE_AGENT_SUPERVISOR_DOCS_URL ?? 'http://127.0.0.1:3000';
 
-type Theme = 'dark' | 'light';
-
-function getInitialTheme(): Theme {
-  const saved = localStorage.getItem('ass-www-theme');
-  if (saved === 'dark' || saved === 'light') return saved;
-  return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-}
-
 export function App() {
-  const [theme, setTheme] = useState<Theme>(getInitialTheme);
   const [scenario, setScenario] = useState<Scenario>(scenarios[0]);
   const [surface, setSurface] = useState<Surface>(surfaces[0]);
   const [step, setStep] = useState(2);
   const [running, setRunning] = useState(false);
-
-  useEffect(() => {
-    document.documentElement.dataset.theme = theme;
-    localStorage.setItem('ass-www-theme', theme);
-  }, [theme]);
 
   const activeStep = workflow[step];
 
@@ -51,17 +35,21 @@ export function App() {
 
   return (
     <div className="site-shell">
-      <Header theme={theme} onThemeChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')} />
+      <Header />
 
       <main>
         <section className="hero section-frame" id="top">
           <div className="hero__grid">
             <div className="hero__copy">
               <p className="eyebrow">Agent Tool-Call Supervisor</p>
-              <h1>让智能体每次敏感动作，都先经过安全判定。</h1>
+              <h1>
+                工具调用前，
+                <br />
+                <span className="hero__headline-line">先判定风险再放行。</span>
+              </h1>
               <p className="hero__lead">
-                智安哨把工具调用、上下文来源、策略命中、风险评分和审计证据组织成一条实时监督链路，
-                在文件、邮件、API、代码执行和外部 Agent 接入前完成拦截或复核。
+                智安哨把工具名、参数、上下文来源、策略命中、风险评分和审计证据接到同一条链路，
+                在文件、邮件、API、代码执行和外部 Agent 接入前完成拦截、询问或复核。
               </p>
 
               <div className="hero__actions">
@@ -92,8 +80,8 @@ export function App() {
         <section className="section-frame workflow-section" id="workflow">
           <SectionHeading
             eyebrow="Workflow"
-            title="不是展示概念，而是把执行前监督跑成闭环。"
-            body="官网主线按真实产品流程展开：先接收事件，再标注来源、融合评分、判定动作，最后沉淀可复核证据。"
+            title="从事件接入到审计留痕的一条闭环。"
+            body="按真实监督流程展开：先接收工具调用事件，再标注来源、融合评分、判定动作，最后沉淀可复核证据。"
           />
 
           <div className="workflow-board">
@@ -126,7 +114,7 @@ export function App() {
         <section className="section-frame demo-section" id="demo">
           <SectionHeading
             eyebrow="Live Decision"
-            title="把官网交互做成一次真实监督演示。"
+            title="交互式查看不同事件的处置结果。"
             body="选择不同事件，点击运行监督，页面会根据上下文来源、工具和策略命中结果更新风险分与动作。"
           />
 
@@ -169,7 +157,7 @@ export function App() {
         <section className="section-frame surface-section" id="surfaces">
           <SectionHeading
             eyebrow="Attack Surfaces"
-            title="攻击面不做表格堆砌，而是做成可复核工作台。"
+            title="7 类智能体攻击面，按风险和证据复核。"
             body="左侧选择攻击面，右侧展示风险等级、剧本规模、样本证据和对应策略，让评审能快速理解系统覆盖范围。"
           />
 
@@ -215,7 +203,7 @@ export function App() {
         <section className="section-frame product-section" id="product">
           <SectionHeading
             eyebrow="Console Preview"
-            title="官网要证明产品真的存在，而不是画一个假窗口。"
+            title="用控制台视角展示核心事件流。"
             body="这里用接近控制台的信息密度展示核心列表：事件、来源、风险分和动作，风格克制，少边框，方便扫描。"
           />
           <ProductPreview />
@@ -254,7 +242,7 @@ export function App() {
   );
 }
 
-function Header({ theme, onThemeChange }: { theme: Theme; onThemeChange: () => void }) {
+function Header() {
   return (
     <header className="site-header">
       <a className="brand" href="#top" aria-label="智安哨官网首页">
@@ -274,10 +262,6 @@ function Header({ theme, onThemeChange }: { theme: Theme; onThemeChange: () => v
       </nav>
 
       <div className="header-actions">
-        <button type="button" className="theme-button" onClick={onThemeChange} aria-label="切换明暗主题">
-          {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
-          {theme === 'dark' ? '浅色' : '深色'}
-        </button>
         <a className="button button--small button--primary" href={consoleUrl}>
           进入控制台
         </a>
@@ -404,8 +388,10 @@ function ProductPreview() {
 function FlowItem({ icon, title, body }: { icon: ReactNode; title: string; body: string }) {
   return (
     <article>
-      <span>{icon}</span>
-      <h3>{title}</h3>
+      <h3>
+        {icon}
+        <span>{title}</span>
+      </h3>
       <p>{body}</p>
     </article>
   );

@@ -13,6 +13,7 @@ const config: Config = {
   baseUrl: '/',
   organizationName: 'agent-security-supervisor',
   projectName: 'agent-security-supervisor',
+  scripts: [{ src: '/js/silence-react-devtools-prompt.js', async: false }],
   onBrokenLinks: 'throw',
   markdown: {
     hooks: {
