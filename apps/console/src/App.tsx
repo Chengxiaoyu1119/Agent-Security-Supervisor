@@ -63,8 +63,6 @@ export default function App() {
     report,
     apiNotice,
     apiAvailable,
-    realtimeStatus,
-    lastRealtimeEvent,
     setApiNotice,
     refresh,
     loadReport,
@@ -121,8 +119,6 @@ export default function App() {
       theme={theme}
       drawerVisible={drawerVisible}
       apiNotice={apiNotice}
-      realtimeStatus={realtimeStatus}
-      lastRealtimeEvent={lastRealtimeEvent}
       onPageChange={setPage}
       onThemeChange={setTheme}
       onRefresh={() => {
