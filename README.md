@@ -193,7 +193,7 @@ sequenceDiagram
 
 ### 0. 前置环境
 
-- Node.js 22.12 或更高版本。官网使用 Astro 6，旧版 Node 会导致官网构建失败。
+- Node.js 22.0 或更高版本。官网和控制台都使用 Vite + React，Node 22.11.0 可以直接运行。
 - Python 3.10 或更高版本。后端 API 和命令行工具依赖 Python。
 
 ### 1. 安装依赖
@@ -399,7 +399,7 @@ agent-security-supervisor/
 │  │  └─ tests/                      # 后端单元测试
 │  ├─ console/                       # React + Vite 控制台
 │  │  └─ src/                        # 页面、组件、类型、样式和请求封装
-│  ├─ www/                           # Astro 官网介绍页
+│  ├─ www/                           # Vite + React 官网介绍页
 │  └─ docs/                          # Docusaurus 正式文档站
 ├─ docs/                             # 历史开发记录、方案和过程材料
 ├─ scripts/                          # 前端治理检查、自审脚本

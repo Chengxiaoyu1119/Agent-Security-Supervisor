@@ -7,18 +7,20 @@
     "node": ">=22.0.0"
   },
   "scripts": {
-    "dev": "node ../../scripts/www-runner.mjs dev",
-    "build": "node ../../scripts/www-runner.mjs build",
-    "preview": "node ../../scripts/www-runner.mjs preview"
+    "dev": "vite --host 127.0.0.1 --port 4321 --strictPort",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1 --port 4321 --strictPort"
   },
   "dependencies": {
-    "@astrojs/check": "^0.9.9",
-    "astro": "^6.4.8",
-    "typescript": "^5.6.3"
+    "lucide-react": "^0.468.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
-  "overrides": {
-    "yaml-language-server": {
-      "yaml": "2.9.0"
-    }
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "^5.6.3",
+    "vite": "^6.4.3"
   }
 }

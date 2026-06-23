@@ -12,7 +12,7 @@ agent-security-supervisor/
 ├─ apps/
 │  ├─ api/        # FastAPI 后端接口服务
 │  ├─ console/    # React 控制台
-│  ├─ www/        # Astro 官网
+│  ├─ www/        # Vite + React 官网
 │  └─ docs/       # Docusaurus 文档站
 ├─ docs/          # 历史开发资料和过程记录
 ├─ scripts/       # 项目脚本

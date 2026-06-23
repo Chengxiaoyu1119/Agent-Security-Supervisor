@@ -16,10 +16,10 @@ const PROJECTS = [
   },
   {
     id: "www",
-    name: "Astro 官网",
+    name: "Vite React 官网",
     path: "apps/www",
-    accepted: { low: 2, moderate: 0, high: 0, critical: 0 },
-    note: "当前低危来自 Astro/esbuild 开发服务器链路；生产构建是静态文件，不暴露 dev server。",
+    accepted: { low: 0, moderate: 0, high: 0, critical: 0 },
+    note: "官网依赖应保持 0 个已知漏洞；生产构建是静态文件。",
   },
   {
     id: "docs",
@@ -156,7 +156,7 @@ function buildMarkdown(report) {
     "",
     "- 不使用 `npm audit fix --force` 强行升大版本，避免把官网或文档站构建链路打断。",
     "- 官网和文档站开发服务器只在本机使用，不对公网暴露。",
-    "- 生产交付使用静态构建产物；后续等 Astro、Docusaurus 上游修复后再收敛残留漏洞。",
+    "- 生产交付使用静态构建产物；后续等 Docusaurus 上游修复后再收敛残留漏洞。",
   );
   return lines.join("\n");
 }
