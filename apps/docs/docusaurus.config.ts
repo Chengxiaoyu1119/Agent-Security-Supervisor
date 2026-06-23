@@ -6,8 +6,8 @@ const wwwUrl = process.env.AGENT_SUPERVISOR_WWW_URL ?? 'http://127.0.0.1:4321';
 const consoleUrl = process.env.AGENT_SUPERVISOR_CONSOLE_URL ?? 'http://127.0.0.1:5178';
 
 const config: Config = {
-  title: '智安哨文档站',
-  tagline: 'Agent Security Supervisor documentation',
+  title: 'Agent Security Supervisor Docs',
+  tagline: '工具调用监督、攻击复现和 Agent 安全集成手册',
   favicon: 'img/logo.svg',
   url: siteUrl,
   baseUrl: '/',
@@ -42,7 +42,7 @@ const config: Config = {
   themeConfig: {
     image: 'img/logo.svg',
     navbar: {
-      title: '智安哨文档',
+      title: 'Agent Security Supervisor',
       logo: {
         alt: '智安哨',
         src: 'img/logo.svg'
