@@ -94,7 +94,18 @@ export function App() {
 
   const navigateToSection = (id: string) => {
     setActiveSection(id as PageSectionId);
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const section = document.getElementById(id);
+
+    if (!section) return;
+
+    const sectionTop = section.getBoundingClientRect().top + window.scrollY;
+    const centeredTop = sectionTop + (section.offsetHeight - window.innerHeight) / 2;
+
+    window.history.replaceState(null, '', `#${id}`);
+    window.scrollTo({
+      top: Math.max(0, centeredTop),
+      behavior: 'smooth'
+    });
   };
 
   return (
@@ -118,16 +129,6 @@ export function App() {
                 智安哨把工具名、参数、上下文来源、策略命中和审计证据串成一条可回放链路，
                 在文件、邮件、接口、代码执行和外部智能体接入前完成拦截、询问或复核。
               </p>
-
-              <div className="hero__actions">
-                <a className="button button--primary" href={consoleUrl}>
-                  打开控制台
-                  <ArrowRight size={18} />
-                </a>
-                <a className="button button--ghost" href={docsUrl}>
-                  查看文档
-                </a>
-              </div>
 
               <p className="hero__proof">覆盖 7 类攻击面、22 个攻击剧本和 13 条监督策略。</p>
               <div className="hero__sequence" aria-label="监督链路">
