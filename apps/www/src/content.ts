@@ -34,64 +34,64 @@ export const scenarios: Scenario[] = [
     id: 'tool-hijack',
     label: '工具调用劫持',
     source: '不可信文档',
-    tool: 'file.read / api.call',
+    tool: '文件读取 / 接口调用',
     score: 97,
     decision: '拒绝执行',
     tone: 'danger',
     reason: '文档试图覆盖系统规则，并诱导读取受保护路径。',
-    evidence: '策略命中 3 项，异常分 88，audit hash 已生成',
-    action: 'block'
+    evidence: '策略命中 3 项，异常分 88，审计指纹已生成',
+    action: '拦截'
   },
   {
     id: 'bulk-export',
     label: '批量数据外发',
-    source: '外部 Agent 任务',
-    tool: 'api.call / export',
+    source: '外部智能体任务',
+    tool: '接口调用 / 数据导出',
     score: 84,
     decision: '人工确认',
     tone: 'warning',
     reason: '请求包含批量导出意图，接收域名和数据范围未确认。',
     evidence: '参数快照、目标域、上下文来源已进入复核队列',
-    action: 'review'
+    action: '复核'
   },
   {
     id: 'safe-read',
     label: '可信资料读取',
     source: '可信用户',
-    tool: 'file.read',
+    tool: '文件读取',
     score: 18,
     decision: '允许执行',
     tone: 'safe',
     reason: '读取范围位于公开目录，参数与当前任务目标一致。',
     evidence: '低风险事件已记录，可用于后续审计回放',
-    action: 'allow'
+    action: '放行'
   }
 ];
 
 export const workflow = [
   {
     title: '标准化事件',
-    meta: 'before_tool_call',
-    body: '把外部 Agent 的目标、上下文、工具名和参数整理成统一事件。'
+    meta: '调用前事件',
+    body: '把外部智能体的目标、上下文、工具名和参数整理成统一事件。'
   },
   {
     title: '标注来源',
-    meta: 'context boundary',
+    meta: '上下文边界',
     body: '区分系统指令、用户意图、不可信文档、邮件和外部事件。'
   },
   {
     title: '融合评分',
-    meta: 'policy + anomaly',
+    meta: '策略与异常融合',
     body: '把策略命中、异常行为、敏感资源和历史证据合成风险分。'
   },
   {
     title: '执行前判定',
-    meta: 'decision gate',
+    meta: '执行前闸门',
     body: '在真实工具执行前返回允许、询问、隔离或拒绝。'
   },
   {
     title: '审计留痕',
-    meta: 'audit hash',
+    meta: '审计留痕',
     body: '保留参数、上下文、人工复核和最终动作，方便复盘。'
   }
 ];
@@ -156,8 +156,8 @@ export const surfaces: Surface[] = [
 ];
 
 export const productRows = [
-  { event: 'file.read', source: 'untrusted doc', score: 97, action: 'blocked' },
-  { event: 'api.call', source: 'external agent', score: 84, action: 'review' },
-  { event: 'memory.write', source: 'tool output', score: 72, action: 'isolate' },
-  { event: 'file.read', source: 'trusted user', score: 18, action: 'allowed' }
+  { event: '文件读取', source: '不可信文档', score: 97, action: '已拦截' },
+  { event: '接口调用', source: '外部智能体', score: 84, action: '待复核' },
+  { event: '记忆写入', source: '工具输出', score: 72, action: '已隔离' },
+  { event: '文件读取', source: '可信用户', score: 18, action: '已放行' }
 ];

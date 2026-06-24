@@ -1,40 +1,72 @@
+# 依赖目录
 node_modules/
+
+# 构建产物和框架缓存
 dist/
+build/
+.astro/
+.docusaurus/
 apps/www/.astro/
 apps/www/dist/
-apps/www/.dev-server*.log
 apps/docs/.docusaurus/
 apps/docs/build/
-.venv/
-.coverage
-.mypy_cache/
-.pytest_cache/
-.ruff_cache/
-htmlcov/
-__pycache__/
-*.pyc
-*.sqlite3
-apps/api/runtime/
+
+# TypeScript 和 Vite 临时文件
 *.tsbuildinfo
 vite.config.js
 vite.config.d.ts
+.vite/
+.vite-temp/
+
+# Python 虚拟环境和缓存
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+
+# 测试与覆盖率报告
+.coverage
+coverage/
+htmlcov/
+test-results/
+playwright-report/
+
+# 本地运行数据、数据库和日志
+*.log
+*.sqlite3
+apps/api/runtime/
+apps/www/.dev-server*.log
 apps/api/sandbox/runtime/
+
+# 沙箱生成物和比赛提交包
 apps/api/sandbox/workspace/
 apps/api/sandbox/outbox/
 apps/api/sandbox/memory/
 apps/api/sandbox/external_agent_runtime/
 apps/api/sandbox/reports/
 apps/api/sandbox/release/
+apps/api/sandbox/submission_packages/
+apps/api/agent_supervisor/sandbox/
+
+# 环境变量文件，保留示例文件
 .env
 .env.*
 !.env.example
-.agents
+!apps/*/.env.example
+
+# 本地 Agent 和 Codex 桌面端文件
+.agents/
+.codex-ui.log
+.playwright-mcp/
+
+# 仅本地使用的计划和生成笔记
 /docs/
 SOUL.md
 scripts/archive/
-apps/api/sandbox/submission_packages/
-apps/api/agent_supervisor/sandbox/
-.codex-ui.log
-.playwright-mcp/
+
+# 本地仓库说明快照
 AGENTS.md
 PROJECT_ARCHITECTURE.md

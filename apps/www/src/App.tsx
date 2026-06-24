@@ -1,10 +1,8 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import {
   ArrowRight,
   Blocks,
-  CheckCircle2,
   FileText,
-  Gauge,
   GitBranch,
   LockKeyhole,
   Play,
@@ -20,11 +18,28 @@ const consoleUrl =
 const docsUrl =
   import.meta.env.VITE_AGENT_SUPERVISOR_DOCS_URL ?? 'http://127.0.0.1:3000';
 
+const riskLabels = {
+  critical: '严重',
+  high: '高危',
+  medium: '中危'
+} as const;
+
+const pageSections = [
+  { id: 'top', label: '首页' },
+  { id: 'supervision', label: '监督链路' },
+  { id: 'surfaces', label: '风险覆盖' },
+  { id: 'product', label: '产品界面' },
+  { id: 'start', label: '开始使用' }
+] as const;
+
+type PageSectionId = (typeof pageSections)[number]['id'];
+
 export function App() {
   const [scenario, setScenario] = useState<Scenario>(scenarios[0]);
   const [surface, setSurface] = useState<Surface>(surfaces[0]);
   const [step, setStep] = useState(2);
   const [running, setRunning] = useState(false);
+  const [activeSection, setActiveSection] = useState<PageSectionId>(pageSections[0].id);
 
   const activeStep = workflow[step];
 
@@ -33,23 +48,75 @@ export function App() {
     window.setTimeout(() => setRunning(false), 620);
   };
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const isAtPageEnd =
+          window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 8;
+
+        if (isAtPageEnd) {
+          setActiveSection('start');
+          return;
+        }
+
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+        if (visible?.target.id) {
+          setActiveSection(visible.target.id as PageSectionId);
+        }
+      },
+      {
+        rootMargin: '-18% 0px -24% 0px',
+        threshold: [0.08, 0.24, 0.5]
+      }
+    );
+
+    pageSections.forEach(({ id }) => {
+      const section = document.getElementById(id);
+      if (section) observer.observe(section);
+    });
+
+    const handlePageEnd = () => {
+      if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 8) {
+        setActiveSection('start');
+      }
+    };
+
+    window.addEventListener('scroll', handlePageEnd, { passive: true });
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('scroll', handlePageEnd);
+    };
+  }, []);
+
+  const navigateToSection = (id: string) => {
+    setActiveSection(id as PageSectionId);
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+
   return (
     <div className="site-shell">
       <Header />
+      <SectionNavigator
+        activeSection={activeSection}
+        onNavigate={navigateToSection}
+      />
 
       <main>
         <section className="hero section-frame" id="top">
           <div className="hero__grid">
             <div className="hero__copy">
-              <p className="eyebrow">Agent Tool-Call Supervisor</p>
               <h1>
-                工具调用前，
+                每次工具调用，
                 <br />
-                <span className="hero__headline-line">先判定风险再放行。</span>
+                <span className="hero__headline-line">先过安全闸门。</span>
               </h1>
               <p className="hero__lead">
-                智安哨把工具名、参数、上下文来源、策略命中、风险评分和审计证据接到同一条链路，
-                在文件、邮件、API、代码执行和外部 Agent 接入前完成拦截、询问或复核。
+                智安哨把工具名、参数、上下文来源、策略命中和审计证据串成一条可回放链路，
+                在文件、邮件、接口、代码执行和外部智能体接入前完成拦截、询问或复核。
               </p>
 
               <div className="hero__actions">
@@ -61,30 +128,25 @@ export function App() {
                   查看文档
                 </a>
               </div>
-            </div>
 
-            <SupervisorPanel scenario={scenario} onScenarioChange={setScenario} />
-          </div>
-
-          <div className="metric-strip" aria-label="官网核心数据">
-            {metrics.map((item) => (
-              <div className="metric-strip__item" key={item.label}>
-                <strong>{item.value}</strong>
-                <span>{item.label}</span>
-                <small>{item.note}</small>
+              <p className="hero__proof">覆盖 7 类攻击面、22 个攻击剧本和 13 条监督策略。</p>
+              <div className="hero__sequence" aria-label="监督链路">
+                <span>工具请求</span>
+                <span>风险判定</span>
+                <span>执行动作</span>
+                <span>审计留痕</span>
               </div>
-            ))}
+            </div>
           </div>
         </section>
 
-        <section className="section-frame workflow-section" id="workflow">
+        <section className="section-frame supervision-section" id="supervision">
           <SectionHeading
-            eyebrow="Workflow"
-            title="从事件接入到审计留痕的一条闭环。"
-            body="按真实监督流程展开：先接收工具调用事件，再标注来源、融合评分、判定动作，最后沉淀可复核证据。"
+            title="一次调用，一条完整监督链路。"
+            body="点击步骤查看监督过程，再选择事件运行判定。流程和结果放在同一个工作区，不再拆成两个重复区块。"
           />
 
-          <div className="workflow-board">
+          <div className="supervision-layout">
             <div className="workflow-rail" role="tablist" aria-label="监督流程">
               {workflow.map((item, index) => (
                 <button
@@ -100,66 +162,65 @@ export function App() {
               ))}
             </div>
 
-            <article className="workflow-detail">
-              <p className="eyebrow">{activeStep.meta}</p>
-              <h3>{activeStep.title}</h3>
-              <p>{activeStep.body}</p>
-              <div className="workflow-signal" aria-hidden="true">
-                <span style={{ width: `${42 + step * 10}%` }} />
+            <div className="supervision-stage">
+              <article className="workflow-detail">
+                <h3>{activeStep.title}</h3>
+                <p>{activeStep.body}</p>
+                <div className="workflow-signal" aria-hidden="true">
+                  <span style={{ width: `${42 + step * 10}%` }} />
+                </div>
+              </article>
+
+              <div className="scenario-switcher" role="tablist" aria-label="选择监督事件">
+                {scenarios.map((item) => (
+                  <button
+                    type="button"
+                    key={item.id}
+                    className={scenario.id === item.id ? 'is-active' : ''}
+                    onClick={() => setScenario(item)}
+                    aria-selected={scenario.id === item.id}
+                  >
+                    <span>{item.action}</span>
+                    <strong>{item.label}</strong>
+                  </button>
+                ))}
               </div>
-            </article>
-          </div>
-        </section>
 
-        <section className="section-frame demo-section" id="demo">
-          <SectionHeading
-            eyebrow="Live Decision"
-            title="交互式查看不同事件的处置结果。"
-            body="选择不同事件，点击运行监督，页面会根据上下文来源、工具和策略命中结果更新风险分与动作。"
-          />
-
-          <div className="demo-grid">
-            <div className="scenario-list" role="list">
-              {scenarios.map((item) => (
-                <button
-                  type="button"
-                  key={item.id}
-                  className={scenario.id === item.id ? 'is-active' : ''}
-                  onClick={() => setScenario(item)}
-                >
-                  <span>{item.action}</span>
-                  <strong>{item.label}</strong>
-                  <small>{item.tool}</small>
+              <article className={`decision-lab tone-${scenario.tone} ${running ? 'is-running' : ''}`}>
+                <div className="decision-lab__score">
+                  <span>风险分</span>
+                  <strong>{scenario.score}</strong>
+                  <i style={{ width: `${scenario.score}%` }} />
+                </div>
+                <div className="decision-lab__content">
+                  <h3>{running ? '监督器分析中' : scenario.decision}</h3>
+                  <p>{running ? '正在融合策略命中、上下文边界和工具敏感度。' : scenario.reason}</p>
+                  <small>{running ? '策略命中 · 异常评分 · 审计留痕' : scenario.evidence}</small>
+                </div>
+                <button type="button" className="button button--primary" onClick={runDemo} disabled={running}>
+                  <Play size={17} />
+                  {running ? '运行中' : '运行监督'}
                 </button>
-              ))}
+              </article>
             </div>
-
-            <article className={`decision-lab tone-${scenario.tone} ${running ? 'is-running' : ''}`}>
-              <div className="decision-lab__score">
-                <span>risk score</span>
-                <strong>{scenario.score}</strong>
-                <i style={{ width: `${scenario.score}%` }} />
-              </div>
-              <div className="decision-lab__content">
-                <p className="eyebrow">{scenario.source}</p>
-                <h3>{running ? '监督器分析中' : scenario.decision}</h3>
-                <p>{running ? '正在融合策略命中、上下文边界和工具敏感度。' : scenario.reason}</p>
-                <small>{running ? 'policy fuse · anomaly score · audit trace' : scenario.evidence}</small>
-              </div>
-              <button type="button" className="button button--primary" onClick={runDemo} disabled={running}>
-                <Play size={17} />
-                {running ? '运行中' : '运行监督'}
-              </button>
-            </article>
           </div>
         </section>
 
         <section className="section-frame surface-section" id="surfaces">
           <SectionHeading
-            eyebrow="Attack Surfaces"
-            title="7 类智能体攻击面，按风险和证据复核。"
-            body="左侧选择攻击面，右侧展示风险等级、剧本规模、样本证据和对应策略，让评审能快速理解系统覆盖范围。"
+            title="重点风险、剧本和证据集中查看。"
+            body="选择攻击面即可查看风险等级、样本证据和对应策略。"
           />
+
+          <div className="metric-strip" aria-label="核心覆盖数据">
+            {metrics.map((item) => (
+              <div className="metric-strip__item" key={item.label}>
+                <strong>{item.value}</strong>
+                <span>{item.label}</span>
+                <small>{item.note}</small>
+              </div>
+            ))}
+          </div>
 
           <div className="surface-lab">
             <div className="surface-list">
@@ -171,14 +232,14 @@ export function App() {
                   onClick={() => setSurface(item)}
                 >
                   <strong>{item.name}</strong>
-                  <span className={`risk risk--${item.level}`}>{item.level}</span>
+                  <span className={`risk risk--${item.level}`}>{riskLabels[item.level]}</span>
                 </button>
               ))}
             </div>
 
             <article className="surface-detail">
               <div className="surface-detail__head">
-                <span className={`risk risk--${surface.level}`}>{surface.level}</span>
+                <span className={`risk risk--${surface.level}`}>{riskLabels[surface.level]}</span>
                 <h3>{surface.name}</h3>
               </div>
               <p>{surface.focus}</p>
@@ -202,30 +263,21 @@ export function App() {
 
         <section className="section-frame product-section" id="product">
           <SectionHeading
-            eyebrow="Console Preview"
-            title="用控制台视角展示核心事件流。"
-            body="这里用接近控制台的信息密度展示核心列表：事件、来源、风险分和动作，风格克制，少边框，方便扫描。"
+            title="事件、来源、风险和动作一眼可见。"
+            body="控制台保留真正需要扫描的信息，并提供标准事件入口、策略闸门和审计输出。"
           />
           <ProductPreview />
-        </section>
-
-        <section className="section-frame openclaw-section" id="openclaw">
-          <SectionHeading
-            eyebrow="OpenClaw"
-            title="作为外部 Agent 的工具调用监督层。"
-            body="外部 Agent 只需要在工具执行前提交标准事件，智安哨返回动作、解释和审计标识。"
-          />
           <div className="integration-flow">
             <FlowItem icon={<TerminalSquare size={21} />} title="标准事件入口" body="接收工具名、参数、上下文来源和任务目标。" />
             <FlowItem icon={<LockKeyhole size={21} />} title="策略前置闸门" body="在真实工具执行前完成评分、拒绝、询问或隔离。" />
-            <FlowItem icon={<FileText size={21} />} title="审计报告输出" body="生成参数快照、复核链路和 OpenClaw 验收材料。" />
+            <FlowItem icon={<FileText size={21} />} title="审计报告输出" body="生成参数快照、复核链路和接入验收材料。" />
           </div>
         </section>
 
-        <section className="final-cta">
+        <section className="final-cta" id="start">
           <div>
-            <p className="eyebrow">Start</p>
-            <h2>进入控制台，运行完整攻击剧本和监督策略。</h2>
+            <h2>进入控制台，运行攻击剧本和监督策略。</h2>
+            <p>官网负责说明重点，完整操作、接口和证据都在控制台与文档中。</p>
           </div>
           <div className="final-cta__actions">
             <a className="button button--ghost" href={docsUrl}>
@@ -247,19 +299,8 @@ function Header() {
     <header className="site-header">
       <a className="brand" href="#top" aria-label="智安哨官网首页">
         <img src="/favicon.svg" alt="" />
-        <span>
-          <strong>智安哨</strong>
-          <small>Agent Security Supervisor</small>
-        </span>
+        <strong>智安哨</strong>
       </a>
-
-      <nav className="nav-links" aria-label="官网导航">
-        <a href="#workflow">工作流</a>
-        <a href="#demo">监督演示</a>
-        <a href="#surfaces">攻击面</a>
-        <a href="#product">控制台</a>
-        <a href="#openclaw">OpenClaw</a>
-      </nav>
 
       <div className="header-actions">
         <a className="button button--small button--primary" href={consoleUrl}>
@@ -270,78 +311,38 @@ function Header() {
   );
 }
 
-function SupervisorPanel({
-  scenario,
-  onScenarioChange
+function SectionNavigator({
+  activeSection,
+  onNavigate
 }: {
-  scenario: Scenario;
-  onScenarioChange: (scenario: Scenario) => void;
+  activeSection: string;
+  onNavigate: (id: string) => void;
 }) {
-  const statusIcon = useMemo(() => {
-    if (scenario.tone === 'safe') return <CheckCircle2 size={18} />;
-    if (scenario.tone === 'warning') return <Gauge size={18} />;
-    return <ShieldCheck size={18} />;
-  }, [scenario.tone]);
-
   return (
-    <aside className={`supervisor-panel tone-${scenario.tone}`} aria-label="实时监督演示">
-      <div className="panel-topbar">
-        <span className="window-dots" aria-hidden="true" />
-        <strong>Live Supervisor</strong>
-        <em>{scenario.action}</em>
-      </div>
-
-      <div className="panel-tabs" role="tablist" aria-label="切换事件">
-        {scenarios.map((item, index) => (
+    <nav className="section-nav" aria-label="页面分区导航">
+      {pageSections.map((item) => {
+        const isActive = item.id === activeSection;
+        return (
           <button
             type="button"
             key={item.id}
-            className={scenario.id === item.id ? 'is-active' : ''}
-            onClick={() => onScenarioChange(item)}
-            aria-selected={scenario.id === item.id}
+            className={isActive ? 'is-active' : ''}
+            onClick={() => onNavigate(item.id)}
+            aria-current={isActive ? 'location' : undefined}
+            aria-label={`前往${item.label}`}
           >
-            <span>{String(index + 1).padStart(2, '0')}</span>
-            <strong>{item.label}</strong>
+            <span className="section-nav__label">{item.label}</span>
+            <span className="section-nav__dot" aria-hidden="true" />
           </button>
-        ))}
-      </div>
-
-      <div className="panel-main">
-        <div className="score-block">
-          <span>risk score</span>
-          <strong>{scenario.score}</strong>
-          <i style={{ width: `${scenario.score}%` }} />
-          <small>{scenario.reason}</small>
-        </div>
-
-        <div className="decision-block">
-          <div>
-            <span>Tool</span>
-            <strong>{scenario.tool}</strong>
-          </div>
-          <div>
-            <span>Decision</span>
-            <strong>{scenario.decision}</strong>
-          </div>
-          <div>
-            <span>Evidence</span>
-            <strong>{scenario.evidence}</strong>
-          </div>
-        </div>
-      </div>
-
-      <div className="panel-footer">
-        {statusIcon}
-        <span>事件已标准化，结果可回放、可复核、可导出。</span>
-      </div>
-    </aside>
+        );
+      })}
+    </nav>
   );
 }
 
-function SectionHeading({ eyebrow, title, body }: { eyebrow: string; title: string; body: string }) {
+function SectionHeading({ title, body }: { title: string; body: string }) {
   return (
     <div className="section-heading">
-      <p className="eyebrow">{eyebrow}</p>
       <h2>{title}</h2>
       <p>{body}</p>
     </div>
@@ -354,15 +355,15 @@ function ProductPreview() {
       <div className="product-preview__rail">
         <span className="is-active">
           <Blocks size={17} />
-          Events
+          事件
         </span>
         <span>
           <GitBranch size={17} />
-          Policies
+          策略
         </span>
         <span>
           <Zap size={17} />
-          Actions
+          动作
         </span>
       </div>
       <div className="event-table" role="table" aria-label="控制台事件列表预览">
