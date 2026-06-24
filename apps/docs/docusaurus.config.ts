@@ -52,7 +52,14 @@ const config: Config = {
         { type: 'docSidebar', sidebarId: 'mainSidebar', position: 'left', label: '文档' },
         { to: '/quickstart', label: '快速开始', position: 'left' },
         { href: wwwUrl, label: '官网', position: 'right' },
-        { href: consoleUrl, label: '控制台', position: 'right' }
+        { href: consoleUrl, label: '控制台', position: 'right' },
+        {
+          href: 'https://github.com/Chengxiaoyu1119/agent-security-supervisor',
+          label: 'GitHub',
+          position: 'right',
+          className: 'header-github-link',
+          'aria-label': 'GitHub 仓库'
+        }
       ]
     },
     footer: {

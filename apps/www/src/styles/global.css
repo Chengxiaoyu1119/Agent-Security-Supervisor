@@ -1,13 +1,13 @@
 :root {
   font-family:
-    "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", "Source Han Sans SC",
-    system-ui, sans-serif;
+    "HarmonyOS Sans SC", "MiSans", "Alibaba PuHuiTi 3.0", "PingFang SC", "Microsoft YaHei UI",
+    "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", system-ui, sans-serif;
   color: var(--text);
   background: var(--page);
   color-scheme: light;
   --font-display:
-    "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", "Source Han Sans SC",
-    system-ui, sans-serif;
+    "HarmonyOS Sans SC", "MiSans", "Alibaba PuHuiTi 3.0", "PingFang SC", "Microsoft YaHei UI",
+    "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", system-ui, sans-serif;
   --radius: 8px;
   --header-height: 76px;
   --page: #f6faff;
@@ -31,7 +31,7 @@
   --warning: #9c6a17;
   --warning-soft: #fff7e7;
   --shadow-sm: 0 8px 22px rgba(31, 60, 118, 0.07);
-  --shadow-md: 0 20px 54px rgba(31, 60, 118, 0.1);
+  --shadow-md: 0 18px 44px rgba(31, 60, 118, 0.09);
   --shadow-console: 0 28px 70px rgba(18, 43, 92, 0.18);
 }
 
@@ -208,13 +208,13 @@ a:focus-visible {
   color: #fff;
   background: var(--accent);
   border-color: var(--accent);
-  box-shadow: 0 10px 24px rgba(47, 95, 215, 0.18);
+  box-shadow: 0 8px 18px rgba(47, 95, 215, 0.15);
 }
 
 .button--primary:hover {
   background: var(--accent-strong);
   border-color: var(--accent-strong);
-  box-shadow: 0 14px 28px rgba(47, 95, 215, 0.2);
+  box-shadow: 0 10px 22px rgba(47, 95, 215, 0.18);
 }
 
 .button--ghost {
@@ -239,7 +239,7 @@ a:focus-visible {
   min-height: 100svh;
   flex-direction: column;
   justify-content: center;
-  padding: 96px 32px 108px;
+  padding: 92px 32px 96px;
   scroll-snap-align: start;
 }
 
@@ -257,7 +257,7 @@ a:focus-visible {
 
 .hero__grid {
   display: grid;
-  width: min(860px, 100%);
+  width: min(1120px, 100%);
   grid-template-columns: minmax(0, 1fr);
   justify-content: center;
   align-items: center;
@@ -280,26 +280,25 @@ a:focus-visible {
 }
 
 .hero h1 {
-  max-width: 860px;
-  font-size: clamp(50px, 4.65vw, 70px);
+  width: max-content;
+  max-width: min(1120px, calc(100vw - 72px));
+  margin: 0 auto;
+  font-size: clamp(42px, 3.5vw, 58px);
   font-weight: 700;
   line-height: 1.08;
-}
-
-.hero__headline-line {
-  white-space: normal;
+  white-space: nowrap;
 }
 
 .hero__lead {
-  max-width: 700px;
-  margin: 26px auto 0;
+  max-width: 780px;
+  margin: 30px auto 0;
   color: var(--muted);
   font-size: 17px;
   line-height: 1.76;
 }
 
 .hero__proof {
-  margin: 30px 0 0;
+  margin: 34px 0 0;
   color: var(--accent-strong);
   font-size: 13px;
   font-weight: 700;
@@ -311,7 +310,7 @@ a:focus-visible {
   align-items: center;
   justify-content: center;
   gap: 12px;
-  margin: 26px auto 0;
+  margin: 24px auto 0;
 }
 
 .hero__sequence span {
@@ -357,9 +356,9 @@ a:focus-visible {
 
 .metric-strip {
   display: grid;
-  width: min(1120px, 100%);
+  width: min(1040px, 100%);
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  margin: 0 auto 46px;
+  margin: 0 auto 30px;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 }
@@ -395,22 +394,23 @@ a:focus-visible {
 }
 
 .section-heading {
-  width: min(1120px, 100%);
-  margin: 0 auto 38px;
+  width: min(1040px, 100%);
+  margin: 0 auto 30px;
   text-align: center;
 }
 
 .section-heading h2 {
-  max-width: 820px;
+  max-width: min(1040px, calc(100vw - 72px));
   margin: 0 auto;
-  font-size: clamp(34px, 3.2vw, 48px);
+  font-size: clamp(34px, 2.6vw, 44px);
   font-weight: 700;
   line-height: 1.18;
+  white-space: nowrap;
 }
 
 .section-heading > p {
-  max-width: 760px;
-  margin: 16px auto 0;
+  max-width: 720px;
+  margin: 14px auto 0;
   color: var(--muted);
   font-size: 16px;
   line-height: 1.68;
@@ -424,11 +424,12 @@ a:focus-visible {
 
 .supervision-layout {
   display: grid;
-  width: min(1120px, 100%);
+  width: min(1040px, 100%);
   grid-template-columns: 1fr;
-  gap: 24px;
+  gap: 16px;
   align-items: start;
   margin: 0 auto;
+  overflow: hidden;
 }
 
 .workflow-rail {
@@ -442,20 +443,21 @@ a:focus-visible {
 .workflow-rail button {
   position: relative;
   display: flex;
-  min-height: 76px;
+  min-height: 58px;
   align-items: center;
   justify-content: center;
   gap: 10px;
   padding: 0 14px;
   border: 0;
-  border-right: 1px solid var(--line);
+  border-right: 0;
   color: var(--text);
   background: transparent;
   cursor: pointer;
   text-align: center;
   transition:
     color 170ms ease,
-    background 170ms ease;
+    background 170ms ease,
+    transform 170ms ease;
 }
 
 .workflow-rail button:last-child {
@@ -477,7 +479,7 @@ a:focus-visible {
 .workflow-rail button:hover,
 .workflow-rail button.is-active {
   color: var(--accent-strong);
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.44);
 }
 
 .workflow-rail button.is-active::after {
@@ -494,11 +496,10 @@ a:focus-visible {
   position: relative;
   grid-column: 1;
   grid-row: 1;
-  min-height: 224px;
+  min-height: 218px;
   overflow: hidden;
-  padding: 30px 0;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  padding: 34px 34px 34px 0;
+  border: 0;
   background: transparent;
 }
 
@@ -512,8 +513,8 @@ a:focus-visible {
 
 .workflow-detail > p {
   position: relative;
-  max-width: 650px;
-  margin: 18px 0 0;
+  max-width: 520px;
+  margin: 16px 0 0;
   color: var(--muted);
   font-size: 17px;
   line-height: 1.76;
@@ -522,7 +523,7 @@ a:focus-visible {
 .workflow-signal {
   position: relative;
   max-width: 580px;
-  margin-top: 34px;
+  margin-top: 30px;
   overflow: hidden;
   border-radius: 999px;
   background: rgba(47, 95, 215, 0.1);
@@ -535,15 +536,23 @@ a:focus-visible {
 .supervision-stage {
   display: grid;
   grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
-  gap: 24px;
+  gap: 0 34px;
+  padding: 0 30px 18px;
+  border-top: 0;
+  border-bottom: 1px solid var(--line);
+  background:
+    linear-gradient(90deg, rgba(255, 255, 255, 0.46), rgba(237, 244, 255, 0.34)),
+    rgba(255, 255, 255, 0.34);
 }
 
 .scenario-switcher {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: 0;
   grid-column: 1 / -1;
   grid-row: 2;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
 }
 
 .surface-list button {
@@ -580,12 +589,13 @@ a:focus-visible {
 .scenario-switcher button {
   display: grid;
   gap: 5px;
-  min-height: 72px;
-  padding: 14px 16px;
-  border: 1px solid transparent;
-  border-radius: var(--radius);
+  min-height: 56px;
+  padding: 9px 16px;
+  border: 0;
+  border-right: 1px solid var(--line);
+  border-radius: 0;
   color: var(--text);
-  background: rgba(255, 255, 255, 0.56);
+  background: transparent;
   cursor: pointer;
   text-align: left;
   transition:
@@ -596,9 +606,12 @@ a:focus-visible {
 
 .scenario-switcher button:hover,
 .scenario-switcher button.is-active {
-  border-color: var(--line-strong);
   color: var(--accent-strong);
-  background: #fff;
+  background: rgba(233, 241, 255, 0.58);
+}
+
+.scenario-switcher button:last-child {
+  border-right: 0;
 }
 
 .scenario-switcher span {
@@ -615,13 +628,13 @@ a:focus-visible {
   display: grid;
   grid-column: 2;
   grid-row: 1;
-  grid-template-columns: 150px minmax(0, 1fr);
-  gap: 26px;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 24px;
   align-items: center;
-  min-height: 224px;
-  padding: 30px 0;
-  border-top: 1px solid var(--line);
-  border-bottom: 1px solid var(--line);
+  min-height: 218px;
+  padding: 34px 0 34px 34px;
+  border: 0;
+  border-left: 1px solid var(--line);
   background: transparent;
   transition:
     background 180ms ease,
@@ -630,18 +643,15 @@ a:focus-visible {
 }
 
 .decision-lab.tone-danger {
-  border-color: rgba(207, 63, 85, 0.2);
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.52), rgba(255, 241, 243, 0.58));
+  background: transparent;
 }
 
 .decision-lab.tone-warning {
-  border-color: rgba(156, 106, 23, 0.22);
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.52), rgba(255, 247, 231, 0.58));
+  background: transparent;
 }
 
 .decision-lab.tone-safe {
-  border-color: rgba(47, 95, 215, 0.2);
-  background: linear-gradient(90deg, rgba(255, 255, 255, 0.52), rgba(233, 241, 255, 0.58));
+  background: transparent;
 }
 
 .decision-lab.is-running {
@@ -655,7 +665,7 @@ a:focus-visible {
 
 .decision-lab__content h3 {
   margin: 0 0 14px;
-  font-size: 32px;
+  font-size: 30px;
 }
 
 .decision-lab__content > p {
@@ -678,24 +688,42 @@ a:focus-visible {
 
 .surface-lab {
   display: grid;
-  width: min(1120px, 100%);
-  grid-template-columns: minmax(320px, 0.9fr) minmax(0, 1.1fr);
-  gap: 28px;
+  width: min(1040px, 100%);
+  grid-template-columns: minmax(280px, 0.7fr) minmax(0, 1.3fr);
+  gap: 44px;
   margin: 0 auto;
 }
 
 .surface-list {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  grid-template-columns: 1fr;
+  gap: 0;
+  border-top: 1px solid var(--line);
 }
 
 .surface-list button {
-  min-height: 92px;
+  display: flex;
+  min-height: 50px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 2px;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
 }
 
 .surface-list button strong {
   font-size: 16px;
+}
+
+.surface-list button:hover,
+.surface-list button.is-active {
+  color: var(--accent-strong);
+  border-color: var(--line-strong);
+  background: transparent;
+  box-shadow: none;
+  transform: translateX(4px);
 }
 
 .risk {
@@ -723,13 +751,12 @@ a:focus-visible {
 }
 
 .surface-detail {
-  min-height: 376px;
-  padding: 38px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background:
-    radial-gradient(circle at 90% 84%, rgba(47, 95, 215, 0.09), transparent 22rem),
-    #fff;
+  min-height: 330px;
+  padding: 22px 0 22px 44px;
+  border: 0;
+  border-left: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
 }
 
 .surface-detail__head {
@@ -747,7 +774,7 @@ a:focus-visible {
 }
 
 .surface-detail > p {
-  margin: 24px 0 32px;
+  margin: 18px 0 24px;
   color: var(--muted);
   font-size: 17px;
   line-height: 1.72;
@@ -794,39 +821,50 @@ a:focus-visible {
 
 .product-preview {
   display: grid;
-  width: min(1120px, 100%);
+  width: min(1040px, 100%);
   grid-template-columns: 220px minmax(0, 1fr);
   margin: 0 auto;
   overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: #fff;
-  box-shadow: var(--shadow-sm);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: none;
 }
 
 .product-preview__rail {
   display: grid;
   align-content: start;
-  background: var(--surface-subtle);
+  border-right: 1px solid var(--line);
+  background: rgba(237, 244, 255, 0.72);
 }
 
-.product-preview__rail span {
+.product-preview__rail button {
   display: flex;
+  width: 100%;
   min-height: 70px;
   align-items: center;
   gap: 10px;
   padding: 0 20px;
+  border: 0;
   color: var(--muted);
+  background: transparent;
+  cursor: pointer;
   font-weight: 700;
+  text-align: left;
+  transition:
+    color 170ms ease,
+    background 170ms ease;
 }
 
 .product-preview__rail svg {
   color: currentColor;
 }
 
-.product-preview__rail span.is-active {
+.product-preview__rail button:hover,
+.product-preview__rail button.is-active {
   color: var(--accent-strong);
-  background: #fff;
+  background: rgba(255, 255, 255, 0.82);
 }
 
 .event-table {
@@ -839,7 +877,7 @@ a:focus-visible {
   grid-template-columns: 1.1fr 1.1fr 0.6fr 0.7fr;
   gap: 18px;
   align-items: center;
-  min-height: 62px;
+  min-height: 58px;
   padding: 0 24px;
 }
 
@@ -871,18 +909,19 @@ a:focus-visible {
 
 .integration-flow {
   display: grid;
-  width: min(1120px, 100%);
+  width: min(1040px, 100%);
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  margin: 28px auto 0;
+  margin: 18px auto 0;
   overflow: hidden;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: #fff;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  background: transparent;
 }
 
 .integration-flow article {
-  min-height: 178px;
-  padding: 26px;
+  min-height: 132px;
+  padding: 22px 24px;
   border-right: 1px solid var(--line);
 }
 
@@ -894,7 +933,7 @@ a:focus-visible {
   display: flex;
   gap: 10px;
   align-items: center;
-  margin: 0 0 34px;
+  margin: 0 0 18px;
   font-size: 20px;
 }
 
@@ -926,7 +965,7 @@ a:focus-visible {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 34px;
+  gap: 30px;
   margin: 0;
   padding: 86px max(32px, calc((100vw - 1120px) / 2));
   scroll-snap-align: start;
@@ -936,9 +975,9 @@ a:focus-visible {
 }
 
 .final-cta h2 {
-  max-width: 1120px;
+  max-width: min(1040px, calc(100vw - 72px));
   color: var(--text);
-  font-size: clamp(38px, 3.2vw, 50px);
+  font-size: clamp(36px, 2.8vw, 48px);
   line-height: 1.16;
   white-space: nowrap;
 }
@@ -1067,6 +1106,16 @@ a:focus-visible {
     gap: 42px;
   }
 
+  .hero h1 {
+    font-size: 44px;
+    max-width: calc(100vw - 44px);
+  }
+
+  .section-heading h2,
+  .final-cta h2 {
+    white-space: normal;
+  }
+
   .product-preview__rail {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -1122,12 +1171,9 @@ a:focus-visible {
   }
 
   .hero h1 {
-    font-size: 34px;
-    line-height: 1.1;
-  }
-
-  .hero__headline-line {
-    white-space: normal;
+    font-size: 24px;
+    line-height: 1.15;
+    white-space: nowrap;
   }
 
   .hero__lead {
@@ -1170,9 +1216,20 @@ a:focus-visible {
     grid-template-columns: 1fr;
   }
 
+  .supervision-stage {
+    gap: 0;
+    padding: 0 18px 16px;
+  }
+
   .scenario-switcher button {
     min-height: 60px;
     padding: 12px 14px;
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .scenario-switcher button:last-child {
+    border-bottom: 0;
   }
 
   .workflow-detail,
@@ -1214,6 +1271,7 @@ a:focus-visible {
 
   .section-heading h2 {
     font-size: 32px;
+    white-space: normal;
   }
 
   .section-heading > p {
@@ -1224,6 +1282,15 @@ a:focus-visible {
   .surface-detail,
   .decision-lab {
     padding: 24px;
+  }
+
+  .decision-lab,
+  .surface-detail {
+    border-left: 0;
+  }
+
+  .decision-lab {
+    border-top: 1px solid var(--line);
   }
 
   .workflow-rail {
@@ -1259,13 +1326,13 @@ a:focus-visible {
   }
 
   .surface-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
+    grid-template-columns: 1fr;
+    gap: 0;
   }
 
   .surface-list button {
-    min-height: 82px;
-    padding: 14px;
+    min-height: 50px;
+    padding: 10px 2px;
   }
 
   .surface-list button strong {
@@ -1336,7 +1403,7 @@ a:focus-visible {
 
 @media (max-width: 430px) {
   .hero h1 {
-    font-size: 33px;
+    font-size: 22px;
   }
 
   .metric-strip strong {

@@ -4,6 +4,7 @@ import {
   Blocks,
   FileText,
   GitBranch,
+  Github,
   LockKeyhole,
   Play,
   ShieldCheck,
@@ -17,6 +18,8 @@ const consoleUrl =
 
 const docsUrl =
   import.meta.env.VITE_AGENT_SUPERVISOR_DOCS_URL ?? 'http://127.0.0.1:3000';
+
+const repoUrl = 'https://github.com/Chengxiaoyu1119/agent-security-supervisor';
 
 const riskLabels = {
   critical: '严重',
@@ -120,11 +123,7 @@ export function App() {
         <section className="hero section-frame" id="top">
           <div className="hero__grid">
             <div className="hero__copy">
-              <h1>
-                每次工具调用，
-                <br />
-                <span className="hero__headline-line">先过安全闸门。</span>
-              </h1>
+              <h1>每次工具调用，先过安全闸门。</h1>
               <p className="hero__lead">
                 智安哨把工具名、参数、上下文来源、策略命中和审计证据串成一条可回放链路，
                 在文件、邮件、接口、代码执行和外部智能体接入前完成拦截、询问或复核。
@@ -281,6 +280,10 @@ export function App() {
             <p>官网负责说明重点，完整操作、接口和证据都在控制台与文档中。</p>
           </div>
           <div className="final-cta__actions">
+            <a className="button button--ghost" href={repoUrl} target="_blank" rel="noreferrer">
+              <Github size={18} />
+              查看仓库
+            </a>
             <a className="button button--ghost" href={docsUrl}>
               查看文档
             </a>
@@ -351,32 +354,87 @@ function SectionHeading({ title, body }: { title: string; body: string }) {
 }
 
 function ProductPreview() {
+  const productTabs = [
+    {
+      id: 'events',
+      label: '事件',
+      icon: Blocks,
+      ariaLabel: '控制台事件列表预览',
+      columns: ['事件', '来源', '风险分', '动作'],
+      rows: productRows.map((row) => ({
+        primary: row.event,
+        source: row.source,
+        score: String(row.score),
+        action: row.action
+      }))
+    },
+    {
+      id: 'policies',
+      label: '策略',
+      icon: GitBranch,
+      ariaLabel: '控制台策略命中预览',
+      columns: ['策略', '作用范围', '命中', '结果'],
+      rows: [
+        { primary: '来源隔离', source: '不可信文档', score: '3 项', action: '已命中' },
+        { primary: '工具前置闸门', source: '文件 / 接口', score: '2 项', action: '拦截' },
+        { primary: '异常分融合', source: '行为上下文', score: '88', action: '复核' },
+        { primary: '审计指纹', source: '参数快照', score: '已生成', action: '留痕' }
+      ]
+    },
+    {
+      id: 'actions',
+      label: '动作',
+      icon: Zap,
+      ariaLabel: '控制台执行动作预览',
+      columns: ['动作', '触发条件', '处置', '状态'],
+      rows: [
+        { primary: '拒绝执行', source: '高危工具调用', score: '阻断', action: '已完成' },
+        { primary: '人工复核', source: '批量外发', score: '排队', action: '待确认' },
+        { primary: '隔离上下文', source: '记忆写入', score: '隔离', action: '已处理' },
+        { primary: '允许执行', source: '可信资料', score: '放行', action: '低风险' }
+      ]
+    }
+  ] as const;
+  const [activeTabId, setActiveTabId] = useState<(typeof productTabs)[number]['id']>('events');
+  const activeTab = productTabs.find((tab) => tab.id === activeTabId) ?? productTabs[0];
+
   return (
     <div className="product-preview">
-      <div className="product-preview__rail">
-        <span className="is-active">
-          <Blocks size={17} />
-          事件
-        </span>
-        <span>
-          <GitBranch size={17} />
-          策略
-        </span>
-        <span>
-          <Zap size={17} />
-          动作
-        </span>
+      <div className="product-preview__rail" role="tablist" aria-label="控制台预览切换">
+        {productTabs.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = tab.id === activeTab.id;
+
+          return (
+            <button
+              type="button"
+              key={tab.id}
+              className={isActive ? 'is-active' : ''}
+              role="tab"
+              aria-selected={isActive}
+              aria-controls="product-preview-panel"
+              onClick={() => setActiveTabId(tab.id)}
+            >
+              <Icon size={17} />
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
-      <div className="event-table" role="table" aria-label="控制台事件列表预览">
+      <div
+        className="event-table"
+        role="table"
+        id="product-preview-panel"
+        aria-label={activeTab.ariaLabel}
+      >
         <div className="event-table__head" role="row">
-          <span>事件</span>
-          <span>来源</span>
-          <span>风险分</span>
-          <span>动作</span>
+          {activeTab.columns.map((column) => (
+            <span key={column}>{column}</span>
+          ))}
         </div>
-        {productRows.map((row) => (
-          <div className="event-table__row" role="row" key={`${row.event}-${row.score}`}>
-            <strong>{row.event}</strong>
+        {activeTab.rows.map((row) => (
+          <div className="event-table__row" role="row" key={`${activeTab.id}-${row.primary}-${row.action}`}>
+            <strong>{row.primary}</strong>
             <span>{row.source}</span>
             <span>{row.score}</span>
             <em>{row.action}</em>
