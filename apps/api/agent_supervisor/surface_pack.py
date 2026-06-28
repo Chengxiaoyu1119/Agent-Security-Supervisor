@@ -123,11 +123,11 @@ def build_surface_evidence_pack_markdown(surface_id: str, runs: list[dict[str, A
         "",
         f"- 攻击面编号：`{surface['id']}`",
         f"- 风险等级：{surface['risk']}",
-        f"- 剧本数量：{summary['scenario_count']}",
+        f"- 脚本数量：{summary['scenario_count']}",
         f"- 对抗样本：{summary['sample_count']}",
         f"- 越狱用例：{summary['jailbreak_case_count']}",
         f"- 智能体脚本：{summary['agent_script_count']}",
-        f"- 运行记录：{summary['run_count']}（攻击剧本 {summary['attack_run_count']}，外部事件 {summary['external_run_count']}），有防护控制率：{summary['control_rate']}%",
+        f"- 运行记录：{summary['run_count']}（攻击脚本 {summary['attack_run_count']}，外部事件 {summary['external_run_count']}），有防护控制率：{summary['control_rate']}%",
         f"- 证据完整度：{summary['readiness_score']}%",
         f"- 待补强项：{summary['gap_count']}",
         "",
@@ -159,7 +159,7 @@ def build_surface_evidence_pack_markdown(surface_id: str, runs: list[dict[str, A
     else:
         lines.append("当前攻击面的样本、脚本、策略和运行证据已形成闭环，暂无高优先级补强项。")
 
-    lines.extend(["", "## 剧本证据明细", ""])
+    lines.extend(["", "## 脚本证据明细", ""])
     for card in pack["scenarios"]:
         lines.extend(
             [
@@ -235,14 +235,14 @@ def build_surface_evidence_index_markdown(runs: list[dict[str, Any]] | None = No
         "## 总览",
         "",
         f"- 攻击面数量：{index['summary']['surface_count']}",
-        f"- 攻击剧本数量：{index['summary']['scenario_count']}",
+        f"- 攻击脚本数量：{index['summary']['scenario_count']}",
         f"- 对抗样本数量：{index['summary']['sample_count']}",
         f"- 智能体脚本数量：{index['summary']['agent_script_count']}",
         f"- 平均证据完整度：{index['summary']['avg_readiness_score']}%",
         f"- 平均控制率：{index['summary']['avg_control_rate']}%",
         f"- 待补强项：{index['summary']['gap_count']}",
         "",
-        "| 攻击面 | 风险 | 剧本 | 样本 | 脚本 | 策略数 | 控制率 | 完整度 | 缺口 |",
+        "| 攻击面 | 风险 | 脚本 | 样本 | 脚本 | 策略数 | 控制率 | 完整度 | 缺口 |",
         "|---|---|---:|---:|---:|---:|---:|---:|---:|",
     ]
     for surface in index["surfaces"]:
@@ -438,7 +438,7 @@ def _evidence_gaps(
                 "severity": "high",
                 "title": "攻击面画像不完整",
                 "evidence": "入口、保护资产或检测信号字段缺失。",
-                "action": "补齐攻击入口、保护资产、攻击目标和检测信号，避免只有剧本没有研究说明。",
+                "action": "补齐攻击入口、保护资产、攻击目标和检测信号，避免只有脚本没有研究说明。",
             }
         )
     if summary["sample_count"] < max(3, summary["scenario_count"] * 3):
@@ -446,8 +446,8 @@ def _evidence_gaps(
             {
                 "severity": "medium",
                 "title": "对抗样本数量偏少",
-                "evidence": f"当前 {summary['sample_count']} 条样本，剧本 {summary['scenario_count']} 个。",
-                "action": "为每个剧本保留原始输入、间接注入包装和多 Agent 转述包装。",
+                "evidence": f"当前 {summary['sample_count']} 条样本，脚本 {summary['scenario_count']} 个。",
+                "action": "为每个脚本保留原始输入、间接注入包装和多 Agent 转述包装。",
                 "command": f"node scripts/agent-supervisor-cli.mjs samples --surface {surface['id']} --format md",
             }
         )
@@ -467,8 +467,8 @@ def _evidence_gaps(
             {
                 "severity": "medium",
                 "title": "有防护运行覆盖不足",
-                "evidence": f"剧本 {summary['scenario_count']} 个，有防护运行记录 {summary['guarded_run_count']} 条，至少还需补 {max(0, missing)} 条。",
-                "action": "对该攻击面的所有剧本执行有防护验证，补齐最近运行证据。",
+                "evidence": f"脚本 {summary['scenario_count']} 个，有防护运行记录 {summary['guarded_run_count']} 条，至少还需补 {max(0, missing)} 条。",
+                "action": "对该攻击面的所有脚本执行有防护验证，补齐最近运行证据。",
             }
         )
     if summary["guarded_run_count"] and summary["control_rate"] < 100:
@@ -477,7 +477,7 @@ def _evidence_gaps(
                 "severity": "high",
                 "title": "防护控制率未达满分",
                 "evidence": f"当前有防护控制率为 {summary['control_rate']}%。",
-                "action": "检查未控制剧本的策略命中，补充规则或异常检测兜底。",
+                "action": "检查未控制脚本的策略命中，补充规则或异常检测兜底。",
             }
         )
     missing_guarded = [
@@ -489,9 +489,9 @@ def _evidence_gaps(
         gaps.append(
             {
                 "severity": "medium",
-                "title": "部分剧本缺少最近有防护结果",
+                "title": "部分脚本缺少最近有防护结果",
                 "evidence": "缺少：" + " / ".join(missing_guarded[:5]),
-                "action": "优先运行这些剧本，保证答辩时每张证据卡都有最近结果。",
+                "action": "优先运行这些脚本，保证答辩时每张证据卡都有最近结果。",
             }
         )
     return gaps
@@ -564,7 +564,7 @@ def _replay_commands(surface_id: str, scenario_ids: list[str]) -> list[dict[str,
             "value": f"GET /api/attack_surfaces/{surface_id}/evidence_pack.md",
         },
         {
-            "label": "关联剧本",
+            "label": "关联脚本",
             "value": ", ".join(scenario_ids) or "暂无",
         },
     ]

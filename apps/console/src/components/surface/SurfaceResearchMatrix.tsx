@@ -40,7 +40,7 @@ export function SurfaceResearchMatrix({
         </Typography.Paragraph>
         <Space size="large" className="zh-surface-matrix-hero__stats">
           <Statistic value={displayedProfiles.length} suffix="类比赛对象" className="zh-surface-matrix-stat" />
-          <Statistic value={scenarioCount || surfaces.length} suffix="个关联剧本" className="zh-surface-matrix-stat" />
+          <Statistic value={scenarioCount || surfaces.length} suffix="个关联脚本" className="zh-surface-matrix-stat" />
           <Statistic
             value={highRiskCount || surfaces.filter((surface) => ['critical', 'high'].includes(surface.risk)).length}
             suffix="个高风险对象"
@@ -167,7 +167,7 @@ export function SurfaceResearchMatrix({
                 {profile.demo_scenarios?.length ? (
                   <div>
                     <Typography.Text type="secondary" className="zh-surface-matrix-label">
-                      关联剧本
+                      关联脚本
                     </Typography.Text>
                     <Space size={[0, 8]} wrap>
                       {profile.demo_scenarios.slice(0, 4).map((scenario) => (

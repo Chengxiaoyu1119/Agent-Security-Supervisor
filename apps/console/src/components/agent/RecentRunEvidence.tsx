@@ -54,7 +54,7 @@ export function RecentRunEvidence({
         <Space orientation="vertical" size="large" className="zh-agent-run-stack">
           <Row gutter={[16, 16]}>
             <Col xs={12} sm={6}>
-              <Metric label="实验剧本" value={activeRun.scenario.id.replace('-001', '')} tone="cyan" />
+              <Metric label="实验脚本" value={activeRun.scenario.id.replace('-001', '')} tone="cyan" />
             </Col>
             <Col xs={12} sm={6}>
               <Metric label="工具调用" value={`${activeRun.audit_logs.length}`} tone="amber" />

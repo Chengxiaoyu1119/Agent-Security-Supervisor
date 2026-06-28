@@ -72,7 +72,7 @@ export function useAlertsViewModel({ alerts }: UseAlertsViewModelParams) {
 
     const text = [
       `告警：${selectedAlert.title}`,
-      `剧本：${selectedAlert.scenario_id ?? '未知'}`,
+      `脚本：${selectedAlert.scenario_id ?? '未知'}`,
       `工具：${selectedAlert.tool ?? '未知'}`,
       `决策：${selectedAlert.decision}`,
       `风险：${riskLabel[selectedAlert.severity]}`,
@@ -98,7 +98,7 @@ export function useAlertsViewModel({ alerts }: UseAlertsViewModelParams) {
       .map((alert, index) =>
         [
           `#${index + 1} ${alert.title}`,
-          `剧本：${alert.scenario_id ?? '未知'}`,
+          `脚本：${alert.scenario_id ?? '未知'}`,
           `工具：${alert.tool ?? '未知'}`,
           `决策：${alert.decision}`,
           `风险：${riskLabel[alert.severity]} / ${alert.risk_score ?? '-'}分`,

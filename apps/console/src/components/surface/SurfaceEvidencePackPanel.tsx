@@ -78,7 +78,7 @@ export function SurfaceEvidencePackPanel({
 
           <div>
             <Typography.Text strong className="zh-surface-matrix-label">
-              关联剧本验证
+              关联脚本验证
             </Typography.Text>
             <EvidenceList
               emptyText={loading ? '正在生成证据包...' : '暂无证据包数据。'}

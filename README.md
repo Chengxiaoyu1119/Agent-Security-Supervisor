@@ -51,7 +51,7 @@
 <table>
   <tr>
     <td align="center"><strong>7</strong><br />攻击面</td>
-    <td align="center"><strong>22</strong><br />攻击剧本</td>
+    <td align="center"><strong>22</strong><br />攻击脚本</td>
     <td align="center"><strong>13</strong><br />防御策略</td>
     <td align="center"><strong>9</strong><br />研究台页面</td>
     <td align="center"><strong>OpenClaw</strong><br />兼容接入</td>
@@ -79,8 +79,8 @@
 | 模块 | 能力 | 代码入口 |
 |---|---|---|
 | 攻击面研究台 | 展示 7 类攻击面、风险等级、样本数量、脚本数量和防御建议 | `apps/console/src/pages/Dashboard.tsx` |
-| 攻击剧本库 | 管理提示注入、越狱、数据泄露、工具劫持等剧本 | `apps/console/src/components/scenarios/ScenarioLibrary.tsx` |
-| 攻击复现实验室 | 支持单剧本运行、无防护/有防护对比、批量对比 | `apps/console/src/components/lab/ExperimentLab.tsx` |
+| 攻击脚本库 | 管理提示注入、越狱、数据泄露、工具劫持等脚本 | `apps/console/src/components/scenarios/ScenarioLibrary.tsx` |
+| 攻击复现实验室 | 支持单脚本运行、无防护/有防护对比、批量对比 | `apps/console/src/components/lab/ExperimentLab.tsx` |
 | 多 Agent 攻击链 | 模拟规划 Agent、执行 Agent、目标智能体、监督 Agent、评测 Agent | `apps/console/src/components/agent/AgentChain.tsx` |
 | 行为监督器 | 对工具调用输出允许、拒绝、询问、隔离四类决策 | `apps/api/agent_supervisor/supervisor.py` |
 | 审计与告警 | 记录工具参数、策略命中、风险分、异常分、审计 hash | `apps/api/agent_supervisor/integrity.py` |
@@ -95,7 +95,7 @@
 | 页面 | 用途 |
 |---|---|
 | 攻击面研究台 | 看总体覆盖、模型状态、近期运行和攻击面证据入口 |
-| 攻击剧本库 | 浏览并选择内置攻击剧本 |
+| 攻击脚本库 | 浏览并选择内置攻击脚本 |
 | 攻击复现实验室 | 实际运行攻击，比较开启防护前后的差异 |
 | 多Agent攻击链 | 运行多阶段组合攻击链，观察每一步被如何处理 |
 | 行为监督记录 | 查看每一次工具调用的审计证据 |
@@ -124,7 +124,7 @@ flowchart LR
 
 ```mermaid
 sequenceDiagram
-  participant R as 红队剧本
+  participant R as 红队脚本
   participant A as 目标智能体
   participant S as 智安哨监督器
   participant T as 沙箱工具
@@ -155,9 +155,9 @@ sequenceDiagram
 | 环境感知污染 | medium | 可演示 | 12 | 4 | 伪造环境变量或运行上下文 |
 
 <details>
-<summary><strong>内置剧本分布</strong></summary>
+<summary><strong>内置脚本分布</strong></summary>
 
-| 攻击面编号 | 剧本数 |
+| 攻击面编号 | 脚本数 |
 |---|---:|
 | `tool-hijack` | 4 |
 | `prompt-injection` | 3 |
@@ -277,8 +277,8 @@ CLI 是命令行工具。它适合批量评测、导出报告、生成提交包�
 
 | 目标 | 命令 |
 |---|---|
-| 运行单个攻击剧本 | `node scripts/agent-supervisor-cli.mjs run TOOL-HIJACK-001 on` |
-| 批量运行全部剧本对比 | `node scripts/agent-supervisor-cli.mjs batch --guard compare` |
+| 运行单个攻击脚本 | `node scripts/agent-supervisor-cli.mjs run TOOL-HIJACK-001 on` |
+| 批量运行全部脚本对比 | `node scripts/agent-supervisor-cli.mjs batch --guard compare` |
 | 导出攻防有效性评测 | `node scripts/agent-supervisor-cli.mjs assess --run-compare` |
 | 评估外部智能体事件日志 | `node scripts/agent-supervisor-cli.mjs evaluate --input apps/api/sandbox/examples/agent-events-batch.json` |
 | 运行 OpenClaw 兼容批量接入演示 | `node scripts/agent-supervisor-cli.mjs demo-external` |
@@ -309,10 +309,10 @@ CLI 是命令行工具。它适合批量评测、导出报告、生成提交包�
 |---|---|---|
 | 健康检查 | `GET /api/health` | 确认后端是否运行 |
 | 总览 | `GET /api/overview` | 首页统计、模型状态、近期日志 |
-| 剧本 | `GET /api/scenarios` | 获取攻击剧本列表 |
-| 运行 | `POST /api/run` | 运行单个剧本 |
+| 脚本 | `GET /api/scenarios` | 获取攻击脚本列表 |
+| 运行 | `POST /api/run` | 运行单个脚本 |
 | 对比 | `POST /api/compare` | 对比无防护和有防护结果 |
-| 批量 | `POST /api/batch_compare` | 批量对比多个剧本 |
+| 批量 | `POST /api/batch_compare` | 批量对比多个脚本 |
 | 攻击链 | `GET /api/attack_chains` | 获取组合攻击链 |
 | 攻击链运行 | `POST /api/attack_chains/{chain_id}/run` | 运行指定组合链 |
 | 审计 | `GET /api/audit_logs` | 获取工具调用审计记录 |
@@ -415,7 +415,7 @@ agent-security-supervisor/
 | 前端治理检查 | `npm run ui:audit` | 检查前端结构和治理规则 |
 | 项目自审 | `npm run self:review` | 输出项目自审报告到沙箱报告目录 |
 | 后端健康 | `GET /api/health` | 确认 FastAPI 服务正常 |
-| 攻防评测 | `node scripts/agent-supervisor-cli.mjs assess --run-compare` | 对全部剧本跑攻防对比 |
+| 攻防评测 | `node scripts/agent-supervisor-cli.mjs assess --run-compare` | 对全部脚本跑攻防对比 |
 
 ## 常见问题
 
@@ -429,7 +429,7 @@ agent-security-supervisor/
 <details>
 <summary><strong>前端打开后没有真实运行数据？</strong></summary>
 
-先确认后端是否启动：`npm run api`。后端启动后，运行剧本才会写入真实实验日志。
+先确认后端是否启动：`npm run api`。后端启动后，运行脚本才会写入真实实验日志。
 
 </details>
 

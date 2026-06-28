@@ -71,12 +71,12 @@ export function DashboardOverviewTab({
                     onClick={() =>
                       onBatchCompare(
                         overview.scenarios.map((scenario) => scenario.id),
-                        '全部攻击剧本'
+                        '全部攻击脚本'
                       )
                     }
                     disabled={running || !overview.scenarios.length}
                   >
-                    {running ? '验证中...' : '一键验证全部剧本'}
+                    {running ? '验证中...' : '一键验证全部脚本'}
                   </UiButton>
                   <UiButton
                     size="large"
@@ -84,7 +84,7 @@ export function DashboardOverviewTab({
                     onClick={() => priorityScenario && onSelectScenario(priorityScenario.id)}
                     disabled={!priorityScenario}
                   >
-                    打开高风险剧本
+                    打开高风险脚本
                   </UiButton>
                 </ActionRow>
               </div>
@@ -143,7 +143,7 @@ export function DashboardOverviewTab({
           />
         </Col>
         <Col xs={24} sm={12} md={6}>
-          <Metric label="攻击剧本" value={`${overview.summary.scenario_count}`} tone="amber" />
+          <Metric label="攻击脚本" value={`${overview.summary.scenario_count}`} tone="amber" />
         </Col>
         <Col xs={24} sm={12} md={6}>
           <Metric label="样本/脚本" value={`${totalSamples}/${totalScripts}`} tone="green" />
@@ -166,7 +166,7 @@ export function DashboardOverviewTab({
             className="zh-full-height"
             extra={
               <UiButton type="link" onClick={() => onSelectScenario(priorityScenario?.id ?? '')}>
-                查看剧本详情
+                查看脚本详情
               </UiButton>
             }
           >
@@ -175,7 +175,7 @@ export function DashboardOverviewTab({
                 红队攻击方 (Red Team Agents)
               </Typography.Text>
               <div className="zh-dashboard-agent-flow">
-                <DashboardAgentNode icon={<GitBranch size={20} />} title="规划 Agent" desc="分解攻击剧本" />
+                <DashboardAgentNode icon={<GitBranch size={20} />} title="规划 Agent" desc="分解攻击脚本" />
                 <ArrowRight size={16} color="var(--ant-color-text-tertiary)" />
                 <DashboardAgentNode icon={<FlaskConical size={20} />} title="样本生成" desc="构造对抗样本" />
                 <ArrowRight size={16} color="var(--ant-color-text-tertiary)" />
@@ -213,7 +213,7 @@ export function DashboardOverviewTab({
           <PanelCard
             title={
               <Space orientation="vertical" size={0}>
-                <Typography.Text strong>主演示攻击剧本</Typography.Text>
+                <Typography.Text strong>主演示攻击脚本</Typography.Text>
                 <Typography.Text type="secondary" className="zh-text-meta">
                   {overview.scenarios.length} 个可运行
                 </Typography.Text>

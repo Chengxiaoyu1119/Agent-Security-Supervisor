@@ -66,7 +66,7 @@ export function SurfaceCard({
         </Col>
         <Col span={6}>
           <Typography.Text type="secondary" className="zh-meta-block">
-            剧本
+            脚本
           </Typography.Text>
           <Typography.Text strong>{scenarioCount}</Typography.Text>
         </Col>

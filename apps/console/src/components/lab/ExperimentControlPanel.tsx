@@ -33,7 +33,7 @@ export function ExperimentControlPanel({
     <PanelCard
       title={
         <Space orientation="vertical" size={0}>
-          <Typography.Text strong>攻击剧本控制</Typography.Text>
+          <Typography.Text strong>攻击脚本控制</Typography.Text>
           <Typography.Text type="secondary" className="zh-text-meta">
             {scenario.id}
           </Typography.Text>
@@ -43,7 +43,7 @@ export function ExperimentControlPanel({
     >
       <div className="zh-mb-16">
         <Typography.Text type="secondary" className="zh-text-block zh-mb-8">
-          选择剧本
+          选择脚本
         </Typography.Text>
         <UiSelect
           value={selected}
@@ -60,13 +60,13 @@ export function ExperimentControlPanel({
 
       <Space orientation="vertical" className="zh-full-width zh-mb-24">
         <UiButton type="primary" block icon={<Play size={16} />} onClick={run} loading={running}>
-          {running ? '运行中...' : '运行当前剧本'}
+          {running ? '运行中...' : '运行当前脚本'}
         </UiButton>
         <UiButton block icon={<TerminalSquare size={16} />} onClick={compare} disabled={running}>
           无防护/有防护对比
         </UiButton>
         <UiButton block icon={<ClipboardList size={16} />} onClick={batchCompare} disabled={running}>
-          批量对比全部剧本
+          批量对比全部脚本
         </UiButton>
       </Space>
 

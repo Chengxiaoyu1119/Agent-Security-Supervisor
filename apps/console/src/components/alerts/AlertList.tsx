@@ -52,7 +52,7 @@ export function AlertList({ alerts, selectedAlertId, onSelectAlert }: AlertListP
                   {alert.evidence}
                 </Typography.Paragraph>
                 <Space wrap size={[0, 4]}>
-                  <Typography.Text className="zh-text-meta">{alert.scenario_id ?? '未知剧本'}</Typography.Text>
+                  <Typography.Text className="zh-text-meta">{alert.scenario_id ?? '未知脚本'}</Typography.Text>
                   <Typography.Text className="zh-text-meta">·</Typography.Text>
                   <Typography.Text className="zh-text-meta">{alert.policy_id ?? '未知策略'}</Typography.Text>
                   <Typography.Text className="zh-text-meta">·</Typography.Text>

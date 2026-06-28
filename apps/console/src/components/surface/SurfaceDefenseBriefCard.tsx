@@ -70,7 +70,7 @@ export function SurfaceDefenseBriefCard({
       <Row gutter={[16, 16]} className="zh-surface-brief__stats">
         <Col span={6}>
           <Typography.Text type="secondary" className="zh-meta-block">
-            剧本
+            脚本
           </Typography.Text>
           <Typography.Text strong>{displayValue(summary?.scenario_count ?? scenarios.length)}</Typography.Text>
         </Col>
@@ -128,7 +128,7 @@ export function SurfaceDefenseBriefCard({
             <Space>
               <LabelTag color={decisionTone}>{latestGuarded?.status ?? '待验证'}</LabelTag>
               <Typography.Text type="secondary" className="zh-text-sm">
-                {mainScenario?.id ?? fallbackScenario?.id ?? '暂无剧本'}
+                {mainScenario?.id ?? fallbackScenario?.id ?? '暂无脚本'}
               </Typography.Text>
             </Space>
           </div>

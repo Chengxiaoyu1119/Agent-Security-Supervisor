@@ -45,12 +45,12 @@ def _attack_surface_check(surfaces: list[dict[str, Any]], scenarios: list[dict[s
     passed = surface_count >= 7 and scenario_count >= 22
     return _check(
         check_id="attack-surface-coverage",
-        title="攻击面与剧本覆盖",
+        title="攻击面与脚本覆盖",
         category="赛题成果",
         status="passed" if passed else "blocked",
         severity="P0",
         weight=12,
-        evidence=f"已覆盖 {surface_count} 类攻击面、{scenario_count} 个攻击剧本。",
+        evidence=f"已覆盖 {surface_count} 类攻击面、{scenario_count} 个攻击脚本。",
         details={"surface_count": surface_count, "scenario_count": scenario_count},
         next_action="保持 7 类攻击面口径；答辩时优先演示工具劫持、提示注入、记忆中毒和环境污染。",
     )
@@ -91,7 +91,7 @@ def _student_competition_domain_check(
         weight=10,
         evidence=(
             f"学生对象画像 {len(profile_ids & required_profile_ids)}/5，"
-            f"专项剧本 {len(scenario_ids & required_scenario_ids)}/5，"
+            f"专项脚本 {len(scenario_ids & required_scenario_ids)}/5，"
             f"组合攻击链 {len(attack_chains)} 条，学生平台链 {_yes_no(has_student_chain)}。"
         ),
         details={
@@ -126,7 +126,7 @@ def _attack_dataset_check(dataset: dict[str, Any]) -> dict[str, Any]:
             f"攻击脚本 {summary.get('agent_script_count', 0)} 条。"
         ),
         details=summary,
-        next_action="继续把新增攻击面按同一数据结构沉淀，保证每个剧本都有可复现输入和工具调用脚本。",
+        next_action="继续把新增攻击面按同一数据结构沉淀，保证每个脚本都有可复现输入和工具调用脚本。",
     )
 
 

@@ -17,12 +17,12 @@ title: API 地图
 | 模型状态 | GET | `/api/models` |
 | 运行指标 | GET | `/api/observability/metrics` |
 
-## 剧本与运行
+## 脚本与运行
 
 | 能力 | 方法 | 路径 |
 | --- | --- | --- |
-| 剧本列表 | GET | `/api/scenarios` |
-| 运行剧本 | POST | `/api/run` |
+| 脚本列表 | GET | `/api/scenarios` |
+| 运行脚本 | POST | `/api/run` |
 | 攻防对比 | POST | `/api/compare` |
 | 批量对比 | POST | `/api/batch_compare` |
 | 攻击链列表 | GET | `/api/attack_chains` |

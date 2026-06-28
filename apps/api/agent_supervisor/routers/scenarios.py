@@ -57,7 +57,7 @@ def run(request: RunRequest) -> dict:
     try:
         return run_scenario(request.scenario_id, request.guard_enabled)
     except KeyError as exc:
-        raise HTTPException(status_code=404, detail=f"未知攻击剧本：{request.scenario_id}") from exc
+        raise HTTPException(status_code=404, detail=f"未知攻击脚本：{request.scenario_id}") from exc
 
 
 @router.post("/api/compare")
@@ -65,7 +65,7 @@ def compare(request: RunRequest) -> dict:
     try:
         return compare_scenario(request.scenario_id)
     except KeyError as exc:
-        raise HTTPException(status_code=404, detail=f"未知攻击剧本：{request.scenario_id}") from exc
+        raise HTTPException(status_code=404, detail=f"未知攻击脚本：{request.scenario_id}") from exc
 
 
 @router.post("/api/batch_compare")
@@ -73,7 +73,7 @@ def batch_compare(request: BatchCompareRequest) -> dict:
     try:
         return batch_compare_scenarios(request.scenario_ids)
     except KeyError as exc:
-        raise HTTPException(status_code=404, detail=f"未知攻击剧本：{exc.args[0]}") from exc
+        raise HTTPException(status_code=404, detail=f"未知攻击脚本：{exc.args[0]}") from exc
 
 
 @router.get("/api/attack_chains")

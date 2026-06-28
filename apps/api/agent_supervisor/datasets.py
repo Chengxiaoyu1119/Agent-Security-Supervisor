@@ -47,14 +47,14 @@ def build_attack_case_markdown(surface_id: str | None = None) -> str:
         "## 数据集概览",
         "",
         f"- 攻击面数量：{dataset['summary']['surface_count']}",
-        f"- 攻击剧本数量：{dataset['summary']['scenario_count']}",
+        f"- 攻击脚本数量：{dataset['summary']['scenario_count']}",
         f"- 对抗样本数量：{dataset['summary']['adversarial_sample_count']}",
         f"- 越狱用例数量：{dataset['summary']['jailbreak_case_count']}",
         f"- 工具调用数量：{dataset['summary']['tool_call_count']}",
         "",
         "## 攻击面分布",
         "",
-        "| 攻击面 | 剧本数 |",
+        "| 攻击面 | 脚本数 |",
         "|---|---:|",
     ]
     for surface_id, count in dataset["summary"]["surface_distribution"].items():

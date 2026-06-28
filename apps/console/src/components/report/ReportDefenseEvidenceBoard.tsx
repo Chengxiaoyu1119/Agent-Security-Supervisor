@@ -44,7 +44,7 @@ export function ReportDefenseEvidenceBoard({
           ))
         ) : (
           <Typography.Text type="secondary" className="zh-defense-evidence-empty">
-            没有匹配的证据卡，清空筛选后可查看全部剧本。
+            没有匹配的证据卡，清空筛选后可查看全部脚本。
           </Typography.Text>
         )}
       </Space>

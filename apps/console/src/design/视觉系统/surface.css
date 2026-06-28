@@ -452,6 +452,66 @@
   text-align: center;
 }
 
+.zh-surface-attack-playbook .ant-tabs-nav {
+  margin-bottom: 12px;
+}
+
+.zh-surface-playbook-counter {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: 8px;
+  background: var(--ant-color-fill-quaternary);
+}
+
+.zh-surface-playbook-counter strong {
+  color: var(--ant-color-primary);
+  font-size: 28px;
+  line-height: 1;
+}
+
+.zh-surface-playbook-counter span {
+  color: var(--ant-color-text-secondary);
+  font-size: 13px;
+}
+
+.zh-surface-brief-block {
+  height: 100%;
+  padding: 14px;
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: 8px;
+  background: var(--ant-color-fill-quaternary);
+}
+
+.zh-surface-brief-block .zh-evidence-code-block {
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+
+.zh-surface-brief-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.zh-surface-brief-step {
+  padding: 9px 10px;
+  border-radius: 6px;
+  color: var(--ant-color-text);
+  line-height: 1.5;
+  word-break: break-word;
+  background: var(--ant-color-bg-container);
+}
+
+@media (max-width: 768px) {
+  .zh-surface-playbook-counter {
+    justify-content: flex-start;
+  }
+}
+
 .zh-surface-evidence-card {
   display: flex;
   height: 100%;

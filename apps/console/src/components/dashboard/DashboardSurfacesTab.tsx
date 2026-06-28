@@ -76,7 +76,7 @@ export function DashboardSurfacesTab({
             }
             disabled={running || !selectedSurfaceScenarios.length}
           >
-            {running ? '验证中...' : '验证当前面'}
+            {running ? '验证中...' : '验证当前攻击面'}
           </UiButton>
         </ActionRow>
       </PanelCard>

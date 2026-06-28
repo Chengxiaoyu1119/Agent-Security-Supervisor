@@ -50,7 +50,7 @@ export function ScenarioLibrary({
         <PanelCard
           title={
             <Space>
-              <Typography.Text strong>攻击剧本目录</Typography.Text>
+              <Typography.Text strong>攻击脚本目录</Typography.Text>
               <LabelTag color="blue">
                 {filteredScenarios.length}/{scenarios.length}
               </LabelTag>
@@ -61,7 +61,7 @@ export function ScenarioLibrary({
         >
           <div className="zh-filter-panel">
             <UiInput
-              placeholder="搜索剧本、工具、标签..."
+              placeholder="搜索脚本、工具、标签..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="zh-mb-12"
@@ -119,7 +119,7 @@ export function ScenarioLibrary({
                 );
               })}
             </div>
-            {!filteredScenarios.length && <div className="zh-empty-panel">没有匹配的攻击剧本。</div>}
+            {!filteredScenarios.length && <div className="zh-empty-panel">没有匹配的攻击脚本。</div>}
           </div>
         </PanelCard>
       </Col>
@@ -229,7 +229,7 @@ arguments: ${JSON.stringify(call.arguments, null, 2)}`}
           </PanelCard>
         ) : (
           <PanelCard variant="borderless">
-            <div className="zh-empty-panel zh-empty-panel--large">暂无攻击剧本。</div>
+            <div className="zh-empty-panel zh-empty-panel--large">暂无攻击脚本。</div>
           </PanelCard>
         )}
       </Col>

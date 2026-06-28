@@ -111,22 +111,22 @@ def build_policy_ablation_markdown(data: dict[str, Any] | None = None) -> str:
     lines = [
         "# 策略消融实验结果",
         "",
-        "消融实验会临时关闭一组防护策略，运行固定攻击剧本，再恢复策略状态。它用于证明各策略层对攻击控制率的实际贡献。",
+        "消融实验会临时关闭一组防护策略，运行固定攻击脚本，再恢复策略状态。它用于证明各策略层对攻击控制率的实际贡献。",
         "",
         "## 总览",
         "",
         f"- 实验组数：{summary['experiment_count']}",
-        f"- 覆盖剧本：{summary['scenario_count']}",
+        f"- 覆盖脚本：{summary['scenario_count']}",
         f"- 基线控制率：{summary['baseline_control_rate']}%",
         f"- 消融后控制率：{summary['ablated_control_rate']}%",
         f"- 控制率下降：{summary['control_drop']}%",
-        f"- 消融后风险暴露剧本：{summary['risk_exposed_count']}",
+        f"- 消融后风险暴露脚本：{summary['risk_exposed_count']}",
         f"- 由其他策略兜底控制：{summary['fallback_control_count']}",
         f"- 基线命中被关闭策略次数：{summary['primary_hit_count']}",
         "",
         "## 实验明细",
         "",
-        "| 实验组 | 关闭策略 | 剧本 | 基线控制率 | 消融后控制率 | 暴露 | 兜底 | 结论 |",
+        "| 实验组 | 关闭策略 | 脚本 | 基线控制率 | 消融后控制率 | 暴露 | 兜底 | 结论 |",
         "|---|---|---:|---:|---:|---:|---:|---|",
     ]
     for item in report["experiments"]:
@@ -142,7 +142,7 @@ def build_policy_ablation_markdown(data: dict[str, Any] | None = None) -> str:
                 conclusion=item["conclusion"],
             )
         )
-    lines.extend(["", "## 剧本级对比", ""])
+    lines.extend(["", "## 脚本级对比", ""])
     for item in report["experiments"]:
         lines.extend(
             [
@@ -151,7 +151,7 @@ def build_policy_ablation_markdown(data: dict[str, Any] | None = None) -> str:
                 f"- 假设：{item['hypothesis']}",
                 f"- 关闭策略：`{', '.join(item['disabled_policies'])}`",
                 "",
-                "| 剧本 | 基线决策 | 消融后决策 | 状态 |",
+                "| 脚本 | 基线决策 | 消融后决策 | 状态 |",
                 "|---|---|---|---|",
             ]
         )
@@ -272,7 +272,7 @@ def _conclusion(risk_exposed_count: int, fallback_control_count: int, primary_hi
         return "关闭后仍被其他策略兜底，说明存在多层防护。"
     if primary_hit_count:
         return "基线有命中，但消融后影响较小。"
-    return "本组策略在所选剧本中贡献有限，需要扩展样本。"
+    return "本组策略在所选脚本中贡献有限，需要扩展样本。"
 
 
 @contextmanager

@@ -49,7 +49,7 @@ def cmd_run(args: argparse.Namespace) -> None:
     scenario = args.scenario or args.scenario_pos
     guard = args.guard or args.guard_pos or "on"
     if not scenario:
-        raise SystemExit("缺少攻击剧本编号，例如：run TOOL-HIJACK-001 on")
+        raise SystemExit("缺少攻击脚本编号，例如：run TOOL-HIJACK-001 on")
     result = run_scenario(scenario, guard_enabled=guard == "on")
     print(json.dumps(_brief(result), ensure_ascii=False, indent=2))
 
@@ -73,7 +73,7 @@ def cmd_export(args: argparse.Namespace) -> None:
     lines = [
         "# 智安哨 CLI 实验导出",
         "",
-        "| 时间 | 剧本 | 防护 | 攻击成功 | 阻断 | 询问 | 隔离 | 延迟 |",
+        "| 时间 | 脚本 | 防护 | 攻击成功 | 阻断 | 询问 | 隔离 | 延迟 |",
         "|---|---|---|---|---|---|---|---|",
     ]
     for run in runs:
@@ -446,19 +446,19 @@ def _attack_assessment_markdown(data: dict) -> str:
     lines = [
         "# 攻防有效性评测",
         "",
-        "该评测只基于真实运行记录统计，不把未运行剧本算作已验证。",
+        "该评测只基于真实运行记录统计，不把未运行脚本算作已验证。",
         "",
         "## 摘要",
         "",
-        f"- 攻击剧本：{summary['scenario_count']}",
+        f"- 攻击脚本：{summary['scenario_count']}",
         f"- 无防护攻击复现率：{summary['attack_reproduced_rate']}%",
         f"- 有防护有效控制率：{summary['defense_effective_rate']}%",
         f"- 预期策略匹配率：{summary['expected_match_rate']}%",
         f"- 证据完整率：{summary['evidence_complete_rate']}%",
         "",
-        "## 剧本矩阵",
+        "## 脚本矩阵",
         "",
-        "| 剧本 | 攻击面 | 无防护复现 | 有防护控制 | 策略匹配 | 证据完整 | 缺口 |",
+        "| 脚本 | 攻击面 | 无防护复现 | 有防护控制 | 策略匹配 | 证据完整 | 缺口 |",
         "|---|---|---|---|---|---|---|",
     ]
     for case in data["cases"]:
@@ -488,17 +488,17 @@ def _attack_assessment_markdown(data: dict) -> str:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="agent-supervisor", description="智安哨攻击剧本 CLI")
+    parser = argparse.ArgumentParser(prog="agent-supervisor", description="智安哨攻击脚本 CLI")
     sub = parser.add_subparsers(required=True)
 
-    run = sub.add_parser("run", help="运行单个攻击剧本")
+    run = sub.add_parser("run", help="运行单个攻击脚本")
     run.add_argument("scenario_pos", nargs="?")
     run.add_argument("guard_pos", nargs="?", choices=["on", "off"])
     run.add_argument("--scenario")
     run.add_argument("--guard", choices=["on", "off"])
     run.set_defaults(func=cmd_run)
 
-    batch = sub.add_parser("batch", help="批量运行攻击剧本")
+    batch = sub.add_parser("batch", help="批量运行攻击脚本")
     batch.add_argument("--guard", choices=["on", "off", "compare"], default="compare")
     batch.set_defaults(func=cmd_batch)
 
@@ -550,7 +550,7 @@ def build_parser() -> argparse.ArgumentParser:
     assess = sub.add_parser("assess", help="导出攻防有效性评测矩阵")
     assess.add_argument("--output", default="apps/api/sandbox/reports/攻防有效性评测.md")
     assess.add_argument("--format", choices=["json", "md"], default="md")
-    assess.add_argument("--run-compare", action="store_true", help="导出前先对全部剧本运行无防护/有防护对比")
+    assess.add_argument("--run-compare", action="store_true", help="导出前先对全部脚本运行无防护/有防护对比")
     assess.set_defaults(func=cmd_assess)
 
     attack_chains = sub.add_parser("attack-chains", help="导出或运行多步组合攻击链")

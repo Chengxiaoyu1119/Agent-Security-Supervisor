@@ -5,7 +5,7 @@ import { DecisionPill, LabelTag, MetricCard as Metric, PanelCard, UiTable } from
 export function BatchResultPanel({ batch }: { batch: BatchCompareResult }) {
   const columns = [
     {
-      title: '剧本',
+      title: '脚本',
       dataIndex: 'scenario_id',
       key: 'scenario_id',
       render: (text: string) => <Typography.Text strong>{text}</Typography.Text>
@@ -52,7 +52,7 @@ export function BatchResultPanel({ batch }: { batch: BatchCompareResult }) {
         <Space orientation="vertical" size={0}>
           <Typography.Text strong>批量对比结果</Typography.Text>
           <Typography.Text type="secondary" className="zh-text-meta">
-            {batch.summary.total} 个剧本 · 控制率 {batch.summary.control_rate}%
+            {batch.summary.total} 个脚本 · 控制率 {batch.summary.control_rate}%
           </Typography.Text>
         </Space>
       }

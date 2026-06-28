@@ -99,7 +99,7 @@ export function useAppActions({
   );
 
   const handleBatchCompare = useCallback(
-    async (scenarioIds?: string[], label = '全部剧本') => {
+    async (scenarioIds?: string[], label = '全部脚本') => {
       setRunning(true);
       setApiNotice('');
       try {
@@ -114,7 +114,7 @@ export function useAppActions({
         }
         setGuardEnabled(true);
         setApiNotice(
-          `批量对比完成：${label} ${result.summary.total} 个剧本，无防护暴露 ${result.summary.exposed_without_guard} 个，有防护控制 ${result.summary.controlled_with_guard} 个。`
+          `批量对比完成：${label} ${result.summary.total} 个脚本，无防护暴露 ${result.summary.exposed_without_guard} 个，有防护控制 ${result.summary.controlled_with_guard} 个。`
         );
         await refresh();
         if (page === 'report') {

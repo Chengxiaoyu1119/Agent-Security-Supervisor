@@ -26,7 +26,7 @@ export const defaultPage: PageKey = 'dashboard';
 
 export const navItems: Array<{ key: PageKey; label: string; icon: JSX.Element }> = [
   { key: 'dashboard', label: '攻击面研究台', icon: <FlaskConical size={18} /> },
-  { key: 'scenarios', label: '攻击剧本库', icon: <ClipboardList size={18} /> },
+  { key: 'scenarios', label: '攻击脚本库', icon: <ClipboardList size={18} /> },
   { key: 'lab', label: '攻击复现实验室', icon: <Play size={18} /> },
   { key: 'chain', label: '多 Agent 攻击链', icon: <GitBranch size={18} /> },
   { key: 'audit', label: '行为监督记录', icon: <ScrollText size={18} /> },

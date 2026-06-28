@@ -31,7 +31,7 @@ export function DefenseEvidenceFilters({
         <UiInput
           value={query}
           onChange={(event) => onQueryChange(event.target.value)}
-          placeholder="剧本、策略、工具"
+          placeholder="脚本、策略、工具"
           className="zh-filter-input-md"
         />
       </Space>

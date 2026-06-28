@@ -14,7 +14,7 @@ export function SurfaceScenarioList({
     <PanelCard
       title={
         <Space orientation="vertical" size={0}>
-          <Typography.Text strong>关联剧本</Typography.Text>
+          <Typography.Text strong>关联脚本</Typography.Text>
           <Typography.Text type="secondary" className="zh-text-sm">
             {scenarios.length} 个
           </Typography.Text>
@@ -50,7 +50,7 @@ export function SurfaceScenarioList({
             </div>
           );
         })}
-        {!scenarios.length && <div className="zh-surface-empty">该攻击面暂无关联剧本。</div>}
+        {!scenarios.length && <div className="zh-surface-empty">该攻击面暂无关联脚本。</div>}
       </div>
     </PanelCard>
   );

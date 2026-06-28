@@ -220,7 +220,7 @@ const directDecisionMarkupCount = countMatches(appText, /className=\{`decision \
 const hardcodedColorCount = countMatches(stylesText + '\n' + visualText, /#[0-9a-fA-F]{3,8}|rgba?\(/g);
 const tokenUsageCount = countMatches(stylesText + '\n' + visualText + '\n' + tokenText, /var\(--/g);
 const primaryDocText = [readmeText, deliveryGuideText, selfReviewRecordText].join('\n');
-const oldMetricResidualCount = countMatches(primaryDocText, /17 个剧本|51 条|51 个|17 条/g);
+const oldMetricResidualCount = countMatches(primaryDocText, /17 个脚本|51 条|51 个|17 条/g);
 const latestZip = latestPackage();
 const latestPackageDir = latestPackageDirectory(latestZip);
 const packageStudentMapDesktop = packageHasFile(latestPackageDir, 'student-competition-attack-map-desktop.png');
@@ -266,9 +266,9 @@ const checks = [
   },
   {
     id: 'student-competition-scenarios',
-    title: '学生比赛专项剧本',
+    title: '学生比赛专项脚本',
     status: studentScenarioCount >= 5 && (readinessPayload?.summary?.scenario_count ?? 0) >= 22 ? 'passed' : 'warning',
-    evidence: `专项剧本同步 ${studentScenarioCount}/5 个，体检剧本总数 ${readinessPayload?.summary?.scenario_count ?? '未生成'}。`
+    evidence: `专项脚本同步 ${studentScenarioCount}/5 个，体检脚本总数 ${readinessPayload?.summary?.scenario_count ?? '未生成'}。`
   },
   {
     id: 'attack-chain-coverage',
@@ -283,7 +283,7 @@ const checks = [
       packageStudentMapDesktop && packageStudentMapMobile && packageStudentChain && packageStudentScenario
         ? 'passed'
         : 'warning',
-    evidence: `最新提交包学生画像截图 ${packageStudentMapDesktop && packageStudentMapMobile ? '已归档' : '缺失'}，学生组合链 ${packageStudentChain ? '已归档' : '缺失'}，专项剧本 ${packageStudentScenario ? '已归档' : '缺失'}。`
+    evidence: `最新提交包学生画像截图 ${packageStudentMapDesktop && packageStudentMapMobile ? '已归档' : '缺失'}，学生组合链 ${packageStudentChain ? '已归档' : '缺失'}，专项脚本 ${packageStudentScenario ? '已归档' : '缺失'}。`
   },
   {
     id: 'delivery-metric-consistency',
@@ -372,7 +372,7 @@ const report = {
   current_baseline: [
     `前端主入口 App.tsx 当前 ${fileInfo('apps/console/src/App.tsx').lines} 行。`,
     `基础 UI 组件 ${uiComponents.length} 个，目录由治理脚本约束。`,
-    `学生比赛对象画像 ${studentProfileCount}/5，专项剧本 ${studentScenarioCount}/5。`,
+    `学生比赛对象画像 ${studentProfileCount}/5，专项脚本 ${studentScenarioCount}/5。`,
     `组合攻击链 ${attackChainCount} 条，学生比赛平台对象链${hasStudentPortalChain ? '已存在' : '缺失'}。`,
     `设计 Token 使用 ${tokenUsageCount} 次，历史 CSS 硬编码颜色 ${hardcodedColorCount} 处。`
   ],
@@ -412,7 +412,7 @@ const lines = [
   '## 学生比赛攻击面指标',
   '',
   `- 学生比赛对象画像：${report.competition_domain.student_profile_count}/5`,
-  `- 学生比赛专项剧本：${report.competition_domain.student_scenario_count}/5`,
+  `- 学生比赛专项脚本：${report.competition_domain.student_scenario_count}/5`,
   `- 组合攻击链：${report.competition_domain.attack_chain_count} 条`,
   `- 学生比赛平台对象链：${report.competition_domain.has_student_portal_chain ? '已生成' : '缺失'}`,
   `- 误导方向残留词：${report.competition_domain.misleading_domain_residual_count} 处`,

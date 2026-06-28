@@ -278,7 +278,7 @@ def build_attack_chain_catalog_markdown() -> str:
     lines = [
         "# 组合攻击链评测",
         "",
-        "该材料把单点攻击剧本串成多步红队路径，用来证明系统不是只会拦截单个样本，而是能监督连续智能体行为。",
+        "该材料把单点攻击脚本串成多步红队路径，用来证明系统不是只会拦截单个样本，而是能监督连续智能体行为。",
         "",
     ]
     for chain in list_attack_chains():
@@ -295,7 +295,7 @@ def build_attack_chain_catalog_markdown() -> str:
                 f"- 覆盖工具：{stats['tool_count']} 类（{'、'.join(stats['tools'])}）",
                 f"- 防御重点：{'、'.join(chain['defense_focus'])}",
                 "",
-                "| 步骤 | 阶段 | 剧本 | 攻击面 | 目标工具 | 预期控制 |",
+                "| 步骤 | 阶段 | 脚本 | 攻击面 | 目标工具 | 预期控制 |",
                 "|---:|---|---|---|---|---|",
             ]
         )

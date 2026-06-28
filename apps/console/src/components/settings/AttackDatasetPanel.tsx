@@ -15,7 +15,7 @@ export function AttackDatasetPanel({ overview, attackDataset }: AttackDatasetPan
           <Metric label="攻击面" value={`${attackDataset?.summary.surface_count ?? overview.summary.surface_count}`} />
         </Col>
         <Col xs={12} sm={8} md={4}>
-          <Metric label="剧本" value={`${attackDataset?.summary.scenario_count ?? overview.summary.scenario_count}`} />
+          <Metric label="脚本" value={`${attackDataset?.summary.scenario_count ?? overview.summary.scenario_count}`} />
         </Col>
         <Col xs={12} sm={8} md={4}>
           <Metric

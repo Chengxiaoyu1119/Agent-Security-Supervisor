@@ -282,7 +282,7 @@ def render_surface_briefing_sheet_html(pack: dict[str, Any]) -> str:
       <div class="score"><strong>{summary['readiness_score']}%</strong><span>证据完整度</span></div>
     </header>
     <section class="metrics">
-      <div><span>剧本</span><strong>{summary['scenario_count']}</strong></div>
+      <div><span>脚本</span><strong>{summary['scenario_count']}</strong></div>
       <div><span>样本/脚本</span><strong>{summary['sample_count']}/{summary['agent_script_count']}</strong></div>
       <div><span>控制率</span><strong>{summary['control_rate']}%</strong></div>
       <div><span>运行证据</span><strong>{summary['run_count']}</strong></div>
@@ -296,7 +296,7 @@ def render_surface_briefing_sheet_html(pack: dict[str, Any]) -> str:
       <article class="block">
         <div class="section-title"><strong>监督命中</strong><span>{_html(guarded.get('run_id', '等待运行证据'))}</span></div>
         <span class="decision">{_html(guarded.get('status', '待验证'))}</span>
-        <p class="scenario-line">{_html(main_scenario['id'] if main_scenario else '暂无剧本')} · {_html(main_scenario['target'] if main_scenario else '暂无目标工具')}</p>
+        <p class="scenario-line">{_html(main_scenario['id'] if main_scenario else '暂无脚本')} · {_html(main_scenario['target'] if main_scenario else '暂无目标工具')}</p>
         <div class="chips">{policies}</div>
         <div class="tools">{tools}</div>
       </article>
@@ -307,7 +307,7 @@ def render_surface_briefing_sheet_html(pack: dict[str, Any]) -> str:
       </article>
     </section>
     <table>
-      <thead><tr><th>剧本</th><th>预期策略</th><th>最近有防护结果</th></tr></thead>
+      <thead><tr><th>脚本</th><th>预期策略</th><th>最近有防护结果</th></tr></thead>
       <tbody>{scenarios}</tbody>
     </table>
     <footer>
@@ -326,7 +326,7 @@ def render_briefing_sheet_index_html(sheets: list[dict[str, Any]]) -> str:
         <a class="sheet-link" href="{_html(Path(sheet['html_path']).name)}">
           <span>{_html(sheet['surface_name'])}</span>
           <b>{sheet['summary']['readiness_score']}%</b>
-          <small>{sheet['summary']['scenario_count']} 剧本 · {sheet['summary']['sample_count']} 样本 · 缺口 {sheet['summary']['gap_count']}</small>
+          <small>{sheet['summary']['scenario_count']} 脚本 · {sheet['summary']['sample_count']} 样本 · 缺口 {sheet['summary']['gap_count']}</small>
         </a>
         """
         for sheet in sheets

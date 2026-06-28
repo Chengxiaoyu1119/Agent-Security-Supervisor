@@ -37,7 +37,7 @@ export function AlertDetail({ alert, copied, onCopy }: AlertDetailProps) {
         </Descriptions.Item>
         <Descriptions.Item label="异常分">{alert.anomaly_score ?? '-'}</Descriptions.Item>
         <Descriptions.Item label="策略编号">{alert.policy_id ?? '未知'}</Descriptions.Item>
-        <Descriptions.Item label="攻击剧本">{alert.scenario_id ?? '未知'}</Descriptions.Item>
+        <Descriptions.Item label="攻击脚本">{alert.scenario_id ?? '未知'}</Descriptions.Item>
         <Descriptions.Item label="目标工具">{alert.tool ?? alert.target ?? '未知'}</Descriptions.Item>
       </Descriptions>
 

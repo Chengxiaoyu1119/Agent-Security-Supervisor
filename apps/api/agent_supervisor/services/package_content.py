@@ -38,14 +38,14 @@ def _clean_submission_evidence(summary: dict[str, Any], runs: list[dict[str, Any
         "",
         "## 生成方式",
         "",
-        "- 对每个攻击剧本固定运行一次无防护复现。",
-        "- 对每个攻击剧本固定运行一次有防护验证。",
+        "- 对每个攻击脚本固定运行一次无防护复现。",
+        "- 对每个攻击脚本固定运行一次有防护验证。",
         "- 生成提交包时只使用本轮固定运行得到的证据数据。",
         "- 本流程不会把这些临时运行写入历史演示数据库。",
         "",
         "## 本轮统计",
         "",
-        f"- 攻击剧本数量：{summary['clean_scenario_count']}",
+        f"- 攻击脚本数量：{summary['clean_scenario_count']}",
         f"- 固定运行记录：{summary['clean_run_count']}",
         f"- 无防护运行：{summary['clean_unguarded_run_count']}",
         f"- 有防护运行：{summary['clean_guarded_run_count']}",
@@ -55,7 +55,7 @@ def _clean_submission_evidence(summary: dict[str, Any], runs: list[dict[str, Any
         "",
         "## 运行明细",
         "",
-        "| 剧本 | 防护状态 | 攻击成功 | 阻断 | 询问 | 隔离 | 审计条数 | 告警条数 |",
+        "| 脚本 | 防护状态 | 攻击成功 | 阻断 | 询问 | 隔离 | 审计条数 | 告警条数 |",
         "|---|---|---|---|---|---|---|---|",
     ]
     for run in runs:
@@ -239,6 +239,8 @@ def _copy_release_artifacts(support_dir: Path) -> list[Path]:
     target_dir = support_dir / "Windows一键运行"
     sources = [
         REPO_ROOT / "apps" / "api" / "sandbox" / "release" / "dist" / "zhian-supervisor-launcher.exe",
+        REPO_ROOT / "scripts" / "start-zhian.cmd",
+        REPO_ROOT / "scripts" / "start-zhian.ps1",
         REPO_ROOT / "scripts" / "启动智安哨.cmd",
         REPO_ROOT / "scripts" / "启动智安哨.ps1",
         REPO_ROOT / "scripts" / "生成智安哨Windows启动器.ps1",
@@ -304,9 +306,9 @@ def _risk_report(surfaces: list[dict[str, Any]], scenarios: list[dict[str, Any]]
         for scenario in linked:
             lines.extend(
                 [
-                    f"### 剧本：{scenario['title']}",
+                    f"### 脚本：{scenario['title']}",
                     "",
-                    f"- 剧本编号：{scenario['id']}",
+                    f"- 脚本编号：{scenario['id']}",
                     f"- 目标工具：{scenario['target']}",
                     f"- 模型对抗样本：{scenario['adversarial_prompt']}",
                     f"- 越狱测试用例：{scenario['jailbreak_case']}",
@@ -464,7 +466,7 @@ def _experiment_report(runs: list[dict[str, Any]]) -> str:
             "",
             "## 最近实验明细",
             "",
-            "| 时间 | 剧本 | 防护 | 攻击成功 | 阻断 | 询问 | 隔离 | 延迟 |",
+            "| 时间 | 脚本 | 防护 | 攻击成功 | 阻断 | 询问 | 隔离 | 延迟 |",
             "|---|---|---|---|---:|---:|---:|---:|",
         ]
     )
@@ -504,12 +506,12 @@ def _checklist(
         {
             "requirement": "安全风险分析报告至少 3 类攻击场景",
             "status": "满足",
-            "evidence": f"当前覆盖 {len(surfaces)} 类攻击面，其中 {surface_count} 类已有剧本。",
+            "evidence": f"当前覆盖 {len(surfaces)} 类攻击面，其中 {surface_count} 类已有脚本。",
         },
         {
             "requirement": "每类场景包含模型对抗样本与越狱测试用例集",
             "status": "满足",
-            "evidence": f"{len(complete_scenarios)}/{len(scenarios)} 个剧本已包含对抗样本、越狱用例、脚本步骤和工具调用。",
+            "evidence": f"{len(complete_scenarios)}/{len(scenarios)} 个脚本已包含对抗样本、越狱用例、脚本步骤和工具调用。",
         },
         {
             "requirement": "智能体攻击脚本",

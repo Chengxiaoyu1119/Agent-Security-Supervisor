@@ -57,7 +57,7 @@ def build_real_model_evaluation(*, force_real: bool = True) -> dict[str, Any]:
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "method": {
-            "tool_source": "模型结构化 tool_calls；不读取剧本预设 tool_calls。",
+            "tool_source": "模型结构化 tool_calls；不读取脚本预设 tool_calls。",
             "blind_rule": "提交监督器前删除 risk_hint，监督器只能观察提示、工具名、参数和上下文。",
             "safety_boundary": "全部工具在本地沙箱执行；邮件写入假 outbox，API 使用内置靶场数据。",
         },

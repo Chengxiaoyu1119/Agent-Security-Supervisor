@@ -92,7 +92,7 @@ def build_surface_conclusions_markdown(runs: list[dict[str, Any]] | None = None)
         f"- 攻击面数量：{data['summary']['surface_count']}",
         f"- 已形成结论：{data['summary']['conclusion_count']}",
         f"- 有运行证据的攻击面：{data['summary']['with_run_evidence_count']}",
-        f"- 剧本数量：{data['summary']['scenario_count']}",
+        f"- 脚本数量：{data['summary']['scenario_count']}",
         f"- 覆盖工具类型：{data['summary']['tool_count']}",
         "",
     ]
@@ -103,7 +103,7 @@ def build_surface_conclusions_markdown(runs: list[dict[str, Any]] | None = None)
                 "",
                 f"- 风险等级：{item['risk']}",
                 f"- 实验状态：{item['experiment_status']}",
-                f"- 剧本数量：{item['scenario_count']}",
+                f"- 脚本数量：{item['scenario_count']}",
                 f"- 工具覆盖：{'、'.join(item['tool_coverage'])}",
                 f"- 控制率：{item['control_rate']}%",
                 f"- 平均延迟：{item['avg_latency_ms']}ms",
@@ -116,7 +116,7 @@ def build_surface_conclusions_markdown(runs: list[dict[str, Any]] | None = None)
         )
         for finding in item["key_findings"]:
             lines.append(f"- {finding}")
-        lines.extend(["", "### 代表剧本", "", "| 剧本 | 目标 | 风险 |", "|---|---|---|"])
+        lines.extend(["", "### 代表脚本", "", "| 脚本 | 目标 | 风险 |", "|---|---|---|"])
         for scenario in item["representative_scenarios"]:
             lines.append(f"| {scenario['id']} | {scenario['target']} | {scenario['severity']} |")
         lines.append("")
@@ -193,7 +193,7 @@ def build_output_filter_markdown() -> str:
         "",
         "## 对比明细",
         "",
-        "| 剧本 | 类型 | 关闭防护 | 开启防护 | 策略 |",
+        "| 脚本 | 类型 | 关闭防护 | 开启防护 | 策略 |",
         "|---|---|---|---|---|",
     ]
     for case in data["cases"]:
@@ -229,7 +229,7 @@ def _surface_findings(
 ) -> list[str]:
     tools = sorted({call["tool"] for scenario in scenarios for call in scenario.get("tool_calls", [])})
     findings = [
-        f"该攻击面内置 {len(scenarios)} 个可复现实验剧本，覆盖 {'、'.join(tools)} 等工具调用。",
+        f"该攻击面内置 {len(scenarios)} 个可复现实验脚本，覆盖 {'、'.join(tools)} 等工具调用。",
         f"主要保护资产包括：{'、'.join(surface.get('protected_assets', [])[:4]) or '模型上下文和工具权限'}。",
     ]
     if guarded_runs:

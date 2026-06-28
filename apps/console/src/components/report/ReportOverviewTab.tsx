@@ -16,7 +16,7 @@ export function ReportOverviewTab({ report }: ReportOverviewTabProps) {
           <Metric label="攻击面覆盖" value={`${report.summary.surface_count}/7`} tone="cyan" />
         </Col>
         <Col xs={24} sm={12} md={8} lg={4}>
-          <Metric label="攻击剧本" value={`${report.summary.scenario_count}`} tone="amber" />
+          <Metric label="攻击脚本" value={`${report.summary.scenario_count}`} tone="amber" />
         </Col>
         <Col xs={24} sm={12} md={8} lg={4}>
           <Metric label="防护控制率" value={`${report.summary.control_rate}%`} tone="green" />
@@ -100,7 +100,7 @@ export function ReportOverviewTab({ report }: ReportOverviewTabProps) {
           </PanelCard>
         </Col>
         <Col xs={24} lg={12}>
-          <PanelCard title="攻击面剧本分布" variant="borderless" className="zh-full-height">
+          <PanelCard title="攻击面脚本分布" variant="borderless" className="zh-full-height">
             <Space orientation="vertical" className="zh-full-width">
               {report.surface_coverage.map((surface) => {
                 const maxCount = Math.max(1, ...report.surface_coverage.map((i) => i.scenario_count));
@@ -167,7 +167,7 @@ export function ReportOverviewTab({ report }: ReportOverviewTabProps) {
                 </div>
               ))}
               {!report.policy_hits.length && (
-                <div className="zh-empty-panel">暂无策略命中记录，先运行一次攻击剧本。</div>
+                <div className="zh-empty-panel">暂无策略命中记录，先运行一次攻击脚本。</div>
               )}
             </div>
           </PanelCard>

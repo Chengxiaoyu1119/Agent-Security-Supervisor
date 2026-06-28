@@ -152,11 +152,11 @@ def build_requirement_alignment(cases: list[dict[str, Any]] | None = None) -> li
     checks = {
         "risk-report": {
             "status": "满足" if len(covered_surfaces) >= 3 else "不足",
-            "evidence": f"当前覆盖 {len(covered_surfaces)} 类攻击场景、{len(scenarios)} 个攻击剧本。",
+            "evidence": f"当前覆盖 {len(covered_surfaces)} 类攻击场景、{len(scenarios)} 个攻击脚本。",
         },
         "attack-samples": {
             "status": "满足" if all(s.get("adversarial_prompt") and s.get("jailbreak_case") for s in scenarios) else "不足",
-            "evidence": "每个剧本均包含 adversarial_prompt 与 jailbreak_case。",
+            "evidence": "每个脚本均包含 adversarial_prompt 与 jailbreak_case。",
         },
         "agent-scripts": {
             "status": "满足" if all(s.get("script_steps") and s.get("tool_calls") for s in scenarios) else "不足",
@@ -168,7 +168,7 @@ def build_requirement_alignment(cases: list[dict[str, Any]] | None = None) -> li
         },
         "business-tools": {
             "status": "满足" if {"mail.send", "file.read", "file.write", "api.call", "code.run"}.issubset(scenario_tools) else "需补强",
-            "evidence": f"当前剧本中的工具：{', '.join(sorted(scenario_tools))}。",
+            "evidence": f"当前脚本中的工具：{', '.join(sorted(scenario_tools))}。",
         },
         "open-agent": {
             "status": "基本满足",

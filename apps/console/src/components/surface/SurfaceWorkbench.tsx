@@ -6,6 +6,7 @@ import { LabelTag, MetricCard as Metric, PanelCard, UiButton } from '../ui';
 import { SurfaceAttributeGroup } from './SurfaceAttributeGroup';
 import { SurfaceDefenseBriefCard } from './SurfaceDefenseBriefCard';
 import { SurfaceEvidencePackPanel } from './SurfaceEvidencePackPanel';
+import { SurfaceAttackPlaybookPanel } from './SurfaceAttackPlaybookPanel';
 import { SurfaceScenarioList } from './SurfaceScenarioList';
 import { getSurfaceRiskColor } from './surfaceWorkbenchUtils';
 
@@ -59,7 +60,7 @@ export function SurfaceWorkbench({
                 onClick={() => firstScenarioId && onOpenScenario(firstScenarioId)}
                 disabled={!firstScenarioId}
               >
-                运行首个剧本
+                运行首个脚本
               </UiButton>
               <UiButton
                 icon={<Play size={16} />}
@@ -88,7 +89,7 @@ export function SurfaceWorkbench({
               <Metric label="脚本" value={`${surface.scripts}`} tone="amber" />
             </Col>
             <Col xs={12} sm={6}>
-              <Metric label="剧本" value={`${scenarios.length}`} tone="green" />
+              <Metric label="脚本" value={`${scenarios.length}`} tone="green" />
             </Col>
             <Col xs={12} sm={6}>
               <Metric
@@ -122,6 +123,15 @@ export function SurfaceWorkbench({
               />
             </Col>
           </Row>
+
+          <SurfaceAttackPlaybookPanel
+            surface={surface}
+            scenarios={scenarios}
+            pack={surfacePack}
+            running={running}
+            onOpenScenario={onOpenScenario}
+            onBatchCompare={onBatchCompare}
+          />
 
           <SurfaceDefenseBriefCard
             surface={surface}

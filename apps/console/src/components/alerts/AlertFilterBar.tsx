@@ -44,7 +44,7 @@ export function AlertFilterBar({
   return (
     <Flex gap={16} wrap="wrap" className="zh-mb-16">
       <UiInput
-        placeholder="剧本、策略、工具、证据"
+        placeholder="脚本、策略、工具、证据"
         value={query}
         onChange={(event) => onQueryChange(event.target.value)}
         className="zh-filter-control--query"
@@ -88,7 +88,7 @@ export function AlertFilterBar({
         value={scenarioFilter}
         onChange={onScenarioFilterChange}
         className="zh-filter-control--md"
-        options={['全部', ...scenarios].map((value) => ({ label: value === '全部' ? '全部剧本' : value, value }))}
+        options={['全部', ...scenarios].map((value) => ({ label: value === '全部' ? '全部脚本' : value, value }))}
       />
       <div className="zh-flex-spacer" />
       <UiButton onClick={onReset}>重置</UiButton>

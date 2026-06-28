@@ -14,7 +14,7 @@ export function ReportNormalEvaluationTab({ report }: ReportNormalEvaluationTabP
           title={
             <SectionTitle
               title="策略消融实验"
-              meta={`${report.policy_ablation.summary.experiment_count} 组策略 / ${report.policy_ablation.summary.scenario_count} 个剧本`}
+              meta={`${report.policy_ablation.summary.experiment_count} 组策略 / ${report.policy_ablation.summary.scenario_count} 个脚本`}
             />
           }
           variant="borderless"
@@ -71,7 +71,7 @@ export function ReportNormalEvaluationTab({ report }: ReportNormalEvaluationTabP
                     </div>
                     <div>
                       <Typography.Text type="secondary" className="zh-meta-block">
-                        剧本
+                        脚本
                       </Typography.Text>
                       <Typography.Text strong>{item.baseline.scenario_count}</Typography.Text>
                     </div>

@@ -17,7 +17,7 @@ export function ReportAttackEvaluationTab({ report, onOpenScenario }: ReportAtta
           title={
             <SectionTitle
               title="攻防有效性评测"
-              meta={`${report.attack_effectiveness.summary.attack_reproduced_count}/${report.attack_effectiveness.summary.scenario_count} 个剧本已复现攻击`}
+              meta={`${report.attack_effectiveness.summary.attack_reproduced_count}/${report.attack_effectiveness.summary.scenario_count} 个脚本已复现攻击`}
             />
           }
           variant="borderless"
@@ -62,7 +62,7 @@ export function ReportAttackEvaluationTab({ report, onOpenScenario }: ReportAtta
             className="zh-mt-24"
             columns={[
               {
-                title: '剧本',
+                title: '脚本',
                 dataIndex: 'scenario_id',
                 render: (t) => <Typography.Text strong>{t}</Typography.Text>
               },
@@ -168,7 +168,7 @@ export function ReportAttackEvaluationTab({ report, onOpenScenario }: ReportAtta
           pagination={{ pageSize: 5 }}
           columns={[
             {
-              title: '剧本',
+              title: '脚本',
               dataIndex: 'scenario_id',
               render: (t) => <Typography.Text strong>{t}</Typography.Text>
             },
@@ -241,7 +241,7 @@ export function ReportAttackEvaluationTab({ report, onOpenScenario }: ReportAtta
         />
       </PanelCard>
       <PanelCard
-        title={<SectionTitle title="攻击剧本证据矩阵" meta={`${report.scenario_matrix.length} 个剧本`} />}
+        title={<SectionTitle title="攻击脚本证据矩阵" meta={`${report.scenario_matrix.length} 个脚本`} />}
         variant="borderless"
       >
         <UiTable
@@ -251,7 +251,7 @@ export function ReportAttackEvaluationTab({ report, onOpenScenario }: ReportAtta
           pagination={{ pageSize: 10 }}
           columns={[
             {
-              title: '剧本',
+              title: '脚本',
               dataIndex: 'id',
               render: (t) => <Typography.Text strong>{t}</Typography.Text>
             },

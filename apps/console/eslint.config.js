@@ -9,6 +9,7 @@ export default tseslint.config(
     ignores: [
       'dist/**',
       'node_modules/**',
+      'public/**',
       '../api/sandbox/**',
       '../../scripts/archive/**',
       '*.config.js',

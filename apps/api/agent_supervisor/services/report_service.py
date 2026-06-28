@@ -89,17 +89,17 @@ def build_report() -> dict:
         {
             "name": "安全风险分析报告",
             "status": "已覆盖",
-            "evidence": f"{len(surfaces)} 类攻击面，{len(scenarios)} 个攻击剧本。",
+            "evidence": f"{len(surfaces)} 类攻击面，{len(scenarios)} 个攻击脚本。",
         },
         {
             "name": "模型对抗样本与越狱测试用例集",
             "status": "已覆盖",
-            "evidence": "每个剧本均包含 adversarial_prompt 与 jailbreak_case。",
+            "evidence": "每个脚本均包含 adversarial_prompt 与 jailbreak_case。",
         },
         {
             "name": "智能体攻击脚本",
             "status": "已覆盖",
-            "evidence": "每个剧本均包含 script_steps 与 tool_calls。",
+            "evidence": "每个脚本均包含 script_steps 与 tool_calls。",
         },
         {
             "name": "行为监督原型系统",
@@ -189,7 +189,7 @@ def build_report() -> dict:
         "## 2. 核心统计",
         "",
         f"- 攻击面覆盖：{summary['surface_count']} 类",
-        f"- 攻击剧本数量：{summary['scenario_count']} 个",
+        f"- 攻击脚本数量：{summary['scenario_count']} 个",
         f"- 已记录实验：{summary['run_count']} 次",
         f"- 防护开启实验：{summary['guarded_run_count']} 次",
         f"- 防护控制率：{summary['control_rate']}%",
@@ -218,9 +218,9 @@ def build_report() -> dict:
     lines.extend(
         [
             "",
-            "## 4. 攻击剧本矩阵",
+            "## 4. 攻击脚本矩阵",
             "",
-            "| 剧本 | 攻击面 | 目标 | 风险 | 对抗样本 | 越狱用例 | 脚本步骤 | 工具调用 |",
+            "| 脚本 | 攻击面 | 目标 | 风险 | 对抗样本 | 越狱用例 | 脚本步骤 | 工具调用 |",
             "|---|---|---|---|---|---|---:|---:|",
         ]
     )
@@ -320,7 +320,7 @@ def build_report() -> dict:
             "",
             "## 9. 攻击面实验结论",
             "",
-            "| 攻击面 | 剧本 | 运行证据 | 控制率 | 关键策略 |",
+            "| 攻击面 | 脚本 | 运行证据 | 控制率 | 关键策略 |",
             "|---|---:|---:|---:|---|",
         ]
     )
@@ -341,7 +341,7 @@ def build_report() -> dict:
             "",
             "## 10. 模型输出过滤前后对比",
             "",
-            "| 剧本 | 类型 | 关闭防护 | 开启防护 | 策略 |",
+            "| 脚本 | 类型 | 关闭防护 | 开启防护 | 策略 |",
             "|---|---|---|---|---|",
         ]
     )
@@ -361,7 +361,7 @@ def build_report() -> dict:
             "",
             "## 11. 攻防有效性评测矩阵",
             "",
-            "| 剧本 | 无防护复现 | 有防护控制 | 策略匹配 | 证据完整 | 缺口 |",
+            "| 脚本 | 无防护复现 | 有防护控制 | 策略匹配 | 证据完整 | 缺口 |",
             "|---|---|---|---|---|---|",
         ]
     )
@@ -418,7 +418,7 @@ def build_report() -> dict:
             "",
             "## 14. 近期实验记录",
         "",
-        "| 时间 | 剧本 | 防护 | 攻击成功 | 阻断 | 询问 | 隔离 | 延迟 |",
+        "| 时间 | 脚本 | 防护 | 攻击成功 | 阻断 | 询问 | 隔离 | 延迟 |",
         "|---|---|---|---|---|---|---|---|",
         ]
     )

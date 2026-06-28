@@ -164,19 +164,19 @@ def _maturity_dimensions(
         _dimension(
             "攻击面与样本覆盖",
             100 if summary["surface_count"] >= 7 and summary["scenario_count"] >= 17 else 75,
-            f"{summary['surface_count']} 类攻击面、{summary['scenario_count']} 个剧本、{summary['sample_count']} 个样本。",
+            f"{summary['surface_count']} 类攻击面、{summary['scenario_count']} 个脚本、{summary['sample_count']} 个样本。",
             ["保持 7 类攻击面闭环，新增样本时优先补真实比赛任务上下文。"],
         ),
         _dimension(
             "行为监督闭环",
             min(100, effectiveness_summary["defense_effective_rate"]),
             f"有防护控制率 {effectiveness_summary['defense_effective_rate']}%，证据完整率 {effectiveness_summary['evidence_complete_rate']}%。",
-            ["补充一键补跑缺口剧本，避免历史数据不足时页面只展示静态结论。"],
+            ["补充一键补跑缺口脚本，避免历史数据不足时页面只展示静态结论。"],
         ),
         _dimension(
             "模拟比赛工具真实性",
             95 if {"mail.send", "file.read", "file.write", "api.call", "code.run"}.issubset(tool_surfaces) and workflow_fp_rate == 0 else 78,
-            f"当前攻击剧本工具覆盖：{', '.join(sorted(tool_surfaces))}；连续正常比赛任务流程 {benign_workflows['summary']['workflow_count']} 条、{benign_workflows['summary']['step_count']} 个步骤，误报率 {workflow_fp_rate}%，期望匹配率 {workflow_match_rate}%。",
+            f"当前攻击脚本工具覆盖：{', '.join(sorted(tool_surfaces))}；连续正常比赛任务流程 {benign_workflows['summary']['workflow_count']} 条、{benign_workflows['summary']['step_count']} 个步骤，误报率 {workflow_fp_rate}%，期望匹配率 {workflow_match_rate}%。",
             ["继续补跨模型、跨赛道和跨角色的长流程样本，验证边界控制稳定性。"],
         ),
         _dimension(
@@ -279,7 +279,7 @@ def _feature_backlog(
             "priority": "P1",
             "title": "多模型批量对比评测",
             "why": "大模型安全题需要证明机制不绑定单一模型。",
-            "scope": "对 DeepSeek、智谱、本地模拟或其他可用模型运行同一批剧本。",
+            "scope": "对 DeepSeek、智谱、本地模拟或其他可用模型运行同一批脚本。",
             "acceptance": "输出模型维度的攻击成功率、控制率、输出过滤率对比表。",
             "status": "未完成",
         },
@@ -288,7 +288,7 @@ def _feature_backlog(
             "priority": "P1",
             "title": "缺口一键补跑",
             "why": "证据包有缺口提示，但还缺自动补证据动作。",
-            "scope": "从缺口列表定位剧本，自动运行 compare 或外部事件演示。",
+            "scope": "从缺口列表定位脚本，自动运行 compare 或外部事件演示。",
             "acceptance": "点击按钮后刷新证据包，缺口数和运行记录同步变化。",
             "status": "未完成",
         },
@@ -353,7 +353,7 @@ def _risk_register(backlog: list[dict[str, Any]], effectiveness: dict[str, Any])
         risks.append(
             {
                 "risk": "运行证据不完整",
-                "impact": "部分攻击剧本无法形成无防护/有防护对照。",
+                "impact": "部分攻击脚本无法形成无防护/有防护对照。",
                 "mitigation": "增加缺口一键补跑，提交前固定跑 clean-package。",
             }
         )

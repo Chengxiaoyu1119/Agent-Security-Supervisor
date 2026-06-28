@@ -24,7 +24,7 @@ export type Surface = {
 
 export const metrics = [
   { value: '7', label: '攻击面', note: '覆盖输入、工具、记忆和环境风险' },
-  { value: '22', label: '攻击剧本', note: '样本、参数、触发条件和复核证据' },
+  { value: '22', label: '攻击脚本', note: '样本、参数、触发条件和复核证据' },
   { value: '13', label: '策略规则', note: '工具、数据、上下文和行为联合判定' },
   { value: '4', label: '执行动作', note: '允许、询问、隔离、拒绝' }
 ];

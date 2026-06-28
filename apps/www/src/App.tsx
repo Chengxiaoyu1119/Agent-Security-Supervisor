@@ -129,7 +129,7 @@ export function App() {
                 在文件、邮件、接口、代码执行和外部智能体接入前完成拦截、询问或复核。
               </p>
 
-              <p className="hero__proof">覆盖 7 类攻击面、22 个攻击剧本和 13 条监督策略。</p>
+              <p className="hero__proof">覆盖 7 类攻击面、22 个攻击脚本和 13 条监督策略。</p>
               <div className="hero__sequence" aria-label="监督链路">
                 <span>工具请求</span>
                 <span>风险判定</span>
@@ -208,7 +208,7 @@ export function App() {
 
         <section className="section-frame surface-section" id="surfaces">
           <SectionHeading
-            title="重点风险、剧本和证据集中查看。"
+            title="重点风险、脚本和证据集中查看。"
             body="选择攻击面即可查看风险等级、样本证据和对应策略。"
           />
 
@@ -246,7 +246,7 @@ export function App() {
               <div className="surface-stats">
                 <span>
                   <strong>{surface.scripts}</strong>
-                  攻击剧本
+                  攻击脚本
                 </span>
                 <span>
                   <strong>{surface.samples}</strong>
@@ -276,7 +276,7 @@ export function App() {
 
         <section className="final-cta" id="start">
           <div>
-            <h2>进入控制台，运行攻击剧本和监督策略。</h2>
+            <h2>进入控制台，运行攻击脚本和监督策略。</h2>
             <p>官网负责说明重点，完整操作、接口和证据都在控制台与文档中。</p>
           </div>
           <div className="final-cta__actions">
