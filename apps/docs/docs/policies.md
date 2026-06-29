@@ -50,4 +50,4 @@ PATCH /api/policy_settings
 GET   /api/policies/versions
 ```
 
-正式模式下，策略修改需要具备 `admin` 角色。开发模式下 `npm run api` 会关闭 token 校验，仅用于本地演示。
+开启 API 鉴权时，策略修改需要具备 `admin` 角色。关闭 API 鉴权时，后端会按管理员权限处理控制台请求，适合公开演示或自用部署；这不会影响大模型接口调用。

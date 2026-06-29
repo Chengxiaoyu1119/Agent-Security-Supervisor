@@ -249,8 +249,8 @@ MODEL_REAL_API_ENABLED=true
 MODEL_PROVIDER_PRIORITY=deepseek,zhipu
 MODEL_TIMEOUT_SECONDS=12
 
-AGENT_SUPERVISOR_AUTH_DISABLED=false
-AGENT_SUPERVISOR_API_TOKEN=你的 API Token
+AGENT_SUPERVISOR_AUTH_DISABLED=true
+AGENT_SUPERVISOR_API_TOKEN=
 
 DEEPSEEK_API_KEY=你的 DeepSeek Key
 DEEPSEEK_BASE_URL=https://api.deepseek.com
@@ -266,8 +266,8 @@ ZHIPU_MODEL=glm-4.6v-flashx
 | `MODEL_REAL_API_ENABLED` | 是否允许调用真实模型 | 使用默认值 `false`，默认走本地模拟 |
 | `MODEL_PROVIDER_PRIORITY` | 真实模型优先级 | `deepseek,zhipu` |
 | `MODEL_TIMEOUT_SECONDS` | 请求超时时间 | 12 秒 |
-| `AGENT_SUPERVISOR_AUTH_DISABLED` | 是否关闭 API 鉴权 | 默认 `false`；`npm run api` 会为本地演示显式打开 |
-| `AGENT_SUPERVISOR_API_TOKEN` | API 访问令牌 | 正式部署必须配置 |
+| `AGENT_SUPERVISOR_AUTH_DISABLED` | 是否关闭 API 鉴权 | 公网演示可设为 `true`；这只影响后端接口访问校验，不影响大模型调用 |
+| `AGENT_SUPERVISOR_API_TOKEN` | API 访问令牌 | 关闭鉴权时可留空；开启鉴权时必须配置 |
 | `DEEPSEEK_API_KEY` | DeepSeek 密钥 | 不调用 DeepSeek |
 | `ZHIPU_API_KEY` | 智谱密钥 | 不调用智谱 |
 

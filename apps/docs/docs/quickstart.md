@@ -47,7 +47,7 @@ http://127.0.0.1:8012
 http://127.0.0.1:8012/api/health
 ```
 
-`npm run api` 是本地开发入口，会设置 `AGENT_SUPERVISOR_AUTH_DISABLED=true`，方便第一次运行。直接部署 `apps/api/agent_supervisor/main.py` 时应设置 API Token，见 [API 地图](./api#api-token)。
+`npm run api` 是本地开发入口，会设置 `AGENT_SUPERVISOR_AUTH_DISABLED=true`，方便第一次运行。直接部署时也可以继续关闭 API 鉴权；这只影响后端接口访问校验，不影响 DeepSeek、智谱等大模型调用。
 
 ## 启动控制台
 

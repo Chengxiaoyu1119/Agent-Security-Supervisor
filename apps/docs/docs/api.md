@@ -73,13 +73,21 @@ title: API 地图
 | OpenClaw 插件包 | GET | `/api/integrations/openclaw/plugin_package` |
 | OpenClaw 插件验证 | GET | `/api/integrations/openclaw/plugin_package/validation` |
 
-## API Token
+## API 鉴权
 
-正式部署默认需要 API Token。`npm run api` 是本地开发入口，会显式关闭鉴权；直接运行或部署后端时不要依赖这个开发开关。
+API 鉴权用于保护后端接口，防止别人直接调用运行脚本、修改策略或生成报告。它和大模型接口是两件事：关闭 API 鉴权不会关闭 DeepSeek、智谱等真实模型调用。
 
-设置后端 token：
+关闭 API 鉴权：
 
 ```powershell
+$env:AGENT_SUPERVISOR_AUTH_DISABLED="true"
+```
+
+开启 API 鉴权时，设置后端 token：
+
+
+```powershell
+$env:AGENT_SUPERVISOR_AUTH_DISABLED="false"
 $env:AGENT_SUPERVISOR_API_TOKEN="your-token"
 ```
 
@@ -109,7 +117,7 @@ localStorage.setItem("agent-supervisor-api-token", "your-token")
 
 ## 角色
 
-API 会根据 token 解析安全角色。当前文档关注本地运行；正式部署前应补充独立登录、token 轮换和权限分级。
+开启 API 鉴权时，API 会根据 token 和角色请求头解析安全角色。关闭 API 鉴权时，后端会按 `admin` 角色处理请求。
 
 | 角色 | 典型权限 |
 | --- | --- |

@@ -25,8 +25,8 @@ const PROJECTS = [
     id: "docs",
     name: "Docusaurus 文档站",
     path: "apps/docs",
-    accepted: { low: 0, moderate: 26, high: 0, critical: 0 },
-    note: "当前中危主要来自 Docusaurus 上游构建链路；已用 override 处理 serialize-javascript 高危，剩余不做强制大版本替换。",
+    accepted: { low: 0, moderate: 0, high: 0, critical: 0 },
+    note: "文档站依赖应保持 0 个已知漏洞；生产构建是静态文件。",
   },
 ];
 
@@ -166,7 +166,7 @@ const projects = PROJECTS.map(runAudit);
 const failed = projects.filter((item) => item.status === "failed");
 const report = {
   generated_at: new Date().toISOString(),
-  status: failed.length ? "failed" : "passed-with-accepted-residuals",
+  status: failed.length ? "failed" : projects.every((item) => item.status === "passed") ? "passed" : "passed-with-accepted-residuals",
   failed_project_ids: failed.map((item) => item.id),
   projects,
 };

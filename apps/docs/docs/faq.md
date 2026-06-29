@@ -41,7 +41,7 @@ http://127.0.0.1:8012/api/health
 
 ## 什么时候需要 API Token
 
-本地 `npm run api` 会关闭 token 校验，方便开发演示。直接部署或面向他人开放时，应设置 `AGENT_SUPERVISOR_API_TOKEN`，并让控制台或外部 Agent 通过请求头携带 token。
+只有开启 API 鉴权时才需要 API Token。如果设置 `AGENT_SUPERVISOR_AUTH_DISABLED=true`，控制台和外部 Agent 调用后端接口时不需要携带 token。这个开关不影响真实大模型接口，DeepSeek、智谱是否可用由对应模型密钥和 `MODEL_REAL_API_ENABLED` 决定。
 
 ## OpenClaw 是强依赖吗
 
