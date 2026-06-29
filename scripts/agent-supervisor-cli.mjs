@@ -4,8 +4,6 @@ const commandNames = new Set([
   'run',
   'batch',
   'export',
-  'package',
-  'clean-package',
   'samples',
   'benign',
   'benign-workflows',

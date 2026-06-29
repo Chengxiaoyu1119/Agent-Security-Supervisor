@@ -32,7 +32,7 @@ export function CompetitionReadinessPanel({
       type="inner"
     >
       <Typography.Paragraph type="secondary">
-        自动检查攻击面、误报、连续流程、OpenClaw 插件、截图和提交包，直接给出可提交状态与 P0 补证项。
+        自动检查攻击面、误报、连续流程、OpenClaw 插件和报告证据，直接给出演示就绪状态与 P0 补证项。
       </Typography.Paragraph>
       {competitionReadiness ? (
         <>
@@ -64,18 +64,6 @@ export function CompetitionReadinessPanel({
                     阻塞
                   </Typography.Text>
                   <Typography.Text strong>{competitionReadiness.summary.blocker_count}</Typography.Text>
-                </div>
-                <div>
-                  <Typography.Text type="secondary" className="zh-meta-block">
-                    截图
-                  </Typography.Text>
-                  <Typography.Text strong>{competitionReadiness.summary.screenshot_count}</Typography.Text>
-                </div>
-                <div>
-                  <Typography.Text type="secondary" className="zh-meta-block">
-                    提交包文件
-                  </Typography.Text>
-                  <Typography.Text strong>{competitionReadiness.summary.latest_package_file_count}</Typography.Text>
                 </div>
               </Space>
             </Col>
@@ -143,11 +131,6 @@ export function CompetitionReadinessPanel({
                 {command}
               </LabelTag>
             ))}
-            {competitionReadiness.summary.latest_package_zip && (
-              <Typography.Text code className="zh-settings-code-wrap">
-                {competitionReadiness.summary.latest_package_zip}
-              </Typography.Text>
-            )}
             {competitionReadinessOutput && (
               <Typography.Text code className="zh-settings-code-wrap">
                 {competitionReadinessOutput.markdown_path}

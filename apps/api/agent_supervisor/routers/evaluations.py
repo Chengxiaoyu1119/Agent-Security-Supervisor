@@ -26,7 +26,6 @@ from ..runtime_evaluation import (
     build_real_model_evaluation_markdown,
     write_real_model_evaluation_report,
 )
-from ..services.package_service import write_clean_submission_package, write_submission_package
 from ..services.report_service import build_report
 from ..surface_pack import (
     build_surface_briefing_sheet_html,
@@ -312,12 +311,12 @@ def requirement_alignment() -> list[dict]:
 
 @router.post("/api/submission_package")
 def submission_package() -> dict:
-    return write_submission_package(latest_runs(50))
+    raise HTTPException(status_code=410, detail="提交包生成功能已停用，请使用报告材料中心复制或下载单个材料。")
 
 
 @router.post("/api/submission_package/clean")
 def clean_submission_package() -> dict:
-    return write_clean_submission_package()
+    raise HTTPException(status_code=410, detail="提交包生成功能已停用，请使用报告材料中心复制或下载单个材料。")
 
 
 @router.get("/api/report")

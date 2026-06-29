@@ -249,7 +249,7 @@ npm run package:server
 生成位置：
 
 ```text
-apps/api/sandbox/release/server-source/
+部署包/
 ```
 
 ## 模型配置
@@ -287,7 +287,7 @@ ZHIPU_MODEL=glm-4.6v-flashx
 
 ## 命令中心
 
-CLI 是命令行工具。它适合批量评测、导出报告、生成提交包。不会影响前端页面，只是在本地运行项目提供的 Python 模块。
+CLI 是命令行工具。它适合批量评测和导出报告材料。不会影响前端页面，只是在本地运行项目提供的 Python 模块。
 
 | 目标 | 命令 |
 |---|---|
@@ -300,7 +300,6 @@ CLI 是命令行工具。它适合批量评测、导出报告、生成提交包�
 | 运行策略消融实验 | `node scripts/agent-supervisor-cli.mjs policy-ablation` |
 | 导出单个攻击面证据包 | `node scripts/agent-supervisor-cli.mjs surface-pack --surface prompt-injection --output apps/api/sandbox/reports` |
 | 一键导出全部攻击面证据包 | `node scripts/agent-supervisor-cli.mjs surface-packs --output apps/api/sandbox/reports` |
-| 生成干净提交包 | `node scripts/agent-supervisor-cli.mjs clean-package` |
 | 赛前一键体检 | `node scripts/agent-supervisor-cli.mjs readiness --write` |
 | OpenClaw 插件包生成 | `node scripts/agent-supervisor-cli.mjs openclaw-plugin` |
 | OpenClaw 插件包验证 | `node scripts/agent-supervisor-cli.mjs openclaw-plugin-validate` |

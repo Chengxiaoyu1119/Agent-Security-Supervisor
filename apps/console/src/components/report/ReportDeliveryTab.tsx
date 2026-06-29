@@ -1,19 +1,13 @@
-import { Col, Descriptions, Row, Space, Typography } from 'antd';
-import { Copy, FileWarning } from 'lucide-react';
-import { EvidenceCodeBlock, MetricCard as Metric, PanelCard, SectionTitle, UiAlert, UiBadge, UiButton } from '../ui';
-import type { ReportData, SubmissionPackageResult } from '@/types';
+import { Col, Row, Space, Typography } from 'antd';
+import { Copy } from 'lucide-react';
+import { EvidenceCodeBlock, MetricCard as Metric, PanelCard, SectionTitle, UiBadge, UiButton } from '../ui';
+import type { ReportData } from '@/types';
 
 type ReportDeliveryTabProps = {
   competitionPackage: ReportData['competition_package'];
   packageFiles: NonNullable<ReportData['competition_package']>['files'];
   markdown: string;
-  submissionPackage: SubmissionPackageResult | null;
-  creatingPackage: boolean;
-  creatingCleanPackage: boolean;
-  packageError: string;
   copiedFile: string;
-  handleCreateSubmissionPackage: () => void | Promise<void>;
-  handleCreateCleanSubmissionPackage: () => void | Promise<void>;
   copyPackageFile: (filename: string, content: string) => void | Promise<void>;
   downloadPackageFile: (filename: string, content: string, contentType: string) => void;
 };
@@ -22,13 +16,7 @@ export function ReportDeliveryTab({
   competitionPackage,
   packageFiles,
   markdown,
-  submissionPackage,
-  creatingPackage,
-  creatingCleanPackage,
-  packageError,
   copiedFile,
-  handleCreateSubmissionPackage,
-  handleCreateCleanSubmissionPackage,
   copyPackageFile,
   downloadPackageFile
 }: ReportDeliveryTabProps) {
@@ -44,61 +32,6 @@ export function ReportDeliveryTab({
           }
           variant="borderless"
         >
-          <UiAlert
-            type="info"
-            showIcon
-            title="一键生成初赛提交包"
-            description="普通包使用当前历史记录；干净包会重新跑固定攻防对照，更适合最终提交。"
-            action={
-              <Space orientation="vertical">
-                <UiButton
-                  type="primary"
-                  onClick={handleCreateCleanSubmissionPackage}
-                  disabled={creatingCleanPackage || creatingPackage}
-                  loading={creatingCleanPackage}
-                  icon={<FileWarning size={14} />}
-                >
-                  生成干净提交包
-                </UiButton>
-                <UiButton
-                  onClick={handleCreateSubmissionPackage}
-                  disabled={creatingPackage || creatingCleanPackage}
-                  loading={creatingPackage}
-                  icon={<FileWarning size={14} />}
-                >
-                  生成普通提交包
-                </UiButton>
-              </Space>
-            }
-            className="zh-mb-24"
-          />
-
-          {packageError && <UiAlert type="error" title={packageError} className="zh-mb-24" />}
-
-          {submissionPackage && (
-            <PanelCard type="inner" className="zh-success-panel zh-mb-24" variant="borderless">
-              <Descriptions size="small" column={{ xs: 1, sm: 2, md: 4 }}>
-                <Descriptions.Item label="提交包目录">
-                  <Typography.Text code>{submissionPackage.package_dir}</Typography.Text>
-                </Descriptions.Item>
-                <Descriptions.Item label="Zip 文件">
-                  <Typography.Text code>{submissionPackage.zip_path}</Typography.Text>
-                </Descriptions.Item>
-                <Descriptions.Item label="文件数量">
-                  <Typography.Text strong>{submissionPackage.file_count}</Typography.Text>
-                </Descriptions.Item>
-                {submissionPackage.clean_summary && (
-                  <Descriptions.Item label="干净运行">
-                    <Typography.Text strong>
-                      {submissionPackage.clean_summary.clean_run_count} (控制率{' '}
-                      {submissionPackage.clean_summary.clean_control_rate}%)
-                    </Typography.Text>
-                  </Descriptions.Item>
-                )}
-              </Descriptions>
-            </PanelCard>
-          )}
-
           <Row gutter={[16, 16]} className="zh-mb-24">
             <Col span={6}>
               <Metric

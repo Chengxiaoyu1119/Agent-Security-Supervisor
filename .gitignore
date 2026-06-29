@@ -64,6 +64,7 @@ apps/api/agent_supervisor/sandbox/
 
 # 仅本地使用的计划和生成笔记
 /docs/
+部署包/
 SOUL.md
 scripts/archive/
 

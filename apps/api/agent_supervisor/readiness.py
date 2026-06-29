@@ -15,7 +15,7 @@ from .database import latest_runs
 from .datasets import build_attack_case_dataset
 from .demo_drill import load_judge_demo_drill_report
 from .openclaw_plugin_package import validate_openclaw_plugin_package
-from .paths import SANDBOX_REPORTS_DIR, SUBMISSION_PACKAGES_DIR
+from .paths import SANDBOX_REPORTS_DIR
 from .readiness_checks import (
     _approval_review_check,
     _attack_dataset_check,
@@ -24,19 +24,15 @@ from .readiness_checks import (
     _benign_workflow_check,
     _calibration_check,
     _demo_drill_check,
-    _latest_submission_package,
     _next_actions,
     _openclaw_runtime_check,
     _openclaw_static_check,
-    _screenshot_evidence_check,
     _student_competition_domain_check,
-    _submission_package_check,
     _supervisor_check,
 )
 from .roadmap import build_project_roadmap
 
 REPORT_ROOT = SANDBOX_REPORTS_DIR
-SUBMISSION_ROOT = SUBMISSION_PACKAGES_DIR
 
 
 def build_competition_readiness(
@@ -57,8 +53,6 @@ def build_competition_readiness(
     approvals = list_approval_reviews(limit=200)
     demo_drill = load_judge_demo_drill_report()
     openclaw_validation = _openclaw_validation_for_readiness()
-    latest_package = package_snapshot or _latest_submission_package()
-
     checks = [
         _attack_surface_check(surfaces, scenarios),
         _student_competition_domain_check(student_profiles, scenarios, attack_chains),
@@ -71,8 +65,6 @@ def build_competition_readiness(
         _demo_drill_check(demo_drill),
         _openclaw_static_check(openclaw_validation),
         _openclaw_runtime_check(openclaw_validation),
-        _submission_package_check(latest_package),
-        _screenshot_evidence_check(latest_package),
     ]
     total_weight = sum(item["weight"] for item in checks)
     readiness_score = round(sum(item["earned_score"] for item in checks) / total_weight * 100) if total_weight else 0
@@ -91,7 +83,7 @@ def build_competition_readiness(
     else:
         overall_status = "ready"
         status_label = "可提交"
-        verdict = "核心功能、证据、提交包和截图链路均已通过本地体检。"
+        verdict = "核心功能、证据和演示链路均已通过本地体检。"
 
     next_actions = _next_actions(checks)
     return {
@@ -127,10 +119,6 @@ def build_competition_readiness(
             "demo_drill_review_hash_count": demo_drill["summary"]["review_hash_count"],
             "roadmap_score": roadmap["summary"]["overall_score"],
             "roadmap_p0_backlog_count": roadmap["summary"]["p0_backlog_count"],
-            "latest_package_zip": latest_package.get("zip_path", ""),
-            "latest_package_dir": latest_package.get("package_dir", ""),
-            "latest_package_file_count": latest_package.get("file_count", 0),
-            "screenshot_count": latest_package.get("screenshot_count", 0),
         },
         "checks": checks,
         "blockers": [
@@ -146,11 +134,10 @@ def build_competition_readiness(
         "next_actions": next_actions,
         "acceptance_commands": [
             "node scripts/agent-supervisor-cli.mjs readiness --write --output apps/api/sandbox/reports",
-            "node scripts/agent-supervisor-cli.mjs clean-package --output apps/api/sandbox/submission_packages",
             "node scripts/agent-supervisor-cli.mjs openclaw-plugin-validate --output apps/api/sandbox/reports --inspect-runtime",
             "npm run build",
         ],
-        "latest_package": latest_package,
+        "latest_package": {},
     }
 
 
@@ -182,7 +169,6 @@ def build_competition_readiness_markdown(data: dict[str, Any] | None = None) -> 
         f"- 连续流程误报率：{summary['benign_workflow_false_positive_rate']}%",
         f"- 人工复核闭环：{summary['approval_review_count']} 条复核单，待处理 {summary['pending_approval_count']}，已处理 {summary['resolved_approval_count']}",
         f"- 答辩一键演示：{summary['demo_drill_stage_count']} 步，复核 hash {summary['demo_drill_review_hash_count']} 个",
-        f"- 最新提交包：`{summary['latest_package_zip'] or '未找到'}`",
         "",
         "## 检查项",
         "",

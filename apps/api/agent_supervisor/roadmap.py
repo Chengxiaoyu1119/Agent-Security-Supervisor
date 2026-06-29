@@ -354,7 +354,7 @@ def _risk_register(backlog: list[dict[str, Any]], effectiveness: dict[str, Any])
             {
                 "risk": "运行证据不完整",
                 "impact": "部分攻击脚本无法形成无防护/有防护对照。",
-                "mitigation": "增加缺口一键补跑，提交前固定跑 clean-package。",
+                "mitigation": "增加缺口一键补跑，部署或演示前固定跑体检和构建检查。",
             }
         )
     return risks

@@ -39,74 +39,6 @@ function pngInfo(relativePath) {
   };
 }
 
-function latestPackage() {
-  const dir = path.join(root, 'apps', 'api', 'sandbox', 'submission_packages');
-  if (!fs.existsSync(dir)) {
-    return null;
-  }
-  const zips = fs
-    .readdirSync(dir)
-    .filter((name) => name.endsWith('.zip'))
-    .map((name) => {
-      const fullPath = path.join(dir, name);
-      return { name, fullPath, mtimeMs: fs.statSync(fullPath).mtimeMs, bytes: fs.statSync(fullPath).size };
-    })
-    .sort((a, b) => b.mtimeMs - a.mtimeMs);
-  return zips[0] ?? null;
-}
-
-function latestPackageDirectory(zip) {
-  if (!zip) {
-    return null;
-  }
-  return zip.fullPath.replace(/\.zip$/i, '');
-}
-
-function packageHasFile(packageDir, filename) {
-  if (!packageDir || !fs.existsSync(packageDir)) {
-    return false;
-  }
-  const stack = [packageDir];
-  while (stack.length) {
-    const current = stack.pop();
-    for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
-      const fullPath = path.join(current, entry.name);
-      if (entry.isDirectory()) {
-        stack.push(fullPath);
-      } else if (entry.name === filename) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
-function packageContainsText(packageDir, keyword) {
-  if (!packageDir || !fs.existsSync(packageDir)) {
-    return false;
-  }
-  const allowed = new Set(['.md', '.json', '.txt', '.html']);
-  const stack = [packageDir];
-  while (stack.length) {
-    const current = stack.pop();
-    for (const entry of fs.readdirSync(current, { withFileTypes: true })) {
-      const fullPath = path.join(current, entry.name);
-      if (entry.isDirectory()) {
-        stack.push(fullPath);
-      } else if (allowed.has(path.extname(entry.name).toLowerCase())) {
-        try {
-          if (fs.readFileSync(fullPath, 'utf8').includes(keyword)) {
-            return true;
-          }
-        } catch {
-          // Ignore unreadable generated artifacts.
-        }
-      }
-    }
-  }
-  return false;
-}
-
 function loadJson(relativePath) {
   const text = readText(relativePath);
   if (!text) {
@@ -221,13 +153,6 @@ const hardcodedColorCount = countMatches(stylesText + '\n' + visualText, /#[0-9a
 const tokenUsageCount = countMatches(stylesText + '\n' + visualText + '\n' + tokenText, /var\(--/g);
 const primaryDocText = [readmeText, deliveryGuideText, selfReviewRecordText].join('\n');
 const oldMetricResidualCount = countMatches(primaryDocText, /17 个脚本|51 条|51 个|17 条/g);
-const latestZip = latestPackage();
-const latestPackageDir = latestPackageDirectory(latestZip);
-const packageStudentMapDesktop = packageHasFile(latestPackageDir, 'student-competition-attack-map-desktop.png');
-const packageStudentMapMobile = packageHasFile(latestPackageDir, 'student-competition-attack-map-mobile.png');
-const packageStudentChain = packageContainsText(latestPackageDir, 'student-competition-portal-chain');
-const packageStudentScenario = packageContainsText(latestPackageDir, 'SUBMISSION-EXFIL-001');
-
 const checks = [
   {
     id: 'design-token-source',
@@ -275,15 +200,6 @@ const checks = [
     title: '组合攻击链覆盖',
     status: attackChainCount >= 4 && hasStudentPortalChain ? 'passed' : 'warning',
     evidence: `组合攻击链 ${attackChainCount} 条，学生比赛平台对象链：${hasStudentPortalChain ? '已生成' : '缺失'}。`
-  },
-  {
-    id: 'submission-student-evidence',
-    title: '学生比赛画像交付归档',
-    status:
-      packageStudentMapDesktop && packageStudentMapMobile && packageStudentChain && packageStudentScenario
-        ? 'passed'
-        : 'warning',
-    evidence: `最新提交包学生画像截图 ${packageStudentMapDesktop && packageStudentMapMobile ? '已归档' : '缺失'}，学生组合链 ${packageStudentChain ? '已归档' : '缺失'}，专项脚本 ${packageStudentScenario ? '已归档' : '缺失'}。`
   },
   {
     id: 'delivery-metric-consistency',
@@ -346,8 +262,7 @@ const report = {
     score: readinessPayload?.readiness_score ?? readinessPayload?.readiness?.readiness_score ?? null,
     passed_count: readinessPayload?.summary?.passed_count ?? null,
     check_count: readinessPayload?.summary?.check_count ?? null,
-    blocker_count: readinessPayload?.summary?.blocker_count ?? null,
-    latest_package_zip: readinessPayload?.summary?.latest_package_zip ?? latestZip?.fullPath ?? null
+    blocker_count: readinessPayload?.summary?.blocker_count ?? null
   },
   competition_domain: {
     student_profile_count: studentProfileCount,
@@ -358,14 +273,6 @@ const report = {
     has_student_portal_chain: hasStudentPortalChain,
     misleading_domain_residual_count: misleadingDomainResidualCount,
     old_metric_residual_count: oldMetricResidualCount
-  },
-  latest_package: {
-    ...(latestZip ?? {}),
-    package_dir: latestPackageDir,
-    student_map_desktop: packageStudentMapDesktop,
-    student_map_mobile: packageStudentMapMobile,
-    student_chain: packageStudentChain,
-    student_scenario: packageStudentScenario
   },
   screenshots,
   checks,
@@ -420,10 +327,6 @@ const lines = [
   '## 仍未完成',
   '',
   ...(unresolved.length ? unresolved.map((item) => `- ${item}`) : ['- 暂无阻塞项。']),
-  '',
-  '## 最新提交包',
-  '',
-  `- ${report.readiness.latest_package_zip ?? '未检测到最新提交包'}`,
   '',
   '## 截图证据',
   '',

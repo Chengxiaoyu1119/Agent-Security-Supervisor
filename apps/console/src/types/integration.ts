@@ -160,10 +160,6 @@ export interface CompetitionReadiness {
     demo_drill_review_hash_count: number;
     roadmap_score: number;
     roadmap_p0_backlog_count: number;
-    latest_package_zip: string;
-    latest_package_dir: string;
-    latest_package_file_count: number;
-    screenshot_count: number;
   };
   checks: CompetitionReadinessCheck[];
   blockers: Array<{
@@ -180,7 +176,7 @@ export interface CompetitionReadiness {
     action: string;
   }>;
   acceptance_commands: string[];
-  latest_package: Record<string, unknown>;
+  latest_package?: Record<string, unknown>;
 }
 
 export interface CompetitionReadinessWriteResult {

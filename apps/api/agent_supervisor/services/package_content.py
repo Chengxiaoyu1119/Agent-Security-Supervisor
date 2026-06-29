@@ -40,7 +40,7 @@ def _clean_submission_evidence(summary: dict[str, Any], runs: list[dict[str, Any
         "",
         "- 对每个攻击脚本固定运行一次无防护复现。",
         "- 对每个攻击脚本固定运行一次有防护验证。",
-        "- 生成提交包时只使用本轮固定运行得到的证据数据。",
+        "- 生成报告材料时只使用本轮固定运行得到的证据数据。",
         "- 本流程不会把这些临时运行写入历史演示数据库。",
         "",
         "## 本轮统计",
@@ -138,7 +138,7 @@ def _real_model_evaluation_material() -> str:
         [
             "# 真实模型工具调用盲测报告",
             "",
-            "当前提交包生成时未检测到已写入的盲测报告。",
+            "当前报告材料中心未检测到已写入的盲测报告。",
             "请先执行 `node scripts/agent-supervisor-cli.mjs real-model-eval --output apps/api/sandbox/reports` 生成证据。",
         ]
     )

@@ -35,7 +35,6 @@ from .openclaw_plugin_package import write_openclaw_plugin_package, write_opencl
 from .readiness import build_competition_readiness, build_competition_readiness_markdown, write_competition_readiness_report
 from .roadmap import write_project_roadmap
 from .runtime_evaluation import write_real_model_evaluation_report
-from .services.package_service import write_clean_submission_package, write_submission_package
 from .surface_pack import (
     write_all_surface_briefing_sheets,
     write_all_surface_evidence_packs,
@@ -82,16 +81,6 @@ def cmd_export(args: argparse.Namespace) -> None:
         )
     output.write_text("\n".join(lines), encoding="utf-8")
     print(f"已导出：{output}")
-
-
-def cmd_package(args: argparse.Namespace) -> None:
-    result = write_submission_package(latest_runs(50), output_root=args.output)
-    print(json.dumps(result, ensure_ascii=False, indent=2))
-
-
-def cmd_clean_package(args: argparse.Namespace) -> None:
-    result = write_clean_submission_package(output_root=args.output)
-    print(json.dumps(result, ensure_ascii=False, indent=2))
 
 
 def cmd_samples(args: argparse.Namespace) -> None:
@@ -505,14 +494,6 @@ def build_parser() -> argparse.ArgumentParser:
     export = sub.add_parser("export", help="导出实验报告素材")
     export.add_argument("--output", default="apps/api/sandbox/reports/实验结果.md")
     export.set_defaults(func=cmd_export)
-
-    package = sub.add_parser("package", help="生成初赛提交包目录和 zip 文件")
-    package.add_argument("--output", default="apps/api/sandbox/submission_packages")
-    package.set_defaults(func=cmd_package)
-
-    clean_package = sub.add_parser("clean-package", help="生成不依赖历史记录的干净提交包")
-    clean_package.add_argument("--output", default="apps/api/sandbox/submission_packages")
-    clean_package.set_defaults(func=cmd_clean_package)
 
     samples = sub.add_parser("samples", help="导出攻击样本、越狱用例和智能体脚本数据集")
     samples.add_argument("--output", default="apps/api/sandbox/reports/攻击样本与脚本数据集.json")

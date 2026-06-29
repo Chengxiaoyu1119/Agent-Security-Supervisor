@@ -23,7 +23,6 @@ import type {
   RunResult,
   Scenario,
   StudentCompetitionAttackProfile,
-  SubmissionPackageResult,
   SupervisorBatchEvaluation,
   SupervisorEvaluation,
   SurfaceEvidencePack,
@@ -253,20 +252,6 @@ export async function runDemoDrill(): Promise<DemoDrillResult> {
 
 export async function runExternalAgentDemo(): Promise<ExternalAgentDemoResult> {
   return request<ExternalAgentDemoResult>('/api/integrations/openclaw/minimal_agent_demo', {
-    method: 'POST',
-    body: JSON.stringify({})
-  });
-}
-
-export async function createSubmissionPackage(): Promise<SubmissionPackageResult> {
-  return request<SubmissionPackageResult>('/api/submission_package', {
-    method: 'POST',
-    body: JSON.stringify({})
-  });
-}
-
-export async function createCleanSubmissionPackage(): Promise<SubmissionPackageResult> {
-  return request<SubmissionPackageResult>('/api/submission_package/clean', {
     method: 'POST',
     body: JSON.stringify({})
   });

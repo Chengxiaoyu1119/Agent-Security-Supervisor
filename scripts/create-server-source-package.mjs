@@ -26,7 +26,7 @@ if (dirtyCheck.status !== 0) {
 }
 
 const safeBranch = branch.replace(/[^a-zA-Z0-9._-]/g, "-");
-const outputDir = resolve(repoRoot, "apps/api/sandbox/release/server-source");
+const outputDir = resolve(repoRoot, "部署包");
 const outputFile = resolve(outputDir, `agent-security-supervisor-${safeBranch}-${sha}.zip`);
 
 mkdirSync(outputDir, { recursive: true });

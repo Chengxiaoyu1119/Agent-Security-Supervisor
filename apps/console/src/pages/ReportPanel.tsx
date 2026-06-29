@@ -8,8 +8,7 @@ import {
   ReportNormalEvaluationTab,
   ReportOverviewTab
 } from '../components/report';
-import { createCleanSubmissionPackage, createSubmissionPackage } from '../api';
-import type { ReportData, SubmissionPackageResult } from '../types';
+import type { ReportData } from '../types';
 import { writeClipboardText } from '../utils';
 
 export function ReportPanel({
@@ -21,10 +20,6 @@ export function ReportPanel({
 }) {
   const [copied, setCopied] = useState(false);
   const [copiedFile, setCopiedFile] = useState('');
-  const [submissionPackage, setSubmissionPackage] = useState<SubmissionPackageResult | null>(null);
-  const [creatingPackage, setCreatingPackage] = useState(false);
-  const [creatingCleanPackage, setCreatingCleanPackage] = useState(false);
-  const [packageError, setPackageError] = useState('');
   const markdown = report?.markdown ?? '正在加载报告...';
   const competitionPackage = report?.competition_package;
   const packageFiles = competitionPackage?.files ?? [];
@@ -55,32 +50,6 @@ export function ReportPanel({
     anchor.click();
     document.body.removeChild(anchor);
     URL.revokeObjectURL(url);
-  }
-
-  async function handleCreateSubmissionPackage() {
-    setCreatingPackage(true);
-    setPackageError('');
-    try {
-      const result = await createSubmissionPackage();
-      setSubmissionPackage(result);
-    } catch (error) {
-      setPackageError(error instanceof Error ? error.message : '生成提交包失败');
-    } finally {
-      setCreatingPackage(false);
-    }
-  }
-
-  async function handleCreateCleanSubmissionPackage() {
-    setCreatingCleanPackage(true);
-    setPackageError('');
-    try {
-      const result = await createCleanSubmissionPackage();
-      setSubmissionPackage(result);
-    } catch (error) {
-      setPackageError(error instanceof Error ? error.message : '生成干净提交包失败');
-    } finally {
-      setCreatingCleanPackage(false);
-    }
   }
 
   return (
@@ -124,13 +93,7 @@ export function ReportPanel({
                   competitionPackage={competitionPackage}
                   packageFiles={packageFiles}
                   markdown={markdown}
-                  submissionPackage={submissionPackage}
-                  creatingPackage={creatingPackage}
-                  creatingCleanPackage={creatingCleanPackage}
-                  packageError={packageError}
                   copiedFile={copiedFile}
-                  handleCreateSubmissionPackage={handleCreateSubmissionPackage}
-                  handleCreateCleanSubmissionPackage={handleCreateCleanSubmissionPackage}
                   copyPackageFile={copyPackageFile}
                   downloadPackageFile={downloadPackageFile}
                 />
