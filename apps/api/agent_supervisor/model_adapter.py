@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Iterable
 
 DEFAULT_TIMEOUT_SECONDS = 12
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 TOOL_NAME_MAP = {
     "file_read": "file.read",
     "file_write": "file.write",
@@ -103,7 +103,7 @@ def provider_status() -> list[dict]:
         {
             "provider": "智谱",
             "configured": zhipu_key,
-            "model": os.getenv("ZHIPU_MODEL", "glm-5.1"),
+            "model": os.getenv("ZHIPU_MODEL", "glm-4.6v-flashx"),
             "endpoint": _zhipu_endpoint(),
             "mode": "real-api" if zhipu_key else "simulated",
         },
@@ -343,7 +343,7 @@ def _iter_configured_providers() -> Iterable[dict]:
         "zhipu": {
             "provider": "智谱",
             "api_key": os.getenv("ZHIPU_API_KEY", ""),
-            "model": os.getenv("ZHIPU_MODEL", "glm-5.1"),
+            "model": os.getenv("ZHIPU_MODEL", "glm-4.6v-flashx"),
             "endpoint": _zhipu_endpoint(),
         },
     }

@@ -181,7 +181,7 @@ export const fallbackOverview: Overview = {
   scenarios: fallbackScenarios,
   models: [
     { provider: 'DeepSeek', configured: false, model: 'deepseek-v4-pro', mode: 'simulated' },
-    { provider: '智谱', configured: false, model: 'glm-5.1', mode: 'simulated' },
+    { provider: '智谱', configured: false, model: 'glm-4.6v-flashx', mode: 'simulated' },
     { provider: '本地模拟模型', configured: true, model: 'agent-supervisor-sim-guard', mode: 'fallback' }
   ],
   recent_runs: [],

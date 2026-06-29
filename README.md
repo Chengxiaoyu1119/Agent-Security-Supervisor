@@ -258,7 +258,7 @@ DEEPSEEK_MODEL=deepseek-v4-pro
 
 ZHIPU_API_KEY=你的智谱 Key
 ZHIPU_API_URL=https://open.bigmodel.cn/api/paas/v4/chat/completions
-ZHIPU_MODEL=glm-5.1
+ZHIPU_MODEL=glm-4.6v-flashx
 ```
 
 | 配置项 | 含义 | 不配置时 |
