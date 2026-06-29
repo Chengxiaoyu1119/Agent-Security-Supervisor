@@ -34,6 +34,7 @@
     "docs:dev": "npm --prefix apps/docs run start",
     "docs:build": "npm --prefix apps/docs run build",
     "docs:serve": "npm --prefix apps/docs run serve",
+    "package:server": "node scripts/create-server-source-package.mjs",
     "audit:security": "node scripts/dependency-security-audit.mjs",
     "audit:raw:console": "npm audit --prefix apps/console --audit-level=low --registry=https://registry.npmjs.org",
     "audit:raw:www": "npm audit --prefix apps/www --audit-level=low --registry=https://registry.npmjs.org",

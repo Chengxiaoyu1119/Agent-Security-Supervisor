@@ -1,0 +1,6 @@
+# Server source package exclusions for `git archive`.
+.vscode/ export-ignore
+apps/api/tests/ export-ignore
+apps/console/src/**/*.test.ts export-ignore
+apps/console/src/**/*.test.tsx export-ignore
+apps/console/src/test/ export-ignore
