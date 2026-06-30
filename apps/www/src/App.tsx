@@ -14,10 +14,12 @@ import {
 import { metrics, productRows, scenarios, surfaces, workflow, type Scenario, type Surface } from './content';
 
 const consoleUrl =
-  import.meta.env.VITE_AGENT_SUPERVISOR_CONSOLE_URL ?? 'http://127.0.0.1:5178';
+  import.meta.env.VITE_AGENT_SUPERVISOR_CONSOLE_URL ??
+  (import.meta.env.PROD ? 'https://xa.chengxiaoyu.top:46858' : 'http://127.0.0.1:5178');
 
 const docsUrl =
-  import.meta.env.VITE_AGENT_SUPERVISOR_DOCS_URL ?? 'http://127.0.0.1:3000';
+  import.meta.env.VITE_AGENT_SUPERVISOR_DOCS_URL ??
+  (import.meta.env.PROD ? 'https://docs.xa.chengxiaoyu.top:46858' : 'http://127.0.0.1:3000');
 
 const repoUrl = 'https://github.com/Chengxiaoyu1119/agent-security-supervisor';
 

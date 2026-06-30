@@ -1,9 +1,16 @@
 import type { Config } from '@docusaurus/types';
 import type { Preset } from '@docusaurus/preset-classic';
 
-const siteUrl = process.env.AGENT_SUPERVISOR_DOCS_SITE_URL ?? 'https://agent-security-supervisor.local';
-const wwwUrl = process.env.AGENT_SUPERVISOR_WWW_URL ?? 'http://127.0.0.1:4321';
-const consoleUrl = process.env.AGENT_SUPERVISOR_CONSOLE_URL ?? 'http://127.0.0.1:5178';
+const isProduction = process.env.NODE_ENV === 'production';
+const siteUrl =
+  process.env.AGENT_SUPERVISOR_DOCS_SITE_URL ??
+  (isProduction ? 'https://docs.xa.chengxiaoyu.top:46858' : 'https://agent-security-supervisor.local');
+const wwwUrl =
+  process.env.AGENT_SUPERVISOR_WWW_URL ??
+  (isProduction ? 'https://www.xa.chengxiaoyu.top:46858' : 'http://127.0.0.1:4321');
+const consoleUrl =
+  process.env.AGENT_SUPERVISOR_CONSOLE_URL ??
+  (isProduction ? 'https://xa.chengxiaoyu.top:46858' : 'http://127.0.0.1:5178');
 
 const config: Config = {
   title: 'Agent Security Supervisor Docs',
