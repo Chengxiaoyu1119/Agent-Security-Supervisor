@@ -29,7 +29,7 @@ export function SettingsPanel({ overview, refresh }: { overview: Overview; refre
           },
           {
             key: '2',
-            label: '🎯 演示体验与赛前体检',
+            label: '🎯 运行体检与赛前核验',
             children: (
               <DemoReadinessTab
                 overview={overview}

@@ -64,7 +64,7 @@ export function PenetrationLearningLab({ refresh }: PenetrationLearningLabProps)
         }
       })
       .catch(() => {
-        if (mounted) setNotice('后端未连接时只能查看默认样例，运行本地靶场需要启动智安哨。');
+        if (mounted) setNotice('后端未连接时只能查看默认场景，运行本地靶场需要启动智安哨。');
       });
     return () => {
       mounted = false;
@@ -168,7 +168,7 @@ export function PenetrationLearningLab({ refresh }: PenetrationLearningLabProps)
                 <div>
                   <Typography.Text strong>执行本地沙箱工具</Typography.Text>
                   <Typography.Paragraph type="secondary" className="zh-attack-lab__hint">
-                    只触碰项目自带靶场文件、假 API、假记忆和安全探针脚本。
+                    只触碰项目自带靶场文件、靶场 API、靶场记忆和安全探针脚本。
                   </Typography.Paragraph>
                 </div>
                 <UiSwitch checked={executeInSandbox} onChange={setExecuteInSandbox} />
@@ -181,7 +181,7 @@ export function PenetrationLearningLab({ refresh }: PenetrationLearningLabProps)
         </Col>
 
         <Col xs={24} xl={9}>
-          <PanelCard title="攻破与防护结果" subtitle={result ? result.summary.decision_change : '等待运行'}>
+          <PanelCard title="攻破与防护结果" subtitle={result ? result.summary.decision_change : '等待运行'} className="zh-full-height">
             {result ? (
               <Space direction="vertical" size={16} className="zh-full-width">
                 <Row gutter={[12, 12]}>

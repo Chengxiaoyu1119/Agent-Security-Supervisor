@@ -1,6 +1,6 @@
 import React from 'react';
 import { Col, Row, Space, Typography } from 'antd';
-import { MetricCard as Metric, PanelCard, UiAlert } from '../ui';
+import { MetricCard as Metric, PanelCard, UiAlert, UiProgress } from '../ui';
 import type { AnomalyCalibration } from '@/types';
 
 export function AnomalyCalibrationBlock({ calibration }: { calibration: AnomalyCalibration }) {
@@ -73,11 +73,13 @@ export function AnomalyCalibrationBlock({ calibration }: { calibration: AnomalyC
                     <Typography.Text strong>{item.threshold}</Typography.Text>
                   </Col>
                   <Col span={14}>
-                    <div className="zh-threshold-bar">
-                      <div className="zh-threshold-bar__recall" style={{ width: `${item.attack_recall_rate}%` }} />
-                      <div
-                        className="zh-threshold-bar__false-alarm"
-                        style={{ width: `${item.benign_false_alarm_rate}%` }}
+                    <div className="zh-threshold-progress-stack">
+                      <UiProgress percent={item.attack_recall_rate} size="small" showInfo={false} />
+                      <UiProgress
+                        percent={item.benign_false_alarm_rate}
+                        size="small"
+                        status={item.benign_false_alarm_rate ? 'exception' : 'success'}
+                        showInfo={false}
                       />
                     </div>
                   </Col>

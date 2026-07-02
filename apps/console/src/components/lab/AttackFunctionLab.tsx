@@ -36,10 +36,8 @@ export function AttackFunctionLab({ refresh }: AttackFunctionLabProps) {
   const [modules, setModules] = useState<AttackLabModule[]>(DEFAULT_ATTACK_LAB_MODULES);
   const [selectedSurface, setSelectedSurface] = useState(DEFAULT_ATTACK_LAB_MODULES[0].surface_id);
   const [attackInput, setAttackInput] = useState(DEFAULT_ATTACK_LAB_MODULES[0].default_input);
-  const [targetModel, setTargetModel] = useState('openai-compatible / 本地模拟');
   const [executeInSandbox, setExecuteInSandbox] = useState(true);
-  const [plannerMode, setPlannerMode] = useState<'fixed' | 'model'>('fixed');
-  const [forceRealModel, setForceRealModel] = useState(false);
+  const [plannerMode, setPlannerMode] = useState<'fixed' | 'model'>('model');
   const [running, setRunning] = useState(false);
   const [notice, setNotice] = useState('');
   const [result, setResult] = useState<AttackLabRunResult | null>(null);
@@ -58,7 +56,7 @@ export function AttackFunctionLab({ refresh }: AttackFunctionLabProps) {
         }
       })
       .catch(() => {
-        if (mounted) setNotice('后端未连接时只能查看模块样例，运行实验需要启动智安哨后端。');
+        if (mounted) setNotice('后端未连接时只能查看模块说明，运行实验需要启动智安哨后端。');
       });
     return () => {
       mounted = false;
@@ -91,10 +89,9 @@ export function AttackFunctionLab({ refresh }: AttackFunctionLabProps) {
       const nextResult = await runAttackLabModule({
         surface_id: activeModule.surface_id,
         attack_input: attackInput,
-        target_model: targetModel,
         execute_in_sandbox: executeInSandbox,
         planner_mode: plannerMode,
-        force_real_model: forceRealModel
+        force_real_model: plannerMode === 'model'
       });
       setResult(nextResult);
       setTargetLab(nextResult.target_lab);
@@ -160,20 +157,23 @@ export function AttackFunctionLab({ refresh }: AttackFunctionLabProps) {
           >
             <Space direction="vertical" size={16} className="zh-full-width">
               <div className="zh-attack-lab__field">
-                <Typography.Text strong>目标模型</Typography.Text>
-                <UiInput value={targetModel} onChange={(event) => setTargetModel(event.target.value)} />
-              </div>
-              <div className="zh-attack-lab__field">
-                <Typography.Text strong>工具调用来源</Typography.Text>
+                <Typography.Text strong>工具调用生成方式</Typography.Text>
                 <UiSelect
                   value={plannerMode}
                   onChange={(value) => setPlannerMode(value)}
                   options={[
-                    { label: '功能模块固定生成', value: 'fixed' },
-                    { label: '模型规划生成', value: 'model' }
+                    { label: '后端配置模型真实规划', value: 'model' },
+                    { label: '功能模块固定映射', value: 'fixed' }
                   ]}
                 />
               </div>
+              {plannerMode === 'model' && (
+                <UiAlert
+                  type="info"
+                  showIcon
+                  message="运行时会优先调用后端已配置的大模型生成工具调用；接口不可用时才启用本地安全评测模型兜底。"
+                />
+              )}
               <div className="zh-attack-lab__field">
                 <Typography.Text strong>攻击输入</Typography.Text>
                 <UiInput.TextArea
@@ -188,19 +188,10 @@ export function AttackFunctionLab({ refresh }: AttackFunctionLabProps) {
                 <div>
                   <Typography.Text strong>沙箱执行</Typography.Text>
                   <Typography.Paragraph type="secondary" className="zh-attack-lab__hint">
-                    只执行本地假工具，不触碰真实邮件、真实文件或真实比赛平台。
+                    只执行项目内置靶场工具，邮件、文件、API、命令和记忆都限制在本地隔离环境。
                   </Typography.Paragraph>
                 </div>
                 <UiSwitch checked={executeInSandbox} onChange={setExecuteInSandbox} />
-              </div>
-              <div className="zh-attack-lab__switch-row">
-                <div>
-                  <Typography.Text strong>尝试真实模型</Typography.Text>
-                  <Typography.Paragraph type="secondary" className="zh-attack-lab__hint">
-                    仅在已配置模型密钥时生效；否则自动回到本地模拟模型。
-                  </Typography.Paragraph>
-                </div>
-                <UiSwitch checked={forceRealModel} onChange={setForceRealModel} disabled={plannerMode !== 'model'} />
               </div>
               <UiButton type="primary" icon={<Play size={16} />} loading={running} onClick={runModule}>
                 运行攻击实验
@@ -234,8 +225,10 @@ export function AttackFunctionLab({ refresh }: AttackFunctionLabProps) {
                   </Col>
                 </Row>
                 <Descriptions column={1} size="small">
-                  <Descriptions.Item label="工具来源">{result.module.planner_mode}</Descriptions.Item>
-                  <Descriptions.Item label="规划器">{result.model_plan.provider}</Descriptions.Item>
+                  <Descriptions.Item label="生成方式">{result.module.planner_mode}</Descriptions.Item>
+                  <Descriptions.Item label="规划器">
+                    {result.model_plan.provider} {result.model_plan.model}
+                  </Descriptions.Item>
                   <Descriptions.Item label="无防护决策">
                     <DecisionPill decision={result.without_guard.decision} />
                   </Descriptions.Item>

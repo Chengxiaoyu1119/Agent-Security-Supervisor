@@ -81,7 +81,7 @@ export function AuthorizedTargetLab({ refresh }: AuthorizedTargetLabProps) {
               <UiAlert
                 type="warning"
                 showIcon
-                message="这里不是公网扫描器。后端会拒绝本机、内网、保留地址和非 Agent/模型接口路径。"
+                message="这里只测试授权 LLM/Agent 接口；后端会拒绝本机、内网、保留地址和非模型接口路径。"
               />
               <div className="zh-attack-lab__field">
                 <Typography.Text strong>靶场 URL</Typography.Text>
@@ -114,7 +114,7 @@ export function AuthorizedTargetLab({ refresh }: AuthorizedTargetLabProps) {
                 <UiInput.TextArea
                   value={attackInput}
                   onChange={(event) => setAttackInput(event.target.value)}
-                  rows={6}
+                  rows={4}
                   showCount
                   maxLength={8000}
                 />
@@ -124,32 +124,38 @@ export function AuthorizedTargetLab({ refresh }: AuthorizedTargetLabProps) {
                 <UiInput.TextArea
                   value={authorizationNote}
                   onChange={(event) => setAuthorizationNote(event.target.value)}
-                  rows={3}
+                  rows={2}
                   placeholder="说明该靶场属于本人、团队或比赛授权范围。"
                   showCount
                   maxLength={1200}
                 />
               </div>
-              <div className="zh-attack-lab__field">
-                <Typography.Text strong>
-                  <KeyRound size={14} className="zh-tag-icon" />
-                  Bearer Token
-                </Typography.Text>
-                <UiInput.Password
-                  value={bearerToken}
-                  onChange={(event) => setBearerToken(event.target.value)}
-                  placeholder="没有就留空"
-                />
-              </div>
-              <div className="zh-attack-lab__switch-row">
-                <div>
-                  <Typography.Text strong>确认授权</Typography.Text>
-                  <Typography.Paragraph type="secondary" className="zh-attack-lab__hint">
-                    未确认授权时，后端不会发起公网请求。
-                  </Typography.Paragraph>
-                </div>
-                <UiSwitch checked={authorizationConfirmed} onChange={setAuthorizationConfirmed} />
-              </div>
+              <Row gutter={[12, 12]} align="stretch">
+                <Col xs={24} md={12}>
+                  <div className="zh-attack-lab__field">
+                    <Typography.Text strong>
+                      <KeyRound size={14} className="zh-tag-icon" />
+                      Bearer Token
+                    </Typography.Text>
+                    <UiInput.Password
+                      value={bearerToken}
+                      onChange={(event) => setBearerToken(event.target.value)}
+                      placeholder="没有就留空"
+                    />
+                  </div>
+                </Col>
+                <Col xs={24} md={12}>
+                  <div className="zh-attack-lab__switch-row zh-attack-lab__switch-row--compact zh-full-height">
+                    <div>
+                      <Typography.Text strong>确认授权</Typography.Text>
+                      <Typography.Paragraph type="secondary" className="zh-attack-lab__hint">
+                        未确认授权时不会请求公网。
+                      </Typography.Paragraph>
+                    </div>
+                    <UiSwitch checked={authorizationConfirmed} onChange={setAuthorizationConfirmed} />
+                  </div>
+                </Col>
+              </Row>
               <UiButton type="primary" icon={<Play size={16} />} loading={running} onClick={runLab}>
                 运行授权靶场测试
               </UiButton>
@@ -158,7 +164,7 @@ export function AuthorizedTargetLab({ refresh }: AuthorizedTargetLabProps) {
         </Col>
 
         <Col xs={24} xl={15}>
-          <PanelCard title="靶场调用结果" subtitle={result ? result.target_url : '等待运行'}>
+          <PanelCard title="靶场调用结果" subtitle={result ? result.target_url : '等待运行'} className="zh-full-height">
             {result ? (
               <Space direction="vertical" size={16} className="zh-full-width">
                 <Row gutter={[12, 12]}>

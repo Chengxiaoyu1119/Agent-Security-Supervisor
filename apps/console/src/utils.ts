@@ -109,7 +109,7 @@ export const competitionCapabilityRows = [
   },
   {
     requirement: '基座模型检测或过滤原型',
-    implementation: '真实 DeepSeek/智谱优先，本地模拟兜底；输入越狱检测和输出风险过滤共同工作。',
+    implementation: '真实 DeepSeek/智谱优先，本地安全评测模型兜底；输入越狱检测和输出风险过滤共同工作。',
     evidence: 'jailbreak-filter / model-output-filter / generate_model_response'
   },
   {

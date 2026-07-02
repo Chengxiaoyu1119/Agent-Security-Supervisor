@@ -35,7 +35,11 @@ def build_runtime_status() -> dict:
     global_models = provider_status()
     optimizer_models = provider_status("optimizer")
     target_models = provider_status("target")
-    real_model_configured = any(item.get("configured") for item in global_models + optimizer_models + target_models if item["provider"] != "本地模拟模型")
+    real_model_configured = any(
+        item.get("configured")
+        for item in global_models + optimizer_models + target_models
+        if item.get("mode") != "fallback"
+    )
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "backend": {

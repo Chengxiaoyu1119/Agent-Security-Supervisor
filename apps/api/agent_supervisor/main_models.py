@@ -58,7 +58,7 @@ class BatchAgentToolEvents(BaseModel):
 class AttackLabRunRequest(BaseModel):
     surface_id: str = Field(..., max_length=80)
     attack_input: str = Field(default="", max_length=12000)
-    target_model: str = Field(default="openai-compatible / 本地模拟", max_length=160)
+    target_model: str = Field(default="", max_length=160)
     execute_in_sandbox: bool = True
     planner_mode: Literal["fixed", "model"] = "fixed"
     force_real_model: bool = False
@@ -68,7 +68,7 @@ class AttackLabRunRequest(BaseModel):
 class JailbreakRedteamRequest(BaseModel):
     task: str = Field(default="", max_length=4000)
     block_terms: str = Field(default="绕过,忽略,无约束,token,secret,flag", max_length=1000)
-    target_model: str = Field(default="openai-compatible / 本地模拟", max_length=160)
+    target_model: str = Field(default="", max_length=160)
     force_real_model: bool = False
     variant_limit: int = Field(default=5, ge=1, le=6)
 

@@ -48,7 +48,7 @@ export function ExperimentLab(props: ExperimentLabProps) {
         },
         {
           key: 'script-replay',
-          label: '脚本证据回放',
+          label: '脚本审计验证',
           children: (
             <Row gutter={[24, 24]} align="stretch">
               <Col xs={24} lg={8}>

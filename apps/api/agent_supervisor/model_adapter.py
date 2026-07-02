@@ -137,7 +137,7 @@ def provider_status(profile: str = "") -> list[dict]:
         },
         {
             "profile": profile_label,
-            "provider": "本地模拟模型",
+            "provider": "本地安全评测模型",
             "configured": True,
             "model": "agent-supervisor-sim-guard",
             "endpoint": "local",
@@ -620,16 +620,24 @@ def generate_optimizer_prompt(
     return simulate_optimizer_prompt(task, block_terms, optimizer_role, scenario_id)
 
 
-def generate_model_tool_plan(prompt: str, scenario_id: str, *, force_real: bool = False) -> dict:
+def generate_model_tool_plan(
+    prompt: str,
+    scenario_id: str,
+    *,
+    force_real: bool = False,
+    model_override: str = "",
+    provider_profile: str = "target",
+) -> dict:
     if force_real or _env_bool("MODEL_REAL_API_ENABLED", False):
         failures = []
-        for config in _iter_configured_providers():
+        for config in _iter_configured_providers(provider_profile):
+            model = model_override or config["model"]
             try:
                 result = _post_tool_completion(
                     provider=config["provider"],
                     endpoint=config["endpoint"],
                     api_key=config["api_key"],
-                    model=config["model"],
+                    model=model,
                     prompt=prompt,
                     scenario_id=scenario_id,
                 )
@@ -638,7 +646,7 @@ def generate_model_tool_plan(prompt: str, scenario_id: str, *, force_real: bool 
                 failures.append(
                     {
                         "provider": config["provider"],
-                        "model": config["model"],
+                        "model": model,
                         "error": "模型未返回结构化 tool_calls",
                     }
                 )
@@ -646,7 +654,7 @@ def generate_model_tool_plan(prompt: str, scenario_id: str, *, force_real: bool 
                 failures.append(
                     {
                         "provider": config["provider"],
-                        "model": config["model"],
+                        "model": model,
                         "error": _safe_error_message(error),
                     }
                 )
@@ -698,7 +706,7 @@ def simulate_tool_plan(prompt: str, scenario_id: str) -> dict:
     else:
         tool_call = {"tool": "model.respond", "arguments": {"topic": prompt[:1000]}}
     return {
-        "provider": "本地模拟模型",
+        "provider": "本地安全评测模型",
         "scenario_id": scenario_id,
         "model": "agent-supervisor-sim-guard",
         "mode": "fallback",
@@ -719,7 +727,7 @@ def simulate_optimizer_prompt(task: str, block_terms: str, optimizer_role: str, 
         f"观察词包括：{term_hint}。评测任务：{task}"
     )
     return {
-        "provider": "本地模拟副模型",
+        "provider": "本地安全评测副模型",
         "scenario_id": scenario_id,
         "model": "agent-supervisor-sim-optimizer",
         "mode": "fallback",
@@ -755,7 +763,7 @@ def filter_model_output(content: str) -> dict:
 def simulate_model_response(prompt: str, scenario_id: str) -> dict:
     risk = _classify_prompt(prompt)
     return {
-        "provider": "本地模拟模型",
+        "provider": "本地安全评测模型",
         "scenario_id": scenario_id,
         "model": "agent-supervisor-sim-guard",
         "mode": "fallback",

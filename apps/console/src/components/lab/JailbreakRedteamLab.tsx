@@ -35,9 +35,9 @@ function findingText(findings: Array<Record<string, string>>) {
 export function JailbreakRedteamLab({ refresh }: JailbreakRedteamLabProps) {
   const [task, setTask] = useState(DEFAULT_TASK);
   const [blockTerms, setBlockTerms] = useState(DEFAULT_BLOCK_TERMS);
-  const [targetModel, setTargetModel] = useState('openai-compatible / 本地模拟');
+  const [targetModel, setTargetModel] = useState('');
   const [variantLimit, setVariantLimit] = useState(5);
-  const [forceRealModel, setForceRealModel] = useState(false);
+  const [forceRealModel, setForceRealModel] = useState(true);
   const [running, setRunning] = useState(false);
   const [notice, setNotice] = useState('');
   const [result, setResult] = useState<JailbreakRedteamResult | null>(null);
@@ -83,7 +83,7 @@ export function JailbreakRedteamLab({ refresh }: JailbreakRedteamLabProps) {
         <Space direction="vertical" size={0}>
           <LabelTag color={record.mode === 'real-api' ? 'processing' : 'default'}>{record.mode}</LabelTag>
           <Typography.Text type="secondary" className="zh-text-meta">
-            {record.provider || '本地模拟'} {record.model}
+            {record.provider || '本地安全评测模型'} {record.model}
           </Typography.Text>
         </Space>
       )
@@ -117,16 +117,20 @@ export function JailbreakRedteamLab({ refresh }: JailbreakRedteamLabProps) {
       {notice && <UiAlert type="warning" showIcon title={notice} className="zh-mb-24" />}
       <Row gutter={[20, 20]} align="stretch">
         <Col xs={24} xl={9}>
-          <PanelCard title="模型越狱对测" subtitle="真实模型优先，本地模拟兜底" className="zh-full-height">
+          <PanelCard title="模型越狱对测" subtitle="真实模型优先，安全兜底" className="zh-full-height">
             <Space direction="vertical" size={16} className="zh-full-width">
               <UiAlert
                 type="info"
                 showIcon
-                message="这个功能会生成多种越狱变体，调用已配置模型或本地模拟模型，再把输出送入监督器判定。"
+                message="这个功能会生成多种越狱变体，优先调用后端已配置模型，再把输出送入监督器判定；接口不可用时才启用本地安全评测模型。"
               />
               <div className="zh-attack-lab__field">
-                <Typography.Text strong>目标模型</Typography.Text>
-                <UiInput value={targetModel} onChange={(event) => setTargetModel(event.target.value)} />
+                <Typography.Text strong>目标模型名（可选）</Typography.Text>
+                <UiInput
+                  value={targetModel}
+                  onChange={(event) => setTargetModel(event.target.value)}
+                  placeholder="留空使用后端配置模型"
+                />
               </div>
               <div className="zh-attack-lab__field">
                 <Typography.Text strong>越狱任务</Typography.Text>
@@ -173,7 +177,7 @@ export function JailbreakRedteamLab({ refresh }: JailbreakRedteamLabProps) {
         </Col>
 
         <Col xs={24} xl={15}>
-          <PanelCard title="对测结果" subtitle={result ? `${result.summary.variant_count} 个变体` : '等待运行'}>
+          <PanelCard title="对测结果" subtitle={result ? `${result.summary.variant_count} 个变体` : '等待运行'} className="zh-full-height">
             {result ? (
               <Space direction="vertical" size={16} className="zh-full-width">
                 <Row gutter={[12, 12]}>

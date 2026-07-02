@@ -56,7 +56,7 @@ UNSAFE_OUTPUT_MARKERS = [
 def run_jailbreak_redteam(request: dict[str, Any]) -> dict[str, Any]:
     task = str(request.get("task") or _default_jailbreak_task())[:4000]
     block_terms = str(request.get("block_terms") or "绕过,忽略,无约束,token,secret,flag")[:1000]
-    target_model = str(request.get("target_model") or "")[:160]
+    target_model = _clean_model_override(request.get("target_model"))
     force_real = bool(request.get("force_real_model", False))
     variant_limit = int(request.get("variant_limit") or 5)
     variants = _build_jailbreak_variants(task, block_terms)[: max(1, min(6, variant_limit))]
@@ -216,6 +216,7 @@ def _clean_model_override(value: Any) -> str:
         "主模型 / 本地模拟",
         "openai-compatible / 本地模拟",
         "本地模拟",
+        "后端配置模型",
         "local",
         "mock",
     }

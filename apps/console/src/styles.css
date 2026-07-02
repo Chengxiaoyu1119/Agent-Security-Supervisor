@@ -402,6 +402,44 @@ html[data-theme='dark'] * {
   width: 100%;
 }
 
+.zh-attack-lab > .ant-row > .ant-col {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+}
+
+.zh-attack-lab > .ant-row > .ant-col > .ant-card,
+.zh-attack-lab .zh-full-width {
+  width: 100%;
+}
+
+.zh-attack-lab .ant-card {
+  border-radius: 8px;
+}
+
+.zh-attack-lab .ant-card-head {
+  min-height: 58px;
+}
+
+.zh-attack-lab .ant-card-head-title {
+  min-width: 0;
+}
+
+.zh-attack-lab .ant-btn {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  justify-content: center;
+}
+
+.zh-attack-lab .ant-input,
+.zh-attack-lab .ant-input-password,
+.zh-attack-lab .ant-input-number,
+.zh-attack-lab .ant-select,
+.zh-attack-lab .ant-select-selector {
+  width: 100%;
+}
+
 .zh-attack-lab__module-panel,
 .zh-attack-lab__input-panel {
   height: 100%;
@@ -438,7 +476,7 @@ html[data-theme='dark'] * {
 }
 
 .zh-attack-lab__module-button--active {
-  transform: translateX(2px);
+  box-shadow: inset 3px 0 0 var(--ant-color-primary);
 }
 
 .zh-attack-lab__module-icon {
@@ -487,6 +525,18 @@ html[data-theme='dark'] * {
   background: var(--ant-color-fill-quaternary);
   border: 1px solid var(--ant-color-border-secondary);
   border-radius: 8px;
+}
+
+.zh-attack-lab__switch-row > div {
+  min-width: 0;
+}
+
+.zh-attack-lab__switch-row .ant-switch {
+  flex: 0 0 auto;
+}
+
+.zh-attack-lab__switch-row--compact {
+  padding: 10px 12px;
 }
 
 .zh-attack-lab__hint {
@@ -609,6 +659,35 @@ html[data-theme='dark'] * {
   white-space: pre-wrap;
 }
 
+.zh-attack-lab .zh-metric-card {
+  width: 100%;
+  min-height: 96px;
+}
+
+.zh-attack-lab .zh-metric-card .ant-card-body {
+  display: flex;
+  min-height: 96px;
+  align-items: center;
+  padding: 16px 18px;
+}
+
+.zh-attack-lab .zh-metric-card .ant-statistic {
+  width: 100%;
+}
+
+.zh-attack-lab .zh-metric-card .ant-statistic-title {
+  overflow: hidden;
+  font-size: 13px;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.zh-attack-lab .zh-metric-card .ant-statistic-content {
+  font-size: 24px;
+  line-height: 1.2;
+}
+
 .zh-note-text {
   margin-top: 16px;
   font-size: 13px;
@@ -664,21 +743,13 @@ html[data-theme='dark'] * {
   border-left: 3px solid var(--ant-color-primary);
 }
 
-.zh-threshold-bar {
-  display: flex;
+.zh-threshold-progress-stack {
+  display: grid;
   gap: 4px;
-  height: 8px;
-  overflow: hidden;
-  background: var(--ant-color-fill-secondary);
-  border-radius: 4px;
 }
 
-.zh-threshold-bar__recall {
-  background: var(--ant-color-info);
-}
-
-.zh-threshold-bar__false-alarm {
-  background: var(--ant-color-warning);
+.zh-threshold-progress-stack .ant-progress {
+  line-height: 1;
 }
 
 .zh-section-surface {

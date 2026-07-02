@@ -109,10 +109,10 @@ def run_attack_lab_module(request: dict[str, Any]) -> dict[str, Any]:
     module = ATTACK_MODULES[surface_id]
     attack_input = str(request.get("attack_input") or module["default_input"])[:12000]
     execute_in_sandbox = bool(request.get("execute_in_sandbox", True))
-    target_model = str(request.get("target_model") or "openai-compatible / 本地模拟")
+    target_model = _clean_model_override(request.get("target_model"))
     planner_mode = str(request.get("planner_mode") or "fixed")
     force_real_model = bool(request.get("force_real_model", False))
-    plan = _build_tool_plan(surface_id, attack_input, request.get("options"), planner_mode, force_real_model)
+    plan = _build_tool_plan(surface_id, attack_input, request.get("options"), planner_mode, force_real_model, target_model)
     tool_call = plan["tool_call"]
     conversation_id = f"attack-lab-{surface_id}-{uuid4()}"
     base_event = {
@@ -141,7 +141,7 @@ def run_attack_lab_module(request: dict[str, Any]) -> dict[str, Any]:
             "defense": module["defense"],
             "tool": module["tool"],
             "risk_hint": module["risk_hint"],
-            "target_model": target_model,
+            "target_model": target_model or "后端配置模型",
             "planner_mode": planner_mode,
         },
         "attack_input": attack_input,
@@ -170,12 +170,19 @@ def _build_tool_plan(
     options: Any,
     planner_mode: str,
     force_real_model: bool,
+    target_model: str,
 ) -> dict[str, Any]:
     if planner_mode == "model":
         scenario_id = f"ATTACK-LAB-{surface_id}"
         prompt = _planner_prompt(surface_id, attack_input)
         model_plan = (
-            generate_model_tool_plan(prompt, scenario_id, force_real=True)
+            generate_model_tool_plan(
+                prompt,
+                scenario_id,
+                force_real=True,
+                model_override=target_model,
+                provider_profile="target",
+            )
             if force_real_model
             else simulate_tool_plan(prompt, scenario_id)
         )
@@ -196,6 +203,13 @@ def _build_tool_plan(
             "content": "固定模式直接由攻击功能模块生成工具调用。",
         },
     }
+
+
+def _clean_model_override(value: Any) -> str:
+    model = str(value or "").strip()[:160]
+    if not model or "本地模拟" in model or model.lower() in {"local", "mock", "fallback"}:
+        return ""
+    return model
 
 
 def _build_tool_call(surface_id: str, attack_input: str, options: Any) -> dict[str, Any]:
