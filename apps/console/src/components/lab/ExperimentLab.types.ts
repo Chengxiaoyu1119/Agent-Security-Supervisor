@@ -14,4 +14,5 @@ export interface ExperimentLabProps {
   result: RunResult | null;
   compareResult: CompareResult | null;
   batchResult: BatchCompareResult | null;
+  refresh?: () => Promise<unknown>;
 }

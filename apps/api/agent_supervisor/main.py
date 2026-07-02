@@ -8,7 +8,7 @@ from fastapi.staticfiles import StaticFiles
 
 from .database import init_db
 from .paths import REPO_ROOT
-from .routers import core, evaluations, integrations, scenarios
+from .routers import core, evaluations, integrations, proxy, scenarios
 from .tools import init_sandbox
 
 app = FastAPI(title="智安哨 API", version="0.1.0")
@@ -37,6 +37,7 @@ app.include_router(core.router)
 app.include_router(scenarios.router)
 app.include_router(evaluations.router)
 app.include_router(integrations.router)
+app.include_router(proxy.router)
 
 def _console_dist_dir() -> Path:
     bundled_root = Path(getattr(sys, "_MEIPASS", ""))

@@ -32,6 +32,7 @@ import type {
 import { fallbackOverview, fallbackPolicies, fallbackScenarios } from './fallback';
 import { ApiError, request } from './app/apiRequest';
 export { ApiError, setAuthTokenProvider, subscribeRuntimeEvents } from './app/apiRequest';
+export * from './app/attackLabApi';
 export * from './app/governanceApi';
 export type { ApiErrorCode, RequestOptions } from './app/apiRequest';
 

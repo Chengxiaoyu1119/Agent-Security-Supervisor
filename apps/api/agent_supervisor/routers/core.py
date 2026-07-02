@@ -16,6 +16,7 @@ from ..database import latest_audit_logs, latest_runs, list_policy_versions, run
 from ..main_models import PolicySettingsUpdate, PolicyUpdate
 from ..memory_governance import memory_governance_snapshot, rollback_latest_memory, update_memory_status
 from ..model_adapter import provider_status
+from ..runtime_status import build_runtime_status
 from ..services.package_service import build_competition_package
 
 router = APIRouter(dependencies=[Depends(require_api_token)])
@@ -117,6 +118,11 @@ def policy_versions(policy_id: str | None = None, limit: int = Query(100, ge=1, 
 @router.get("/api/models")
 def models() -> list[dict]:
     return provider_status()
+
+
+@router.get("/api/runtime_status")
+def runtime_status() -> dict:
+    return build_runtime_status()
 
 
 @router.get("/api/observability/metrics")

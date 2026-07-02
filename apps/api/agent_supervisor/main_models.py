@@ -55,6 +55,52 @@ class BatchAgentToolEvents(BaseModel):
     execute_in_sandbox: bool = False
 
 
+class AttackLabRunRequest(BaseModel):
+    surface_id: str = Field(..., max_length=80)
+    attack_input: str = Field(default="", max_length=12000)
+    target_model: str = Field(default="openai-compatible / 本地模拟", max_length=160)
+    execute_in_sandbox: bool = True
+    planner_mode: Literal["fixed", "model"] = "fixed"
+    force_real_model: bool = False
+    options: dict[str, Any] = Field(default_factory=dict)
+
+
+class JailbreakRedteamRequest(BaseModel):
+    task: str = Field(default="", max_length=4000)
+    block_terms: str = Field(default="绕过,忽略,无约束,token,secret,flag", max_length=1000)
+    target_model: str = Field(default="openai-compatible / 本地模拟", max_length=160)
+    force_real_model: bool = False
+    variant_limit: int = Field(default=5, ge=1, le=6)
+
+
+class DualModelJailbreakRequest(BaseModel):
+    task: str = Field(default="", max_length=4000)
+    block_terms: str = Field(default="绕过,忽略,无约束,token,secret,flag", max_length=1000)
+    optimizer_model: str = Field(default="", max_length=160)
+    target_model: str = Field(default="", max_length=160)
+    optimizer_provider_profile: str = Field(default="optimizer", max_length=40)
+    target_provider_profile: str = Field(default="target", max_length=40)
+    optimizer_role: str = Field(default="", max_length=3000)
+    force_real_optimizer: bool = True
+    force_real_target: bool = True
+
+
+class AuthorizedTargetRunRequest(BaseModel):
+    target_url: str = Field(..., max_length=1000)
+    attack_input: str = Field(default="", max_length=8000)
+    surface_id: str = Field(default="prompt-injection", max_length=80)
+    target_model: str = Field(default="authorized-target-model", max_length=160)
+    authorization_confirmed: bool = False
+    authorization_note: str = Field(default="", max_length=1200)
+    bearer_token: str = Field(default="", max_length=2000)
+
+
+class LearningLabRunRequest(BaseModel):
+    scenario_id: str = Field(default="system-prompt-leak", max_length=80)
+    attack_input: str = Field(default="", max_length=8000)
+    execute_in_sandbox: bool = True
+
+
 class ApprovalDecisionRequest(BaseModel):
     action: Literal["approve", "reject", "批准", "驳回"]
     operator: str = Field(default="operator", max_length=80)

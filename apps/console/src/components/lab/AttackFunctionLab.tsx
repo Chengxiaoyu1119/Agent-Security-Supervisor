@@ -1,0 +1,290 @@
+import { useEffect, useMemo, useState } from 'react';
+import { AlertCircle, Bot, FileWarning, FlaskConical, Play, ShieldCheck, TerminalSquare } from 'lucide-react';
+import { Col, Descriptions, Divider, Row, Space, Typography } from 'antd';
+import { fetchAttackLabModules, fetchTargetLabState, resetTargetLabState, runAttackLabModule } from '../../api';
+import type { AttackLabModule, AttackLabRunResult, TargetLabState } from '../../types';
+import {
+  DecisionPill,
+  EvidenceCodeBlock,
+  LabelTag,
+  MetricCard,
+  PanelCard,
+  UiAlert,
+  UiButton,
+  UiInput,
+  UiSelect,
+  UiSwitch
+} from '../ui';
+import { DEFAULT_ATTACK_LAB_MODULES } from './attackFunctionModules';
+import { TargetLabStatePanel } from './TargetLabStatePanel';
+
+type AttackFunctionLabProps = {
+  refresh?: () => Promise<unknown>;
+};
+
+const moduleIcons: Record<string, JSX.Element> = {
+  'prompt-injection': <FileWarning size={18} />,
+  jailbreak: <Bot size={18} />,
+  'data-leakage': <AlertCircle size={18} />,
+  'tool-hijack': <TerminalSquare size={18} />,
+  'memory-poison': <FlaskConical size={18} />,
+  'environment-pollution': <ShieldCheck size={18} />,
+  'abuse-risk': <AlertCircle size={18} />
+};
+
+export function AttackFunctionLab({ refresh }: AttackFunctionLabProps) {
+  const [modules, setModules] = useState<AttackLabModule[]>(DEFAULT_ATTACK_LAB_MODULES);
+  const [selectedSurface, setSelectedSurface] = useState(DEFAULT_ATTACK_LAB_MODULES[0].surface_id);
+  const [attackInput, setAttackInput] = useState(DEFAULT_ATTACK_LAB_MODULES[0].default_input);
+  const [targetModel, setTargetModel] = useState('openai-compatible / 本地模拟');
+  const [executeInSandbox, setExecuteInSandbox] = useState(true);
+  const [plannerMode, setPlannerMode] = useState<'fixed' | 'model'>('fixed');
+  const [forceRealModel, setForceRealModel] = useState(false);
+  const [running, setRunning] = useState(false);
+  const [notice, setNotice] = useState('');
+  const [result, setResult] = useState<AttackLabRunResult | null>(null);
+  const [targetLab, setTargetLab] = useState<TargetLabState | null>(null);
+
+  useEffect(() => {
+    let mounted = true;
+    fetchAttackLabModules()
+      .then((response) => {
+        if (!mounted) return;
+        setModules(response.modules);
+        const first = response.modules[0];
+        if (first) {
+          setSelectedSurface(first.surface_id);
+          setAttackInput(first.default_input);
+        }
+      })
+      .catch(() => {
+        if (mounted) setNotice('后端未连接时只能查看模块样例，运行实验需要启动智安哨后端。');
+      });
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    fetchTargetLabState()
+      .then(setTargetLab)
+      .catch(() => undefined);
+  }, []);
+
+  const activeModule = useMemo(
+    () => modules.find((module) => module.surface_id === selectedSurface) ?? modules[0],
+    [modules, selectedSurface]
+  );
+
+  function selectModule(module: AttackLabModule) {
+    setSelectedSurface(module.surface_id);
+    setAttackInput(module.default_input);
+    setResult(null);
+    setNotice('');
+  }
+
+  async function runModule() {
+    if (!activeModule) return;
+    setRunning(true);
+    setNotice('');
+    try {
+      const nextResult = await runAttackLabModule({
+        surface_id: activeModule.surface_id,
+        attack_input: attackInput,
+        target_model: targetModel,
+        execute_in_sandbox: executeInSandbox,
+        planner_mode: plannerMode,
+        force_real_model: forceRealModel
+      });
+      setResult(nextResult);
+      setTargetLab(nextResult.target_lab);
+      await refresh?.();
+    } catch (error) {
+      setNotice(`攻击实验运行失败：${error instanceof Error ? error.message : '未知错误'}`);
+    } finally {
+      setRunning(false);
+    }
+  }
+
+  async function resetTargetLab() {
+    setNotice('');
+    try {
+      setTargetLab(await resetTargetLabState());
+    } catch (error) {
+      setNotice(`靶场状态重置失败：${error instanceof Error ? error.message : '未知错误'}`);
+    }
+  }
+
+  if (!activeModule) {
+    return <UiAlert type="warning" showIcon title="暂无攻击功能模块。" />;
+  }
+
+  return (
+    <div className="zh-attack-lab">
+      {notice && <UiAlert type="warning" showIcon title={notice} className="zh-mb-24" />}
+      <Row gutter={[20, 20]} align="stretch">
+        <Col xs={24} xl={7}>
+          <PanelCard
+            title="攻击功能"
+            subtitle={`${modules.length} 类可运行攻击面`}
+            className="zh-attack-lab__module-panel"
+          >
+            <div className="zh-attack-lab__module-grid">
+              {modules.map((module) => (
+                <button
+                  type="button"
+                  key={module.surface_id}
+                  className={`zh-attack-lab__module-button ${
+                    module.surface_id === activeModule.surface_id ? 'zh-attack-lab__module-button--active' : ''
+                  }`}
+                  onClick={() => selectModule(module)}
+                >
+                  <span className="zh-attack-lab__module-icon">
+                    {moduleIcons[module.surface_id] ?? <FlaskConical size={18} />}
+                  </span>
+                  <span className="zh-attack-lab__module-copy">
+                    <strong>{module.name}</strong>
+                    <span>{module.tool}</span>
+                  </span>
+                </button>
+              ))}
+            </div>
+          </PanelCard>
+        </Col>
+
+        <Col xs={24} xl={9}>
+          <PanelCard
+            title={`${activeModule.name}实验`}
+            subtitle={`${activeModule.target} · ${activeModule.risk_hint}`}
+            className="zh-attack-lab__input-panel"
+          >
+            <Space direction="vertical" size={16} className="zh-full-width">
+              <div className="zh-attack-lab__field">
+                <Typography.Text strong>目标模型</Typography.Text>
+                <UiInput value={targetModel} onChange={(event) => setTargetModel(event.target.value)} />
+              </div>
+              <div className="zh-attack-lab__field">
+                <Typography.Text strong>工具调用来源</Typography.Text>
+                <UiSelect
+                  value={plannerMode}
+                  onChange={(value) => setPlannerMode(value)}
+                  options={[
+                    { label: '功能模块固定生成', value: 'fixed' },
+                    { label: '模型规划生成', value: 'model' }
+                  ]}
+                />
+              </div>
+              <div className="zh-attack-lab__field">
+                <Typography.Text strong>攻击输入</Typography.Text>
+                <UiInput.TextArea
+                  value={attackInput}
+                  onChange={(event) => setAttackInput(event.target.value)}
+                  rows={8}
+                  showCount
+                  maxLength={12000}
+                />
+              </div>
+              <div className="zh-attack-lab__switch-row">
+                <div>
+                  <Typography.Text strong>沙箱执行</Typography.Text>
+                  <Typography.Paragraph type="secondary" className="zh-attack-lab__hint">
+                    只执行本地假工具，不触碰真实邮件、真实文件或真实比赛平台。
+                  </Typography.Paragraph>
+                </div>
+                <UiSwitch checked={executeInSandbox} onChange={setExecuteInSandbox} />
+              </div>
+              <div className="zh-attack-lab__switch-row">
+                <div>
+                  <Typography.Text strong>尝试真实模型</Typography.Text>
+                  <Typography.Paragraph type="secondary" className="zh-attack-lab__hint">
+                    仅在已配置模型密钥时生效；否则自动回到本地模拟模型。
+                  </Typography.Paragraph>
+                </div>
+                <UiSwitch checked={forceRealModel} onChange={setForceRealModel} disabled={plannerMode !== 'model'} />
+              </div>
+              <UiButton type="primary" icon={<Play size={16} />} loading={running} onClick={runModule}>
+                运行攻击实验
+              </UiButton>
+            </Space>
+          </PanelCard>
+        </Col>
+
+        <Col xs={24} xl={8}>
+          <PanelCard
+            title="攻防结果"
+            subtitle={result ? result.summary.decision_change : '等待运行'}
+            className="zh-full-height"
+          >
+            {result ? (
+              <Space direction="vertical" size={14} className="zh-full-width">
+                <Row gutter={[12, 12]}>
+                  <Col span={12}>
+                    <MetricCard
+                      label="无防护暴露"
+                      value={result.summary.exposed_without_guard ? '是' : '否'}
+                      tone={result.summary.exposed_without_guard ? 'red' : 'green'}
+                    />
+                  </Col>
+                  <Col span={12}>
+                    <MetricCard
+                      label="有防护控制"
+                      value={result.summary.controlled_with_guard ? '是' : '否'}
+                      tone={result.summary.controlled_with_guard ? 'green' : 'red'}
+                    />
+                  </Col>
+                </Row>
+                <Descriptions column={1} size="small">
+                  <Descriptions.Item label="工具来源">{result.module.planner_mode}</Descriptions.Item>
+                  <Descriptions.Item label="规划器">{result.model_plan.provider}</Descriptions.Item>
+                  <Descriptions.Item label="无防护决策">
+                    <DecisionPill decision={result.without_guard.decision} />
+                  </Descriptions.Item>
+                  <Descriptions.Item label="监督器决策">
+                    <DecisionPill decision={result.with_guard.decision} />
+                  </Descriptions.Item>
+                  <Descriptions.Item label="命中策略">{result.summary.policy_id}</Descriptions.Item>
+                  <Descriptions.Item label="风险分">{result.summary.risk_score}</Descriptions.Item>
+                </Descriptions>
+                <Divider className="zh-attack-lab__divider" />
+                <div className="zh-attack-lab__explain-list">
+                  {result.explanation.map((item) => (
+                    <div key={item.title} className="zh-attack-lab__explain-item">
+                      <LabelTag color="blue">{item.title}</LabelTag>
+                      <Typography.Text>{item.text}</Typography.Text>
+                    </div>
+                  ))}
+                </div>
+              </Space>
+            ) : (
+              <div className="zh-attack-lab__empty">
+                <Typography.Text type="secondary">选择攻击功能并运行后，这里展示无防护与有防护对比。</Typography.Text>
+              </div>
+            )}
+          </PanelCard>
+        </Col>
+      </Row>
+
+      {result && (
+        <Row gutter={[20, 20]} className="zh-attack-lab__evidence-row">
+          <Col xs={24} lg={12}>
+            <PanelCard title="工具调用事件" subtitle={result.tool_call.tool}>
+              <EvidenceCodeBlock>{JSON.stringify(result.tool_call, null, 2)}</EvidenceCodeBlock>
+            </PanelCard>
+          </Col>
+          <Col xs={24} lg={12}>
+            <PanelCard title="监督证据" subtitle={result.with_guard.audit_id}>
+              <Descriptions column={1} size="small">
+                <Descriptions.Item label="处置方式">{result.summary.execution_mode}</Descriptions.Item>
+                <Descriptions.Item label="判定原因">{result.with_guard.reason}</Descriptions.Item>
+                <Descriptions.Item label="防御建议">{result.with_guard.recommendation}</Descriptions.Item>
+                <Descriptions.Item label="上下文来源">{result.context_sources.join(', ')}</Descriptions.Item>
+              </Descriptions>
+            </PanelCard>
+          </Col>
+        </Row>
+      )}
+
+      <TargetLabStatePanel targetLab={targetLab} onReset={resetTargetLab} />
+    </div>
+  );
+}

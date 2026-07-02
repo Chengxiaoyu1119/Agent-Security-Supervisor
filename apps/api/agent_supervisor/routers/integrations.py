@@ -4,11 +4,21 @@ from fastapi import APIRouter, Body, Depends, HTTPException, Response
 from fastapi.responses import StreamingResponse
 
 from ..agent_integrations import build_agent_integration_bundle, build_agent_integration_markdown
+from ..attack_lab import list_attack_lab_modules, run_attack_lab_module
 from ..auth import require_api_token
+from ..capability_replay import run_capability_replay
 from ..event_stream import stream_runtime_events
 from ..events import evaluate_agent_event
 from ..external_agent_demo import run_minimal_external_agent_demo
-from ..main_models import AgentToolEvent, BatchAgentToolEvents
+from ..main_models import (
+    AgentToolEvent,
+    AttackLabRunRequest,
+    AuthorizedTargetRunRequest,
+    BatchAgentToolEvents,
+    DualModelJailbreakRequest,
+    JailbreakRedteamRequest,
+    LearningLabRunRequest,
+)
 from ..openclaw_adapter import build_openclaw_hook_example, build_openclaw_integration_bundle
 from ..openclaw_plugin_package import (
     build_openclaw_plugin_package_markdown,
@@ -18,7 +28,10 @@ from ..openclaw_plugin_package import (
     write_openclaw_plugin_package,
     write_openclaw_plugin_validation_report,
 )
+from ..penetration_lab import list_learning_scenarios, run_learning_attack
+from ..redteam_lab import run_authorized_target_test, run_dual_model_jailbreak, run_jailbreak_redteam
 from ..services.package_service import build_competition_package
+from ..target_lab import reset_target_lab, target_lab_snapshot
 
 router = APIRouter(dependencies=[Depends(require_api_token)])
 
@@ -34,6 +47,7 @@ def runtime_event_stream() -> StreamingResponse:
             "X-Accel-Buffering": "no",
         },
     )
+
 
 @router.get("/api/integrations/openclaw/schema")
 def openclaw_schema() -> dict:
@@ -93,6 +107,71 @@ def write_openclaw_plugin_package_validation_endpoint(inspect_runtime: bool = Fa
 @router.post("/api/integrations/openclaw/minimal_agent_demo")
 def openclaw_minimal_agent_demo() -> dict:
     return run_minimal_external_agent_demo()
+
+
+@router.get("/api/attack_lab/modules")
+def attack_lab_modules() -> dict:
+    return list_attack_lab_modules()
+
+
+@router.post("/api/attack_lab/run")
+def attack_lab_run(request: AttackLabRunRequest) -> dict:
+    try:
+        return run_attack_lab_module(request.dict())
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.post("/api/capability_replay/run")
+def capability_replay_run() -> dict:
+    return run_capability_replay()
+
+
+@router.get("/api/learning_lab/scenarios")
+def learning_lab_scenarios() -> dict:
+    return list_learning_scenarios()
+
+
+@router.post("/api/learning_lab/run")
+def learning_lab_run(request: LearningLabRunRequest) -> dict:
+    try:
+        return run_learning_attack(request.dict())
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.post("/api/redteam_lab/jailbreak/run")
+def redteam_jailbreak_run(request: JailbreakRedteamRequest) -> dict:
+    try:
+        return run_jailbreak_redteam(request.dict())
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.post("/api/redteam_lab/jailbreak/dual_model/run")
+def redteam_dual_model_jailbreak_run(request: DualModelJailbreakRequest) -> dict:
+    try:
+        return run_dual_model_jailbreak(request.dict())
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.post("/api/redteam_lab/authorized_target/run")
+def redteam_authorized_target_run(request: AuthorizedTargetRunRequest) -> dict:
+    try:
+        return run_authorized_target_test(request.dict())
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.get("/api/target_lab/state")
+def target_lab_state() -> dict:
+    return target_lab_snapshot()
+
+
+@router.post("/api/target_lab/reset")
+def target_lab_reset() -> dict:
+    return reset_target_lab()
 
 
 @router.post("/api/integrations/openclaw/events")

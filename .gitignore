@@ -62,6 +62,9 @@ apps/api/agent_supervisor/sandbox/
 .codex-ui.log
 .playwright-mcp/
 
+# 仅作为逆向观察和功能参考的外部素材，不作为项目源码提交
+Study/
+
 # 仅本地使用的计划和生成笔记
 /docs/
 部署包/

@@ -147,7 +147,7 @@ export function AppShell({
                 <span className="hide-on-mobile">刷新数据</span>
               </UiButton>
               <UiButton type="primary" icon={<Play size={16} />} onClick={onOpenLab}>
-                <span className="hide-on-mobile">运行脚本</span>
+                <span className="hide-on-mobile">攻击实验</span>
               </UiButton>
             </Space>
           </Header>

@@ -112,6 +112,86 @@ export interface SupervisorBatchEvaluation {
   results: SupervisorEvaluation[];
 }
 
+export interface AttackLabModule {
+  surface_id: string;
+  name: string;
+  target: string;
+  default_input: string;
+  why: string;
+  defense: string;
+  tool: string;
+  risk_hint: string;
+}
+
+export interface AttackLabModulesResponse {
+  version: string;
+  module_count: number;
+  modules: AttackLabModule[];
+}
+
+export interface AttackLabRunRequest {
+  surface_id: string;
+  attack_input: string;
+  target_model?: string;
+  execute_in_sandbox?: boolean;
+  planner_mode?: 'fixed' | 'model';
+  force_real_model?: boolean;
+  options?: Record<string, unknown>;
+}
+
+export interface TargetLabState {
+  version: string;
+  state_path: string;
+  updated_at: string;
+  team_count: number;
+  submission_count: number;
+  review_note_count: number;
+  api_call_count: number;
+  bulk_export_count: number;
+  sensitive_read_count: number;
+  latest_api_call: Record<string, unknown> | null;
+}
+
+export interface AttackLabRunResult {
+  module: AttackLabModule & {
+    target_model: string;
+    planner_mode: string;
+  };
+  attack_input: string;
+  tool_call: {
+    tool: string;
+    arguments: Record<string, unknown>;
+    risk_hint: string;
+  };
+  model_plan: {
+    provider: string;
+    scenario_id?: string;
+    model?: string;
+    mode: string;
+    content?: string;
+    tool_calls?: Array<Record<string, unknown>>;
+    provider_failures?: Array<Record<string, unknown>>;
+    fallback_reason?: string;
+  };
+  context_sources: string[];
+  without_guard: SupervisorEvaluation;
+  with_guard: SupervisorEvaluation;
+  target_lab: TargetLabState;
+  summary: {
+    exposed_without_guard: boolean;
+    controlled_with_guard: boolean;
+    decision_change: string;
+    policy_id: string;
+    execution_mode: string;
+    risk_score: number;
+    anomaly_score: number;
+  };
+  explanation: Array<{
+    title: string;
+    text: string;
+  }>;
+}
+
 export interface ExternalAgentDemoRecord {
   task_id: string;
   title: string;

@@ -14,26 +14,38 @@ const viteBin = join(wwwRoot, 'node_modules', 'vite', 'bin', 'vite.js');
 
 function requestHome() {
   return new Promise((resolveRequest) => {
+    let settled = false;
+    const settle = (result) => {
+      if (settled) return;
+      settled = true;
+      resolveRequest(result);
+    };
+    const statusIsReachable = (statusCode) => Boolean(statusCode && statusCode >= 200 && statusCode < 500);
+
     const request = http.get(url, { timeout: 1200 }, (response) => {
       let body = '';
       response.setEncoding('utf8');
       response.on('data', (chunk) => {
         body += chunk;
-        if (body.length > 4096) request.destroy();
+        if (body.length > 4096) {
+          settle({ ok: statusIsReachable(response.statusCode), body });
+          request.destroy();
+        }
       });
       response.on('end', () => {
-        resolveRequest({
-          ok: response.statusCode && response.statusCode >= 200 && response.statusCode < 500,
-          body
-        });
+        settle({ ok: statusIsReachable(response.statusCode), body });
       });
+      response.on('aborted', () => settle({ ok: statusIsReachable(response.statusCode), body }));
+      response.on('error', () => settle({ ok: false, body }));
+      response.on('close', () => settle({ ok: statusIsReachable(response.statusCode), body }));
     });
 
     request.on('timeout', () => {
+      settle({ ok: false, body: '' });
       request.destroy();
-      resolveRequest({ ok: false, body: '' });
     });
-    request.on('error', () => resolveRequest({ ok: false, body: '' }));
+    request.on('error', () => settle({ ok: false, body: '' }));
+    request.on('close', () => settle({ ok: false, body: '' }));
   });
 }
 

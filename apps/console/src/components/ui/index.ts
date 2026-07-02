@@ -26,7 +26,17 @@ export { MetaGrid } from './MetaGrid';
 export type { MetaGridItem, MetaGridProps } from './MetaGrid';
 export { EvidenceList } from './EvidenceList';
 export type { EvidenceListItem, EvidenceListProps, EvidenceListTag, EvidenceListTone } from './EvidenceList';
-export { UiAlert, UiBadge, UiInput, UiInputNumber, UiProgress, UiSelect, UiTable, UiTabs } from './AntdControls';
+export {
+  UiAlert,
+  UiBadge,
+  UiInput,
+  UiInputNumber,
+  UiProgress,
+  UiSelect,
+  UiSwitch,
+  UiTable,
+  UiTabs
+} from './AntdControls';
 export type {
   UiAlertProps,
   UiBadgeProps,
@@ -34,6 +44,7 @@ export type {
   UiInputNumberProps,
   UiProgressProps,
   UiSelectProps,
+  UiSwitchProps,
   UiTableProps,
   UiTabsProps
 } from './AntdControls';

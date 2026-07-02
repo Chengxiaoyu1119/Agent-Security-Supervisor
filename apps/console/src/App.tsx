@@ -171,6 +171,7 @@ export default function App() {
           result={lastResult}
           compareResult={compareResult}
           batchResult={batchResult}
+          refresh={refresh}
         />
       )}
       {page === 'chain' && (

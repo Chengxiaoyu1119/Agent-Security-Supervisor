@@ -20,6 +20,7 @@ $WorkPath = Join-Path $ReleaseRoot "build"
 $SpecPath = Join-Path $ReleaseRoot "spec"
 $ConsoleDist = Resolve-Path "apps\console\dist"
 $ApiConfig = Resolve-Path "apps\api\agent_supervisor\config"
+$SandboxFixtures = Resolve-Path "apps\api\sandbox\fixtures"
 
 New-Item -ItemType Directory -Force -Path $ReleaseRoot | Out-Null
 New-Item -ItemType Directory -Force -Path $DistPath | Out-Null
@@ -36,6 +37,7 @@ Write-Host "Building zhian-supervisor-launcher.exe..."
   --specpath $SpecPath `
   --add-data "$ConsoleDist;apps\console\dist" `
   --add-data "$ApiConfig;apps\api\agent_supervisor\config" `
+  --add-data "$SandboxFixtures;apps\api\sandbox\fixtures" `
   --collect-submodules "uvicorn" `
   --collect-submodules "httptools" `
   --collect-submodules "watchfiles" `

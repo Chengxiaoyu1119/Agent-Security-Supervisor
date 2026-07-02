@@ -2,6 +2,7 @@ export type RiskLevel = 'low' | 'medium' | 'high' | 'critical';
 export type GuardDecision = '允许' | '拒绝' | '询问' | '隔离';
 
 export interface ModelStatus {
+  profile?: string;
   provider: string;
   configured: boolean;
   model: string;
