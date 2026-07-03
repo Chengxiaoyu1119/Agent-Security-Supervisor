@@ -14,6 +14,8 @@ import type {
   CompetitionReadinessWriteResult,
   DemoDrillResult,
   ExternalAgentDemoResult,
+  ModelRuntimeConfig,
+  ModelRuntimeConfigUpdate,
   OpenClawIntegrationBundle,
   OpenClawPluginPackageResult,
   OpenClawPluginValidationWriteResult,
@@ -194,6 +196,17 @@ export async function fetchReport(): Promise<ReportData> {
 
 export async function fetchAttackCaseDataset(): Promise<AttackCaseDataset> {
   return request<AttackCaseDataset>('/api/datasets/attack_cases');
+}
+
+export async function fetchModelConfig(): Promise<ModelRuntimeConfig> {
+  return request<ModelRuntimeConfig>('/api/model_config');
+}
+
+export async function updateModelConfig(payload: ModelRuntimeConfigUpdate): Promise<ModelRuntimeConfig> {
+  return request<ModelRuntimeConfig>('/api/model_config', {
+    method: 'PATCH',
+    body: JSON.stringify(payload)
+  });
 }
 
 export async function fetchSurfaceEvidencePack(surfaceId: string): Promise<SurfaceEvidencePack> {

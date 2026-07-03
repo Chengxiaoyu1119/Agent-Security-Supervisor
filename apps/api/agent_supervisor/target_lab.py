@@ -143,12 +143,37 @@ def handle_target_api_call(endpoint: str, args: dict[str, Any]) -> dict[str, Any
 
 
 def _read_state() -> dict[str, Any]:
-    return json.loads(TARGET_STATE_PATH.read_text(encoding="utf-8"))
+    try:
+        state = json.loads(TARGET_STATE_PATH.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        state = _seed_state()
+        _write_state(state)
+        return state
+    if not isinstance(state, dict) or not _is_valid_state(state):
+        state = _seed_state()
+        _write_state(state)
+    return state
 
 
 def _write_state(state: dict[str, Any]) -> None:
     TARGET_LAB_DIR.mkdir(parents=True, exist_ok=True)
     TARGET_STATE_PATH.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def _is_valid_state(state: dict[str, Any]) -> bool:
+    required_keys = {
+        "version",
+        "updated_at",
+        "teams",
+        "submissions",
+        "private_scoreboard",
+        "challenge_seed",
+        "review_notes",
+        "api_audit",
+        "bulk_export_count",
+        "sensitive_read_count",
+    }
+    return required_keys.issubset(state)
 
 
 def _summarize_state(state: dict[str, Any]) -> dict[str, Any]:

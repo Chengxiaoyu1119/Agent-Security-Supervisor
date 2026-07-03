@@ -5,6 +5,22 @@ import type { Scenario } from '@/types';
 import { riskLabel } from '@/utils';
 import { EvidenceCodeBlock, LabelTag, PanelCard, UiButton, UiInput, UiSelect } from '../ui';
 
+const ALL_FILTER = '全部';
+
+const ATTACK_SURFACE_LABELS: Record<string, string> = {
+  'prompt-injection': '提示注入',
+  jailbreak: '模型越狱',
+  'data-leakage': '数据泄露',
+  'abuse-risk': '滥用风险',
+  'tool-hijack': '工具调用劫持',
+  'memory-poison': '记忆中毒',
+  'environment-pollution': '环境感知污染'
+};
+
+function surfaceLabel(surfaceId: string) {
+  return ATTACK_SURFACE_LABELS[surfaceId] ?? surfaceId;
+}
+
 export function ScenarioLibrary({
   scenarios,
   selected,
@@ -17,8 +33,8 @@ export function ScenarioLibrary({
   onOpenLab: () => void;
 }) {
   const [query, setQuery] = useState('');
-  const [surfaceFilter, setSurfaceFilter] = useState('全部');
-  const [severityFilter, setSeverityFilter] = useState('全部');
+  const [surfaceFilter, setSurfaceFilter] = useState(ALL_FILTER);
+  const [severityFilter, setSeverityFilter] = useState(ALL_FILTER);
   const surfaces = useMemo(() => Array.from(new Set(scenarios.map((scenario) => scenario.surface_id))), [scenarios]);
   const filteredScenarios = useMemo(() => {
     const keyword = query.trim().toLowerCase();
@@ -38,8 +54,8 @@ export function ScenarioLibrary({
         .toLowerCase();
       return (
         (!keyword || text.includes(keyword)) &&
-        (surfaceFilter === '全部' || scenario.surface_id === surfaceFilter) &&
-        (severityFilter === '全部' || scenario.severity === severityFilter)
+        (surfaceFilter === ALL_FILTER || scenario.surface_id === surfaceFilter) &&
+        (severityFilter === ALL_FILTER || scenario.severity === severityFilter)
       );
     });
   }, [query, scenarios, severityFilter, surfaceFilter]);
@@ -71,7 +87,10 @@ export function ScenarioLibrary({
               value={surfaceFilter}
               onChange={setSurfaceFilter}
               className="zh-full-width zh-mb-12"
-              options={[{ label: '全部攻击面', value: '全部' }, ...surfaces.map((s) => ({ label: s, value: s }))]}
+              options={[
+                { label: '全部攻击面', value: ALL_FILTER },
+                ...surfaces.map((surface) => ({ label: surfaceLabel(surface), value: surface }))
+              ]}
             />
             <UiSelect
               value={severityFilter}
@@ -98,19 +117,26 @@ export function ScenarioLibrary({
                   <div
                     key={scenario.id}
                     onClick={() => onSelect(scenario.id)}
-                    className={`zh-selectable-list-item${selected === scenario.id ? ' zh-selectable-list-item--active' : ''}`}
+                    className={`zh-selectable-list-item zh-scenario-list-item${
+                      selected === scenario.id ? ' zh-selectable-list-item--active' : ''
+                    }`}
                   >
                     <div>
-                      <div className="zh-split-row">
-                        <Typography.Text strong className={selected === scenario.id ? 'zh-text-primary-active' : ''}>
+                      <div className="zh-split-row zh-scenario-list-item__head">
+                        <Typography.Text
+                          strong
+                          className={`zh-scenario-list-item__title${
+                            selected === scenario.id ? ' zh-text-primary-active' : ''
+                          }`}
+                        >
                           {scenario.title}
                         </Typography.Text>
-                        <LabelTag color={color} className="zh-mr-0">
+                        <LabelTag color={color} className="zh-scenario-list-item__risk zh-mr-0">
                           {riskLabel[scenario.severity]}
                         </LabelTag>
                       </div>
                       <div className="zh-mt-4">
-                        <Typography.Text type="secondary" className="zh-text-meta">
+                        <Typography.Text type="secondary" className="zh-text-meta zh-scenario-list-item__meta">
                           {scenario.id} · {scenario.target}
                         </Typography.Text>
                       </div>

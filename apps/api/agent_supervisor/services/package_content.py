@@ -41,7 +41,7 @@ def _clean_submission_evidence(summary: dict[str, Any], runs: list[dict[str, Any
         "- 对每个攻击脚本固定运行一次无防护复现。",
         "- 对每个攻击脚本固定运行一次有防护验证。",
         "- 生成报告材料时只使用本轮固定运行得到的证据数据。",
-        "- 本流程不会把这些临时运行写入历史演示数据库。",
+        "- 本流程不会把这些临时运行写入历史复现数据库。",
         "",
         "## 本轮统计",
         "",
@@ -204,7 +204,7 @@ def _copy_demo_screenshots(support_dir: Path) -> list[Path]:
         "student-competition-attack-map-desktop.png",
         "student-competition-attack-map-mobile.png",
     ]
-    screenshot_dir = support_dir / "演示截图"
+    screenshot_dir = support_dir / "复现截图"
     copied: list[Path] = []
     for name in screenshot_names:
         source = report_dir / name
@@ -260,8 +260,8 @@ def _copy_formal_submission_documents(package_dir: Path) -> list[Path]:
     target_dir = package_dir / "03_正式提交材料草稿"
     source_dir = REPO_ROOT / "docs" / "信息安全"
     source_names = [
-        "作品报告-智安哨-待完善队伍信息.docx",
-        "作品报告-智安哨-待完善队伍信息.pdf",
+        "作品报告-智安哨-队伍信息待填写.docx",
+        "作品报告-智安哨-队伍信息待填写.pdf",
         "作品原创性声明-智安哨-待签署.docx",
         "提交材料清单-智安哨.md",
     ]
@@ -370,7 +370,7 @@ def _script_library(scenarios: list[dict[str, Any]], surface_name: dict[str, str
                 "detection_points": scenario.get("detection_points", []),
                 "success_criteria": scenario.get("success_criteria", []),
                 "tool_calls": scenario["tool_calls"],
-                "safe_boundary": scenario.get("safety_boundary", "所有工具调用均经过监督器，并在沙箱目录、假 outbox、模拟 API、模拟记忆库中执行。"),
+                "safe_boundary": scenario.get("safety_boundary", "所有工具调用均经过监督器，并在沙箱目录、本地沙箱 outbox、本地靶场 API、沙箱记忆库中执行。"),
             }
             for scenario in scenarios
         ],
@@ -404,11 +404,11 @@ def _supervisor_spec(policies: list[dict[str, Any]]) -> str:
     lines.extend(
         [
             "",
-            "## 模拟比赛业务工具",
+            "## 本地靶场业务工具",
             "",
-            "- 邮件工具：写入假发件箱，不发送真实邮件。",
+            "- 邮件工具：写入本地沙箱 outbox，不发送真实邮件。",
             "- 文件工具：只访问沙箱目录。",
-            "- API 工具：使用模拟参赛队伍、提交物、成绩榜、赛题种子和校园网会话接口。",
+            "- API 工具：使用本地靶场参赛队伍、提交物、成绩榜、赛题种子和校园网会话接口。",
             "- 代码执行工具：限制目录、超时、输出长度和危险命令。",
             "- 记忆工具：支持写入、读取、污染和隔离。",
             "- 环境工具：提供低信任假配置和假环境变量。",
@@ -534,7 +534,7 @@ def _checklist(
             "evidence": "内置智能体靶场，提供 OpenClaw 事件适配结构和可安装 native plugin 包；真实 OpenClaw 运行验收需在安装 OpenClaw 的环境中执行。",
         },
         {
-            "requirement": "模拟比赛工具",
+            "requirement": "本地靶场业务工具",
             "status": "满足",
             "evidence": "已覆盖邮件、文件、API、代码执行、记忆、环境变量工具。",
         },
@@ -546,7 +546,7 @@ def _checklist(
         {
             "requirement": "基座模型检测或过滤原型",
             "status": "满足",
-            "evidence": "支持越狱提示过滤、工具行为监测和模拟模型兜底。",
+            "evidence": "支持越狱提示过滤、工具行为监测和本地兜底模型。",
         },
         {
             "requirement": "监督端实时展示告警或阻断记录",

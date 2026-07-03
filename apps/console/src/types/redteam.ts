@@ -52,12 +52,12 @@ export interface DualModelJailbreakRequest {
   optimizer_role?: string;
   force_real_optimizer?: boolean;
   force_real_target?: boolean;
+  iteration_count?: number;
 }
 
-export interface DualModelJailbreakResult {
-  generated_at: string;
+export interface DualModelJailbreakRound {
+  round_index: number;
   task: string;
-  block_terms: string;
   optimizer: {
     role: string;
     provider: string;
@@ -98,10 +98,23 @@ export interface DualModelJailbreakResult {
   };
 }
 
+export interface DualModelJailbreakResult extends Omit<DualModelJailbreakRound, 'round_index'> {
+  generated_at: string;
+  task: string;
+  block_terms: string;
+  rounds?: DualModelJailbreakRound[];
+  summary: DualModelJailbreakRound['summary'] & {
+    iteration_count?: number;
+    best_round?: number;
+    attack_success_count?: number;
+  };
+}
+
 export interface AuthorizedTargetRunRequest {
   target_url: string;
   attack_input: string;
   surface_id?: string;
+  target_type?: string;
   target_model?: string;
   authorization_confirmed: boolean;
   authorization_note: string;
@@ -116,6 +129,7 @@ export interface AuthorizedTargetRunResult {
   preflight: SupervisorEvaluation;
   http_status: number;
   target_response: string;
+  request_preview?: Record<string, unknown>;
   output_filter: {
     blocked: boolean;
     findings: Array<Record<string, string>>;
@@ -127,5 +141,6 @@ export interface AuthorizedTargetRunResult {
     reason?: string;
     token_configured: boolean;
     payload_kind?: string;
+    target_type?: string;
   };
 }

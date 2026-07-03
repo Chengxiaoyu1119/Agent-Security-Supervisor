@@ -4,16 +4,8 @@ import { Col, Descriptions, Row, Space, Typography } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { runCapabilityReplay } from '../../api';
 import type { CapabilityReplayProbe, CapabilityReplayResult } from '../../types';
-import {
-  DecisionPill,
-  EvidenceCodeBlock,
-  LabelTag,
-  MetricCard,
-  PanelCard,
-  UiAlert,
-  UiButton,
-  UiTable
-} from '../ui';
+import { AuditDeepLinkButton } from '../audit/AuditDeepLinkButton';
+import { DecisionPill, EvidenceCodeBlock, LabelTag, MetricCard, PanelCard, UiAlert, UiButton, UiTable } from '../ui';
 
 type CapabilityReplayLabProps = {
   refresh?: () => Promise<unknown>;
@@ -55,7 +47,7 @@ export function CapabilityReplayLab({ refresh }: CapabilityReplayLabProps) {
       title: '功能',
       dataIndex: 'name',
       render: (_value, record) => (
-        <Space direction="vertical" size={0}>
+        <Space orientation="vertical" size={0}>
           <Space size={6}>
             {statusIcon(record.status)}
             <Typography.Text strong>{record.name}</Typography.Text>
@@ -69,7 +61,9 @@ export function CapabilityReplayLab({ refresh }: CapabilityReplayLabProps) {
     {
       title: '复现级别',
       key: 'replay_level',
-      render: (_value, record) => <LabelTag color={record.replay_level === '真实可复现' ? 'blue' : 'cyan'}>{record.replay_level}</LabelTag>
+      render: (_value, record) => (
+        <LabelTag color={record.replay_level === '真实可复现' ? 'blue' : 'cyan'}>{record.replay_level}</LabelTag>
+      )
     },
     {
       title: '状态',
@@ -95,9 +89,14 @@ export function CapabilityReplayLab({ refresh }: CapabilityReplayLabProps) {
       title: '审计',
       key: 'audit_id',
       render: (_value, record) => (
-        <Typography.Text copyable={Boolean(record.evidence.audit_id)} className="zh-text-meta">
-          {record.evidence.audit_id ?? '边界拒绝'}
-        </Typography.Text>
+        <Space size={8} wrap>
+          <Typography.Text copyable={Boolean(record.evidence.audit_id)} className="zh-text-meta">
+            {record.evidence.audit_id ?? '边界拒绝'}
+          </Typography.Text>
+          <AuditDeepLinkButton auditId={record.evidence.audit_id} size="small">
+            查看
+          </AuditDeepLinkButton>
+        </Space>
       )
     }
   ];
@@ -108,7 +107,7 @@ export function CapabilityReplayLab({ refresh }: CapabilityReplayLabProps) {
       <Row gutter={[20, 20]} align="stretch">
         <Col xs={24} xl={7}>
           <PanelCard title="一键复现" subtitle="真实调用链证据" className="zh-full-height">
-            <Space direction="vertical" size={16} className="zh-full-width">
+            <Space orientation="vertical" size={16} className="zh-full-width">
               <UiAlert
                 type="info"
                 showIcon
@@ -130,9 +129,12 @@ export function CapabilityReplayLab({ refresh }: CapabilityReplayLabProps) {
         </Col>
 
         <Col xs={24} xl={17}>
-          <PanelCard title="复现结果" subtitle={result ? `${result.summary.passed_count}/${result.summary.probe_count} 已通过` : '等待运行'}>
+          <PanelCard
+            title="复现结果"
+            subtitle={result ? `${result.summary.passed_count}/${result.summary.probe_count} 已通过` : '等待运行'}
+          >
             {result ? (
-              <Space direction="vertical" size={16} className="zh-full-width">
+              <Space orientation="vertical" size={16} className="zh-full-width">
                 <Row gutter={[12, 12]}>
                   <Col xs={12} lg={6}>
                     <MetricCard label="探针数" value={result.summary.probe_count} tone="cyan" />
@@ -168,7 +170,9 @@ export function CapabilityReplayLab({ refresh }: CapabilityReplayLabProps) {
                           <Descriptions column={1} size="small">
                             <Descriptions.Item label="标题">{record.evidence.evidence_title}</Descriptions.Item>
                             <Descriptions.Item label="原因">{record.evidence.evidence_detail}</Descriptions.Item>
-                            <Descriptions.Item label="建议">{record.evidence.recommendation ?? '按边界策略阻断或人工复核。'}</Descriptions.Item>
+                            <Descriptions.Item label="建议">
+                              {record.evidence.recommendation ?? '按边界策略阻断或人工复核。'}
+                            </Descriptions.Item>
                             <Descriptions.Item label="工具">{record.evidence.tool ?? 'URL 预检'}</Descriptions.Item>
                             <Descriptions.Item label="风险分">{record.evidence.risk_score ?? 0}</Descriptions.Item>
                           </Descriptions>
@@ -189,7 +193,9 @@ export function CapabilityReplayLab({ refresh }: CapabilityReplayLabProps) {
               </Space>
             ) : (
               <div className="zh-attack-lab__empty">
-                <Typography.Text type="secondary">点击运行后，这里会展示每个功能的真实调用结果和审计证据。</Typography.Text>
+                <Typography.Text type="secondary">
+                  点击运行后，这里会展示每个功能的真实调用结果和审计证据。
+                </Typography.Text>
               </div>
             )}
           </PanelCard>

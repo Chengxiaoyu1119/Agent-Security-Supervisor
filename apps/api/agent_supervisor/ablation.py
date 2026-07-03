@@ -15,6 +15,8 @@ from .paths import SANDBOX_REPORTS_DIR
 REPORT_DIR = SANDBOX_REPORTS_DIR
 CONTROL_DECISIONS = {"拒绝", "询问", "隔离"}
 _POLICY_LOCK = RLock()
+POLICY_ABLATION_JSON = "策略消融实验结果.json"
+POLICY_ABLATION_MARKDOWN = "策略消融实验结果.md"
 
 
 ABLATION_GROUPS: list[dict[str, Any]] = [
@@ -94,8 +96,8 @@ def write_policy_ablation_report(output_root: str | Path | None = None) -> dict[
     root = Path(output_root) if output_root else REPORT_DIR
     root.mkdir(parents=True, exist_ok=True)
     data = build_policy_ablation()
-    json_path = root / "策略消融实验结果.json"
-    markdown_path = root / "策略消融实验结果.md"
+    json_path = root / POLICY_ABLATION_JSON
+    markdown_path = root / POLICY_ABLATION_MARKDOWN
     json_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     markdown_path.write_text(build_policy_ablation_markdown(data), encoding="utf-8")
     return {
@@ -103,6 +105,19 @@ def write_policy_ablation_report(output_root: str | Path | None = None) -> dict[
         "json_path": str(json_path.resolve()),
         "markdown_path": str(markdown_path.resolve()),
     }
+
+
+def load_policy_ablation_report(output_root: str | Path | None = None) -> dict[str, Any]:
+    root = Path(output_root) if output_root else REPORT_DIR
+    json_path = root / POLICY_ABLATION_JSON
+    if json_path.exists():
+        try:
+            data = json.loads(json_path.read_text(encoding="utf-8"))
+            if isinstance(data, dict) and isinstance(data.get("summary"), dict) and isinstance(data.get("experiments"), list):
+                return data
+        except (OSError, json.JSONDecodeError):
+            pass
+    return _policy_ablation_placeholder()
 
 
 def build_policy_ablation_markdown(data: dict[str, Any] | None = None) -> str:
@@ -273,6 +288,54 @@ def _conclusion(risk_exposed_count: int, fallback_control_count: int, primary_hi
     if primary_hit_count:
         return "基线有命中，但消融后影响较小。"
     return "本组策略在所选脚本中贡献有限，需要扩展样本。"
+
+
+def _policy_ablation_placeholder() -> dict[str, Any]:
+    experiments = []
+    for group in ABLATION_GROUPS:
+        scenario_count = len(group["scenario_ids"])
+        empty_summary = {
+            "scenario_count": scenario_count,
+            "controlled_count": 0,
+            "attack_success_count": 0,
+            "control_rate": 0,
+            "blocked_count": 0,
+            "asked_count": 0,
+            "isolated_count": 0,
+            "primary_hit_count": 0,
+            "policy_distribution": {},
+        }
+        experiments.append(
+            {
+                "id": group["id"],
+                "name": group["name"],
+                "disabled_policies": group["disabled_policies"],
+                "scenario_ids": group["scenario_ids"],
+                "hypothesis": group["hypothesis"],
+                "baseline": empty_summary,
+                "ablated": empty_summary,
+                "risk_exposed_count": 0,
+                "fallback_control_count": 0,
+                "primary_hit_count": 0,
+                "conclusion": "尚未运行策略消融实验；可通过评估接口或 CLI 手动生成缓存证据。",
+                "cases": [],
+            }
+        )
+    return {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "source": "placeholder",
+        "summary": {
+            "experiment_count": len(experiments),
+            "scenario_count": sum(len(group["scenario_ids"]) for group in ABLATION_GROUPS),
+            "baseline_control_rate": 0,
+            "ablated_control_rate": 0,
+            "control_drop": 0,
+            "risk_exposed_count": 0,
+            "fallback_control_count": 0,
+            "primary_hit_count": 0,
+        },
+        "experiments": experiments,
+    }
 
 
 @contextmanager

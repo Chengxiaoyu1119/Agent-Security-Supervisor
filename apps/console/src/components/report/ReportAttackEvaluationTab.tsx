@@ -204,7 +204,7 @@ export function ReportAttackEvaluationTab({ report, onOpenScenario }: ReportAtta
         title={
           <SectionTitle
             title="攻击面覆盖矩阵"
-            meta={`${report.surface_coverage.filter((item) => item.demo_ready).length} 类可演示`}
+            meta={`${report.surface_coverage.filter((item) => item.demo_ready).length} 类可复现`}
           />
         }
         variant="borderless"

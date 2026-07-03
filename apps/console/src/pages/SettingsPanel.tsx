@@ -25,7 +25,15 @@ export function SettingsPanel({ overview, refresh }: { overview: Overview; refre
           {
             key: '1',
             label: '🤖 基础配置与成果对齐',
-            children: <SettingsBasicsTab overview={overview} />
+            children: (
+              <SettingsBasicsTab
+                overview={overview}
+                modelConfig={state.modelConfig}
+                savingModelConfig={state.savingModelConfig}
+                onModelConfigChange={actions.setModelConfig}
+                onSaveModelConfig={actions.handleSaveModelConfig}
+              />
+            )
           },
           {
             key: '2',

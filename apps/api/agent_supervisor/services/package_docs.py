@@ -60,7 +60,7 @@ def _submission_readme(package: dict[str, Any]) -> str:
             "",
             f"- 攻击面覆盖：{summary['surface_count']} 类",
             f"- 攻击脚本数量：{summary['scenario_count']} 个",
-            f"- 可演示攻击面：{summary['demo_ready_surface_count']} 类",
+            f"- 可复现攻击面：{summary['demo_ready_surface_count']} 类",
             f"- 实验记录：{summary['run_count']} 次",
             f"- 告警证据：{summary['alert_count']} 条",
             f"- 防护控制率：{summary['control_rate']}%",
@@ -169,7 +169,7 @@ def _run_guide() -> str:
             "node scripts/agent-supervisor-cli.mjs approvals --write --output apps/api/sandbox/reports",
             "```",
             "",
-            "运行答辩一键演示并导出报告：",
+            "运行答辩复现实验并导出报告：",
             "",
             "```powershell",
             "node scripts/agent-supervisor-cli.mjs demo-drill --run --output apps/api/sandbox/reports",
@@ -214,10 +214,10 @@ def _api_inventory() -> str:
             "| `/api/approvals.md` | GET | 人工复核队列 Markdown 报告 |",
             "| `/api/approvals/write` | POST | 在本地生成人工复核队列 JSON 与 Markdown 报告 |",
             "| `/api/approvals/{review_id}/decision` | POST | 对复核单执行批准或驳回，并写入 review_hash 证据 |",
-            "| `/api/demo_drill` | GET | 查看最近一次答辩一键演示 JSON 报告，不产生新审计记录 |",
-            "| `/api/demo_drill.md` | GET | 查看最近一次答辩一键演示 Markdown 报告 |",
-            "| `/api/demo_drill/run` | POST | 运行四步答辩演示，串联正常放行、人工复核和记忆隔离 |",
-            "| `/api/demo_drill/write` | POST | 运行并在本地生成答辩一键演示 JSON 与 Markdown |",
+            "| `/api/demo_drill` | GET | 查看最近一次答辩复现实验 JSON 报告，不产生新审计记录 |",
+            "| `/api/demo_drill.md` | GET | 查看最近一次答辩复现实验 Markdown 报告 |",
+            "| `/api/demo_drill/run` | POST | 运行四步答辩复现流程，串联正常放行、人工复核和记忆隔离 |",
+            "| `/api/demo_drill/write` | POST | 运行并在本地生成答辩复现实验 JSON 与 Markdown |",
             "| `/api/report` | GET | 初赛报告素材中心数据 |",
             "| `/api/attack_surfaces/evidence_packs` | GET | 全部攻击面的证据包索引 JSON，含完整度、控制率和缺口提示 |",
             "| `/api/attack_surfaces/evidence_packs.md` | GET | 全部攻击面证据包索引 Markdown |",
@@ -255,7 +255,7 @@ def _api_inventory() -> str:
             "| `/api/integrations/openclaw/plugin_package/validation.md` | GET | OpenClaw 插件包验收 Markdown 报告 |",
             "| `/api/integrations/openclaw/plugin_package/validation/write` | POST | 在本地生成 OpenClaw 插件包验收 JSON 与 Markdown |",
             "| `/api/integrations/openclaw/events` | POST | 外部智能体工具调用事件判定 |",
-            "| `/api/integrations/openclaw/minimal_agent_demo` | POST | 页面一键运行最小外部 Agent 真实工具调度接入演示，并生成证据文件 |",
+            "| `/api/integrations/openclaw/minimal_agent_demo` | POST | 页面一键运行最小外部 Agent 真实工具调度验证，并生成证据文件 |",
         ]
     )
 
@@ -286,8 +286,8 @@ def _source_tree() -> str:
             "| `apps/api/agent_supervisor/benign_workflows.py` | 连续正常比赛任务流程误报评测和审计 hash 链 |",
             "| `apps/api/agent_supervisor/approvals.py` | 人工复核队列、批准/驳回和 review_hash 证据生成 |",
             "| `apps/api/agent_supervisor/calibration.py` | 异常检测阈值校准、召回率和误报率报告生成 |",
-            "| `apps/api/agent_supervisor/demo_drill.py` | 答辩一键演示编排和演示报告生成 |",
-            "| `apps/api/agent_supervisor/tools.py` | 邮件、文件、API、代码、记忆、环境模拟工具 |",
+            "| `apps/api/agent_supervisor/demo_drill.py` | 答辩复现实验编排和证据报告生成 |",
+            "| `apps/api/agent_supervisor/tools.py` | 邮件、文件、API、代码、记忆、环境靶场工具 |",
             "| `apps/api/agent_supervisor/services/package_service.py` | 比赛材料包和提交包生成 |",
             "| `apps/api/agent_supervisor/events.py` | 外部智能体工具调用事件评估和审计落库 |",
             "| `apps/api/agent_supervisor/openclaw_adapter.py` | OpenClaw 兼容接口、源码级 native plugin 包生成 |",
@@ -324,8 +324,8 @@ def _threat_model_for_package() -> str:
             "- 系统提示词与安全规则",
             "- 沙箱文件、参赛队伍资料、提交物摘要与赛题种子",
             "- 长期记忆库",
-            "- 假发件箱",
-            "- 模拟比赛平台 API",
+            "- 本地沙箱 outbox",
+            "- 本地靶场比赛平台 API",
             "- 代码执行工具",
             "- 审计日志与告警证据",
             "",
@@ -337,7 +337,7 @@ def _threat_model_for_package() -> str:
             "| 模型输出到工具调用 | 模型生成的工具名和参数 | 工具权限矩阵、参数审计 |",
             "| 工具返回到模型上下文 | 文件、API、环境、网页返回 | 低信任隔离、禁止覆盖授权 |",
             "| 智能体记忆写入 | 用户偏好、会话摘要、外部内容 | 写入审计、隔离区、回滚 |",
-            "| 沙箱工具到本机环境 | 文件路径、命令、外发请求 | 路径限制、假 outbox、模拟 API |",
+            "| 沙箱工具到本机环境 | 文件路径、命令、外发请求 | 路径限制、本地沙箱 outbox、本地靶场 API |",
             "",
             "## 关键攻击面",
             "",
@@ -403,14 +403,14 @@ def _multi_agent_self_review_record() -> str:
 
 
 def _page_agent_demo_record() -> str:
-    doc_path = ROOT_DOCS_DIR / "页面一键真实Agent演示完善记录-20260608.md"
+    doc_path = ROOT_DOCS_DIR / "页面一键真实Agent验证完善记录-20260608.md"
     if doc_path.exists():
         return doc_path.read_text(encoding="utf-8")
     return "\n".join(
         [
-            "# 页面一键真实 Agent 演示完善记录",
+            "# 页面一键真实 Agent 验证完善记录",
             "",
-            "设置页新增一键运行真实 Agent demo 的按钮，可调用 `/api/integrations/openclaw/minimal_agent_demo` 并展示工具调度结果、控制率和审计 hash。",
+            "设置页新增一键运行真实 Agent 验证的按钮，可调用 `/api/integrations/openclaw/minimal_agent_demo` 并展示工具调度结果、控制率和审计 hash。",
         ]
     )
 
@@ -535,12 +535,12 @@ def _readiness_record() -> str:
             "",
             "- 攻击面与脚本覆盖",
             "- 对抗样本、越狱用例和智能体攻击脚本",
-            "- 行为监督器、策略和模拟比赛工具",
+            "- 行为监督器、策略和本地靶场业务工具",
             "- 正常比赛任务单步误报评测",
             "- 连续正常比赛任务流程误报评测",
             "- 异常检测阈值校准",
             "- OpenClaw 插件静态验收和 runtime inspect 缺口",
-            "- 初赛提交包、manifest 和演示截图完整性",
+            "- 初赛提交包、manifest 和复现截图完整性",
             "",
             "## 仍需补证",
             "",
@@ -573,18 +573,18 @@ def _approval_review_record() -> str:
             "",
             "- “询问”不再只是一个静态决策，而是进入待处理队列。",
             "- 复核单关联原始 `audit_hash`，审批后生成 `review_hash`。",
-            "- 答辩时可以演示外部智能体触发风险、监督器暂停、人工复核、证据导出四步闭环。",
+            "- 答辩时可以复现外部智能体触发风险、监督器暂停、人工复核、证据导出四步闭环。",
         ]
     )
 
 
 def _demo_drill_record() -> str:
-    doc_path = ROOT_DOCS_DIR / "答辩一键演示闭环完善记录-20260608.md"
+    doc_path = ROOT_DOCS_DIR / "答辩复现闭环完善记录-20260608.md"
     if doc_path.exists():
         return doc_path.read_text(encoding="utf-8")
     return "\n".join(
         [
-            "# 答辩一键演示闭环完善记录",
+            "# 答辩复现闭环完善记录",
             "",
             "## 本轮新增",
             "",
@@ -595,13 +595,13 @@ def _demo_drill_record() -> str:
             "   - `POST /api/demo_drill/run`",
             "   - `POST /api/demo_drill/write`",
             "3. 新增 CLI：`node scripts/agent-supervisor-cli.mjs demo-drill --run --output apps/api/sandbox/reports`。",
-            "4. 设置页新增“答辩一键演示”面板，展示四步演示、风险分、策略、audit_hash 和 review_hash。",
+            "4. 设置页新增“答辩复现”面板，展示四步运行记录、风险分、策略、audit_hash 和 review_hash。",
             "",
-            "## 演示价值",
+            "## 复现价值",
             "",
             "- 用一条固定流程展示正常放行、外发复核、批量导出审批和记忆隔离。",
             "- 评委不用手动构造 JSON，也能看到系统从攻击输入到证据导出的完整闭环。",
-            "- 提交包新增 `18_答辩一键演示闭环报告.md`，增强现场可解释性。",
+            "- 提交包新增 `18_答辩复现闭环报告.md`，增强现场可解释性。",
         ]
     )
 
@@ -609,7 +609,7 @@ def _demo_drill_record() -> str:
 def _screenshot_checklist() -> str:
     return "\n".join(
         [
-            "# 演示截图清单",
+            "# 复现截图清单",
             "",
             "建议初赛材料至少保留以下截图：",
             "",
@@ -629,10 +629,10 @@ def _screenshot_checklist() -> str:
             "14. 连续正常比赛任务流程误报评测：展示流程通过率、步骤误报率、边界控制和审计 hash 链。",
             "15. 赛前一键体检：展示就绪分、P0 补证项、关键检查项和提交包状态。",
             "16. 人工复核队列：展示待复核、已批准、已驳回和 review_hash 证据。",
-            "17. 答辩一键演示：展示正常放行、外发复核、批量导出审批和记忆隔离。",
+            "17. 答辩复现：展示正常放行、外发复核、批量导出审批和记忆隔离。",
             "18. 前端工程规范与 Token 治理：展示设计 Token、统一组件接入后的桌面和移动端页面状态。",
             "19. 决策标签统一组件：展示审计页、告警页和设置页中统一渲染的允许、拒绝、询问、隔离标签。",
             "",
-            "已生成的核心截图会自动复制到提交包 `02_运行与答辩说明/演示截图` 目录；截图应尽量来自真实本地运行页面，而不是手工绘图。",
+            "已生成的核心截图会自动复制到提交包 `02_运行与答辩说明/复现截图` 目录；截图应尽量来自真实本地运行页面，而不是手工绘图。",
         ]
     )

@@ -4,5 +4,7 @@ import type { TagProps } from 'antd';
 export type LabelTagProps = TagProps;
 
 export function LabelTag(props: LabelTagProps) {
-  return <Tag {...props} />;
+  const className = props.className ? `zh-label-tag ${props.className}` : 'zh-label-tag';
+
+  return <Tag {...props} className={className} />;
 }

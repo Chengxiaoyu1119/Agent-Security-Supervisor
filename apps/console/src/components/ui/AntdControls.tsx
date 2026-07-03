@@ -1,6 +1,6 @@
 import { Alert, Badge, Input, InputNumber, Progress, Select, Switch, Table, Tabs } from 'antd';
+import type { AlertProps } from 'antd';
 
-export const UiAlert = Alert;
 export const UiBadge = Badge;
 export const UiInput = Input;
 export const UiInputNumber = InputNumber;
@@ -10,7 +10,14 @@ export const UiSwitch = Switch;
 export const UiTable = Table;
 export const UiTabs = Tabs;
 
-export type { AlertProps as UiAlertProps } from 'antd';
+export type UiAlertProps = Omit<AlertProps, 'message'> & {
+  message?: AlertProps['message'];
+};
+
+export function UiAlert({ title, message, ...props }: UiAlertProps) {
+  return <Alert {...props} title={title ?? message} />;
+}
+
 export type { BadgeProps as UiBadgeProps } from 'antd';
 export type { InputProps as UiInputProps } from 'antd';
 export type { InputNumberProps as UiInputNumberProps } from 'antd';

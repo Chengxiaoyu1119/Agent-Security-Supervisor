@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Globe2, KeyRound, Play, ShieldCheck } from 'lucide-react';
+import { Globe2, KeyRound, Play } from 'lucide-react';
 import { Col, Descriptions, Row, Space, Typography } from 'antd';
 import { runAuthorizedTarget } from '../../api';
 import type { AuthorizedTargetRunResult } from '../../types';
+import { AuditDeepLinkButton } from '../audit/AuditDeepLinkButton';
 import {
   DecisionPill,
   EvidenceCodeBlock,
@@ -15,6 +16,10 @@ import {
   UiSelect,
   UiSwitch
 } from '../ui';
+import { AuthorizedTargetPreview } from './AuthorizedTargetPreview';
+import { AuthorizedTargetPrecheck } from './AuthorizedTargetPrecheck';
+import { AuthorizedTargetAuditItems } from './AuthorizedTargetAuditItems';
+import { AuthorizedTargetScopeCard } from './AuthorizedTargetScopeCard';
 
 type AuthorizedTargetLabProps = {
   refresh?: () => Promise<unknown>;
@@ -32,14 +37,22 @@ const SURFACE_OPTIONS = [
   { label: '滥用风险', value: 'abuse-risk' }
 ];
 
+const TARGET_TYPE_OPTIONS = [
+  { label: 'OpenAI 兼容模型接口', value: 'openai-compatible' },
+  { label: 'Agent 运行接口', value: 'agent-run' },
+  { label: '监督器事件接口', value: 'supervisor-event' },
+  { label: 'OpenClaw 插件接口', value: 'openclaw-event' }
+];
+
 function findingText(findings: Array<Record<string, string>>) {
   if (!findings.length) return '未命中过滤器';
-  return findings.map((item) => `${item.type ?? 'finding'}:${item.count ?? '1'}`).join('，');
+  return findings.map((item) => `${item.type ?? 'finding'}:${item.count ?? '1'}`).join('；');
 }
 
 export function AuthorizedTargetLab({ refresh }: AuthorizedTargetLabProps) {
   const [targetUrl, setTargetUrl] = useState('');
   const [surfaceId, setSurfaceId] = useState('prompt-injection');
+  const [targetType, setTargetType] = useState('openai-compatible');
   const [targetModel, setTargetModel] = useState('authorized-target-model');
   const [attackInput, setAttackInput] = useState(DEFAULT_ATTACK_INPUT);
   const [authorizationNote, setAuthorizationNote] = useState('');
@@ -57,6 +70,7 @@ export function AuthorizedTargetLab({ refresh }: AuthorizedTargetLabProps) {
         target_url: targetUrl,
         attack_input: attackInput,
         surface_id: surfaceId,
+        target_type: targetType,
         target_model: targetModel,
         authorization_confirmed: authorizationConfirmed,
         authorization_note: authorizationNote,
@@ -77,11 +91,11 @@ export function AuthorizedTargetLab({ refresh }: AuthorizedTargetLabProps) {
       <Row gutter={[20, 20]} align="stretch">
         <Col xs={24} xl={9}>
           <PanelCard title="授权公网靶场" subtitle="只向授权 LLM/Agent 接口发起单点测试" className="zh-full-height">
-            <Space direction="vertical" size={16} className="zh-full-width">
+            <Space orientation="vertical" size={16} className="zh-full-width">
               <UiAlert
                 type="warning"
                 showIcon
-                message="这里只测试授权 LLM/Agent 接口；后端会拒绝本机、内网、保留地址和非模型接口路径。"
+                message="这里不是任意网站攻击器。后端只允许公网 LLM/Agent 靶场路径，并拒绝本机、内网、保留地址和非模型接口。"
               />
               <div className="zh-attack-lab__field">
                 <Typography.Text strong>靶场 URL</Typography.Text>
@@ -104,11 +118,19 @@ export function AuthorizedTargetLab({ refresh }: AuthorizedTargetLabProps) {
                 </Col>
                 <Col xs={24} md={12}>
                   <div className="zh-attack-lab__field">
-                    <Typography.Text strong>目标模型名</Typography.Text>
-                    <UiInput value={targetModel} onChange={(event) => setTargetModel(event.target.value)} />
+                    <Typography.Text strong>目标类型</Typography.Text>
+                    <UiSelect
+                      value={targetType}
+                      onChange={(value) => setTargetType(String(value))}
+                      options={TARGET_TYPE_OPTIONS}
+                    />
                   </div>
                 </Col>
               </Row>
+              <div className="zh-attack-lab__field">
+                <Typography.Text strong>目标模型名</Typography.Text>
+                <UiInput value={targetModel} onChange={(event) => setTargetModel(event.target.value)} />
+              </div>
               <div className="zh-attack-lab__field">
                 <Typography.Text strong>攻击输入</Typography.Text>
                 <UiInput.TextArea
@@ -132,7 +154,11 @@ export function AuthorizedTargetLab({ refresh }: AuthorizedTargetLabProps) {
               </div>
               <Row gutter={[12, 12]} align="stretch">
                 <Col xs={24} md={12}>
-                  <div className="zh-attack-lab__field">
+                  <form
+                    className="zh-attack-lab__field"
+                    autoComplete="off"
+                    onSubmit={(event) => event.preventDefault()}
+                  >
                     <Typography.Text strong>
                       <KeyRound size={14} className="zh-tag-icon" />
                       Bearer Token
@@ -140,9 +166,10 @@ export function AuthorizedTargetLab({ refresh }: AuthorizedTargetLabProps) {
                     <UiInput.Password
                       value={bearerToken}
                       onChange={(event) => setBearerToken(event.target.value)}
+                      autoComplete="off"
                       placeholder="没有就留空"
                     />
-                  </div>
+                  </form>
                 </Col>
                 <Col xs={24} md={12}>
                   <div className="zh-attack-lab__switch-row zh-attack-lab__switch-row--compact zh-full-height">
@@ -156,9 +183,18 @@ export function AuthorizedTargetLab({ refresh }: AuthorizedTargetLabProps) {
                   </div>
                 </Col>
               </Row>
+              <AuthorizedTargetPrecheck targetUrl={targetUrl} authorizationConfirmed={authorizationConfirmed} />
               <UiButton type="primary" icon={<Play size={16} />} loading={running} onClick={runLab}>
                 运行授权靶场测试
               </UiButton>
+              <AuthorizedTargetPreview
+                targetUrl={targetUrl}
+                targetType={targetType}
+                targetModel={targetModel}
+                attackInput={attackInput}
+                surfaceId={surfaceId}
+                hasBearerToken={Boolean(bearerToken)}
+              />
             </Space>
           </PanelCard>
         </Col>
@@ -166,13 +202,21 @@ export function AuthorizedTargetLab({ refresh }: AuthorizedTargetLabProps) {
         <Col xs={24} xl={15}>
           <PanelCard title="靶场调用结果" subtitle={result ? result.target_url : '等待运行'} className="zh-full-height">
             {result ? (
-              <Space direction="vertical" size={16} className="zh-full-width">
+              <Space orientation="vertical" size={16} className="zh-full-width">
                 <Row gutter={[12, 12]}>
                   <Col xs={12} lg={6}>
-                    <MetricCard label="已发起请求" value={result.executed ? '是' : '否'} tone={result.executed ? 'cyan' : 'amber'} />
+                    <MetricCard
+                      label="已发起请求"
+                      value={result.executed ? '是' : '否'}
+                      tone={result.executed ? 'cyan' : 'amber'}
+                    />
                   </Col>
                   <Col xs={12} lg={6}>
-                    <MetricCard label="HTTP 状态" value={result.http_status} tone={result.http_status >= 400 ? 'red' : 'green'} />
+                    <MetricCard
+                      label="HTTP 状态"
+                      value={result.http_status}
+                      tone={result.http_status >= 400 ? 'red' : 'green'}
+                    />
                   </Col>
                   <Col xs={12} lg={6}>
                     <MetricCard
@@ -189,30 +233,56 @@ export function AuthorizedTargetLab({ refresh }: AuthorizedTargetLabProps) {
                     />
                   </Col>
                 </Row>
-                <Descriptions column={1} size="small">
-                  <Descriptions.Item label="预检决策">
-                    <DecisionPill decision={result.preflight.decision} />
-                  </Descriptions.Item>
-                  <Descriptions.Item label="响应决策">
-                    <DecisionPill decision={result.supervisor.decision} />
-                  </Descriptions.Item>
-                  <Descriptions.Item label="请求类型">
-                    <LabelTag color="blue">{result.summary.payload_kind ?? '未执行'}</LabelTag>
-                  </Descriptions.Item>
-                  <Descriptions.Item label="Token 配置">{result.summary.token_configured ? '已填写' : '未填写'}</Descriptions.Item>
-                  <Descriptions.Item label="过滤命中">{findingText(result.output_filter.findings)}</Descriptions.Item>
-                  <Descriptions.Item label="监督理由">{result.supervisor.reason}</Descriptions.Item>
-                </Descriptions>
+                <PanelCard
+                  title="判定解释"
+                  type="inner"
+                  extra={<AuditDeepLinkButton auditId={result.supervisor.audit_id} size="small" />}
+                >
+                  <Descriptions column={1} size="small">
+                    <Descriptions.Item label="预检决策">
+                      <DecisionPill decision={result.preflight.decision} />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="响应决策">
+                      <DecisionPill decision={result.supervisor.decision} />
+                    </Descriptions.Item>
+                    <Descriptions.Item label="请求类型">
+                      <LabelTag color="blue">{result.summary.payload_kind ?? '未执行'}</LabelTag>
+                    </Descriptions.Item>
+                    <Descriptions.Item label="目标类型">{result.summary.target_type ?? targetType}</Descriptions.Item>
+                    <Descriptions.Item label="Token 配置">
+                      {result.summary.token_configured ? '已填写' : '未填写'}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="过滤命中">{findingText(result.output_filter.findings)}</Descriptions.Item>
+                    <AuthorizedTargetAuditItems
+                      preflightAuditId={result.preflight.audit_id}
+                      responseAuditId={result.supervisor.audit_id}
+                    />
+                    <Descriptions.Item label="监督理由">{result.supervisor.reason}</Descriptions.Item>
+                  </Descriptions>
+                </PanelCard>
                 <div className="zh-attack-lab__field">
                   <Typography.Text strong>靶场响应</Typography.Text>
-                  <EvidenceCodeBlock maxHeight="large">{result.target_response || result.summary.reason || '无响应正文'}</EvidenceCodeBlock>
+                  <EvidenceCodeBlock maxHeight="large">
+                    {result.target_response || result.summary.reason || '无响应正文'}
+                  </EvidenceCodeBlock>
                 </div>
+                <AuthorizedTargetPreview
+                  targetUrl={targetUrl}
+                  targetType={targetType}
+                  targetModel={targetModel}
+                  attackInput={attackInput}
+                  surfaceId={surfaceId}
+                  hasBearerToken={result.summary.token_configured}
+                  serverPreview={result.request_preview}
+                />
               </Space>
             ) : (
               <div className="zh-attack-lab__empty">
-                <Space direction="vertical" align="center">
+                <Space orientation="vertical" align="center">
                   <Globe2 size={28} />
-                  <Typography.Text type="secondary">填写授权靶场地址后，系统会先预检，再发起一次受控 POST 测试。</Typography.Text>
+                  <Typography.Text type="secondary">
+                    填写授权靶场地址后，系统会先预检，再发起一次受控 POST 测试。
+                  </Typography.Text>
                 </Space>
               </div>
             )}
@@ -220,17 +290,7 @@ export function AuthorizedTargetLab({ refresh }: AuthorizedTargetLabProps) {
         </Col>
       </Row>
 
-      <Row gutter={[20, 20]} className="zh-attack-lab__evidence-row">
-        <Col xs={24}>
-          <PanelCard title="可调用范围" subtitle={<ShieldCheck size={16} />}>
-            <Typography.Paragraph className="zh-description-flush">
-              允许路径包括 /api/agent/run、/api/chat、/api/supervisor/evaluate、/api/integrations/openclaw/events、
-              /api/attack_lab/run 和 /v1/chat/completions。这个限制的作用是把能力约束在 LLM/Agent 靶场，
-              不把作品做成任意网站攻击器。
-            </Typography.Paragraph>
-          </PanelCard>
-        </Col>
-      </Row>
+      <AuthorizedTargetScopeCard />
     </div>
   );
 }

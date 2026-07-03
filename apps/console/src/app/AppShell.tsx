@@ -2,7 +2,7 @@ import { type ReactNode, Suspense, useEffect, useMemo } from 'react';
 import { ConfigProvider, Drawer, Layout, Menu, Space, Spin, Typography, theme as antdTheme } from 'antd';
 import { Activity, Menu as MenuIcon, Moon, Play, Sun } from 'lucide-react';
 import { UiAlert, UiButton } from '../components/ui';
-import { navItems, type PageKey } from './navigation';
+import { navGroups, navItems, type PageKey } from './navigation';
 
 const { Sider, Header, Content } = Layout;
 const { darkAlgorithm, defaultAlgorithm } = antdTheme;
@@ -67,14 +67,19 @@ export function AppShell({
 
   const menuItems = useMemo(
     () =>
-      navItems.map((item) => ({
-        key: item.key,
-        icon: item.icon,
-        label: item.label,
-        onClick: () => {
-          onPageChange(item.key);
-          onCloseDrawer();
-        }
+      navGroups.map((group) => ({
+        type: 'group' as const,
+        key: group.key,
+        label: group.label,
+        children: group.items.map((item) => ({
+          key: item.key,
+          icon: item.icon,
+          label: item.label,
+          onClick: () => {
+            onPageChange(item.key);
+            onCloseDrawer();
+          }
+        }))
       })),
     [onCloseDrawer, onPageChange]
   );

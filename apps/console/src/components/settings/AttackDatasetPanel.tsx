@@ -1,6 +1,7 @@
+import { useMemo, useState } from 'react';
 import { Col, Row, Space, Typography } from 'antd';
 import type { AttackCaseDataset, Overview } from '@/types';
-import { LabelTag, MetricCard as Metric, PanelCard, UiButton } from '../ui';
+import { LabelTag, MetricCard as Metric, PanelCard, UiButton, UiSelect } from '../ui';
 
 interface AttackDatasetPanelProps {
   overview: Overview;
@@ -8,6 +9,15 @@ interface AttackDatasetPanelProps {
 }
 
 export function AttackDatasetPanel({ overview, attackDataset }: AttackDatasetPanelProps) {
+  const [selectedSurfaceId, setSelectedSurfaceId] = useState(overview.attack_surfaces[0]?.id ?? '');
+  const surfaceOptions = useMemo(
+    () => overview.attack_surfaces.map((surface) => ({ label: surface.name, value: surface.id })),
+    [overview.attack_surfaces]
+  );
+  const exportUrl = selectedSurfaceId
+    ? `/api/datasets/attack_cases?surface_id=${encodeURIComponent(selectedSurfaceId)}`
+    : '/api/datasets/attack_cases';
+
   return (
     <PanelCard title="攻击样本数据集" type="inner">
       <Row gutter={[16, 16]} className="zh-mb-24">
@@ -51,18 +61,17 @@ export function AttackDatasetPanel({ overview, attackDataset }: AttackDatasetPan
         <Typography.Text strong className="zh-settings-field-title">
           按攻击面筛选
         </Typography.Text>
-        <Space wrap>
-          {overview.attack_surfaces.map((surface) => (
-            <UiButton
-              key={surface.id}
-              href={`/api/datasets/attack_cases?surface_id=${encodeURIComponent(surface.id)}`}
-              target="_blank"
-              size="small"
-            >
-              {surface.name}
-            </UiButton>
-          ))}
-        </Space>
+        <Space.Compact block>
+          <UiSelect
+            value={selectedSurfaceId}
+            onChange={setSelectedSurfaceId}
+            options={surfaceOptions}
+            className="zh-settings-dataset-surface-select"
+          />
+          <UiButton href={exportUrl} target="_blank">
+            打开筛选数据
+          </UiButton>
+        </Space.Compact>
       </div>
     </PanelCard>
   );

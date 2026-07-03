@@ -43,7 +43,7 @@ export function AuditFilterBar({
     <Flex gap={16} wrap="wrap" className="zh-mb-16" justify="space-between">
       <Flex gap={16} wrap="wrap" className="zh-flex-spacer">
         <UiInput
-          placeholder="搜索工具、策略、原因..."
+          placeholder="搜索审计编号、工具、策略、原因..."
           value={query}
           onChange={(event) => onQueryChange(event.target.value)}
           className="zh-filter-control--query"

@@ -3,6 +3,7 @@ import { Bot, Play, ShieldCheck } from 'lucide-react';
 import { Col, Descriptions, Row, Space, Typography } from 'antd';
 import { runDualModelJailbreak } from '../../api';
 import type { DualModelJailbreakResult } from '../../types';
+import { AuditDeepLinkButton } from '../audit/AuditDeepLinkButton';
 import {
   DecisionPill,
   EvidenceCodeBlock,
@@ -11,8 +12,10 @@ import {
   PanelCard,
   UiAlert,
   UiButton,
-  UiInput
+  UiInput,
+  UiInputNumber
 } from '../ui';
+import { DualModelRoundsPanel } from './DualModelRoundsPanel';
 
 type DualModelJailbreakLabProps = {
   refresh?: () => Promise<unknown>;
@@ -45,6 +48,7 @@ export function DualModelJailbreakLab({ refresh }: DualModelJailbreakLabProps) {
   const [task, setTask] = useState(DEFAULT_TASK);
   const [blockTerms, setBlockTerms] = useState(DEFAULT_BLOCK_TERMS);
   const [optimizerRole, setOptimizerRole] = useState(DEFAULT_OPTIMIZER_ROLE);
+  const [iterationCount, setIterationCount] = useState(3);
   const [running, setRunning] = useState(false);
   const [notice, setNotice] = useState('');
   const [result, setResult] = useState<DualModelJailbreakResult | null>(null);
@@ -60,7 +64,8 @@ export function DualModelJailbreakLab({ refresh }: DualModelJailbreakLabProps) {
         target_provider_profile: TARGET_PROVIDER_PROFILE,
         optimizer_role: optimizerRole,
         force_real_optimizer: true,
-        force_real_target: true
+        force_real_target: true,
+        iteration_count: iterationCount
       });
       setResult(nextResult);
       await refresh?.();
@@ -76,8 +81,12 @@ export function DualModelJailbreakLab({ refresh }: DualModelJailbreakLabProps) {
       {notice && <UiAlert type="warning" showIcon title={notice} className="zh-mb-24" />}
       <Row gutter={[20, 20]} align="stretch">
         <Col xs={24} xl={8}>
-          <PanelCard title="真实双模型链路" subtitle="副模型优化，主模型对测" className="zh-full-height zh-dual-model-config-card">
-            <Space direction="vertical" size={16} className="zh-full-width">
+          <PanelCard
+            title="真实双模型链路"
+            subtitle="副模型优化，主模型对测"
+            className="zh-full-height zh-dual-model-config-card"
+          >
+            <Space orientation="vertical" size={16} className="zh-full-width">
               <UiAlert
                 type="info"
                 showIcon
@@ -123,17 +132,30 @@ export function DualModelJailbreakLab({ refresh }: DualModelJailbreakLabProps) {
                 <Typography.Text strong>观察/拦截词</Typography.Text>
                 <UiInput value={blockTerms} onChange={(event) => setBlockTerms(event.target.value)} />
               </div>
+              <div className="zh-attack-lab__field">
+                <Typography.Text strong>迭代轮数</Typography.Text>
+                <UiInputNumber
+                  min={1}
+                  max={5}
+                  value={iterationCount}
+                  onChange={(value) => setIterationCount(Number(value ?? 1))}
+                />
+              </div>
               <UiButton type="primary" icon={<Play size={16} />} loading={running} onClick={runLab} block>
-                运行真实双模型对测
+                运行多轮双模型对测
               </UiButton>
             </Space>
           </PanelCard>
         </Col>
 
         <Col xs={24} xl={16}>
-          <PanelCard title="双模型链路结果" subtitle={result ? result.summary.decision_change : '等待运行'} className="zh-full-height">
+          <PanelCard
+            title="双模型链路结果"
+            subtitle={result ? result.summary.decision_change : '等待运行'}
+            className="zh-full-height"
+          >
             {result ? (
-              <Space direction="vertical" size={16} className="zh-full-width">
+              <Space orientation="vertical" size={16} className="zh-full-width">
                 <Row gutter={[12, 12]} className="zh-dual-model-metrics">
                   <Col xs={12} md={8} xl={4}>
                     <MetricCard label="副模型" value={result.summary.optimizer_real ? '真实' : '兜底'} tone="cyan" />
@@ -142,36 +164,68 @@ export function DualModelJailbreakLab({ refresh }: DualModelJailbreakLabProps) {
                     <MetricCard label="主模型" value={result.summary.target_real ? '真实' : '兜底'} tone="amber" />
                   </Col>
                   <Col xs={12} md={8} xl={4}>
-                    <MetricCard label="疑似突破" value={result.summary.attack_success ? '是' : '否'} tone={result.summary.attack_success ? 'red' : 'green'} />
+                    <MetricCard
+                      label="疑似突破"
+                      value={result.summary.attack_success ? '是' : '否'}
+                      tone={result.summary.attack_success ? 'red' : 'green'}
+                    />
                   </Col>
                   <Col xs={12} md={8} xl={4}>
-                    <MetricCard label="监督控制" value={result.summary.controlled_with_guard ? '成功' : '未控制'} tone={result.summary.controlled_with_guard ? 'green' : 'red'} />
+                    <MetricCard
+                      label="监督控制"
+                      value={result.summary.controlled_with_guard ? '成功' : '未控制'}
+                      tone={result.summary.controlled_with_guard ? 'green' : 'red'}
+                    />
                   </Col>
                   <Col xs={12} md={8} xl={4}>
                     <MetricCard label="风险分" value={result.summary.risk_score} tone="red" />
                   </Col>
                   <Col xs={12} md={8} xl={4}>
-                    <MetricCard label="输出过滤" value={result.output_filter.blocked ? '命中' : '未命中'} tone={result.output_filter.blocked ? 'amber' : 'green'} />
+                    <MetricCard
+                      label="输出过滤"
+                      value={result.output_filter.blocked ? '命中' : '未命中'}
+                      tone={result.output_filter.blocked ? 'amber' : 'green'}
+                    />
+                  </Col>
+                  <Col xs={12} md={8} xl={4}>
+                    <MetricCard
+                      label="最佳轮次"
+                      value={result.summary.best_round ?? result.summary.iteration_count ?? 1}
+                      tone="cyan"
+                    />
                   </Col>
                 </Row>
                 <Row gutter={[16, 16]} align="stretch" className="zh-dual-model-output-row">
                   <Col xs={24} lg={12}>
-                    <PanelCard title="副模型优化提示词" subtitle={<Bot size={16} />} type="inner" className="zh-full-height">
+                    <PanelCard
+                      title="副模型优化提示词"
+                      subtitle={<Bot size={16} />}
+                      type="inner"
+                      className="zh-full-height"
+                    >
                       <Descriptions column={1} size="small">
                         <Descriptions.Item label="模式">
                           <LabelTag color={result.optimizer.mode === 'real-api' ? 'processing' : 'default'}>
                             {result.optimizer.mode}
                           </LabelTag>
                         </Descriptions.Item>
-                        <Descriptions.Item label="模型">{result.optimizer.provider} {result.optimizer.model}</Descriptions.Item>
-                        <Descriptions.Item label="配置组">{result.optimizer.provider_profile ?? OPTIMIZER_PROVIDER_PROFILE}</Descriptions.Item>
+                        <Descriptions.Item label="模型">
+                          {result.optimizer.provider} {result.optimizer.model}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="配置组">
+                          {result.optimizer.provider_profile ?? OPTIMIZER_PROVIDER_PROFILE}
+                        </Descriptions.Item>
                       </Descriptions>
                       {providerFailureText(result.optimizer.provider_failures) && (
                         <UiAlert
                           type="warning"
                           showIcon
                           message="副模型真实接口未成功，已启用本地安全评测模型"
-                          description={<pre className="zh-dual-model-failures">{providerFailureText(result.optimizer.provider_failures)}</pre>}
+                          description={
+                            <pre className="zh-dual-model-failures">
+                              {providerFailureText(result.optimizer.provider_failures)}
+                            </pre>
+                          }
                         />
                       )}
                       <EvidenceCodeBlock maxHeight="large">{result.optimizer.optimized_prompt}</EvidenceCodeBlock>
@@ -185,8 +239,12 @@ export function DualModelJailbreakLab({ refresh }: DualModelJailbreakLabProps) {
                             {result.target.mode}
                           </LabelTag>
                         </Descriptions.Item>
-                        <Descriptions.Item label="模型">{result.target.provider} {result.target.model}</Descriptions.Item>
-                        <Descriptions.Item label="配置组">{result.target.provider_profile ?? TARGET_PROVIDER_PROFILE}</Descriptions.Item>
+                        <Descriptions.Item label="模型">
+                          {result.target.provider} {result.target.model}
+                        </Descriptions.Item>
+                        <Descriptions.Item label="配置组">
+                          {result.target.provider_profile ?? TARGET_PROVIDER_PROFILE}
+                        </Descriptions.Item>
                         <Descriptions.Item label="过滤">{findingText(result.output_filter.findings)}</Descriptions.Item>
                       </Descriptions>
                       {providerFailureText(result.target.provider_failures) && (
@@ -194,14 +252,23 @@ export function DualModelJailbreakLab({ refresh }: DualModelJailbreakLabProps) {
                           type="warning"
                           showIcon
                           message="主模型真实接口未成功，已启用本地安全评测模型"
-                          description={<pre className="zh-dual-model-failures">{providerFailureText(result.target.provider_failures)}</pre>}
+                          description={
+                            <pre className="zh-dual-model-failures">
+                              {providerFailureText(result.target.provider_failures)}
+                            </pre>
+                          }
                         />
                       )}
                       <EvidenceCodeBlock maxHeight="large">{result.target.filtered_output}</EvidenceCodeBlock>
                     </PanelCard>
                   </Col>
                 </Row>
-                <PanelCard title="监督器判定" subtitle={<ShieldCheck size={16} />} type="inner">
+                <PanelCard
+                  title="监督器判定"
+                  subtitle={<ShieldCheck size={16} />}
+                  type="inner"
+                  extra={<AuditDeepLinkButton auditId={result.supervisor.with_guard.audit_id} size="small" />}
+                >
                   <Descriptions column={1} size="small">
                     <Descriptions.Item label="无监督">
                       <DecisionPill decision={result.supervisor.without_guard.decision} />
@@ -213,10 +280,13 @@ export function DualModelJailbreakLab({ refresh }: DualModelJailbreakLabProps) {
                     <Descriptions.Item label="原因">{result.supervisor.with_guard.reason}</Descriptions.Item>
                   </Descriptions>
                 </PanelCard>
+                <DualModelRoundsPanel rounds={result.rounds ?? []} />
               </Space>
             ) : (
               <div className="zh-attack-lab__empty">
-                <Typography.Text type="secondary">运行后会显示副模型优化提示词、主模型输出和监督器判定。</Typography.Text>
+                <Typography.Text type="secondary">
+                  运行后会显示副模型优化提示词、主模型输出和监督器判定。
+                </Typography.Text>
               </div>
             )}
           </PanelCard>

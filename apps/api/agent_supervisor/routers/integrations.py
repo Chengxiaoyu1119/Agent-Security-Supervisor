@@ -5,6 +5,7 @@ from fastapi.responses import StreamingResponse
 
 from ..agent_integrations import build_agent_integration_bundle, build_agent_integration_markdown
 from ..attack_lab import list_attack_lab_modules, run_attack_lab_module
+from ..attack_testsets import list_attack_testsets, run_attack_testset
 from ..auth import require_api_token
 from ..capability_replay import run_capability_replay
 from ..event_stream import stream_runtime_events
@@ -13,6 +14,7 @@ from ..external_agent_demo import run_minimal_external_agent_demo
 from ..main_models import (
     AgentToolEvent,
     AttackLabRunRequest,
+    AttackTestsetRunRequest,
     AuthorizedTargetRunRequest,
     BatchAgentToolEvents,
     DualModelJailbreakRequest,
@@ -118,6 +120,19 @@ def attack_lab_modules() -> dict:
 def attack_lab_run(request: AttackLabRunRequest) -> dict:
     try:
         return run_attack_lab_module(request.dict())
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.get("/api/attack_lab/testsets")
+def attack_lab_testsets() -> dict:
+    return list_attack_testsets()
+
+
+@router.post("/api/attack_lab/testsets/run")
+def attack_lab_testset_run(request: AttackTestsetRunRequest) -> dict:
+    try:
+        return run_attack_testset(request.dict())
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 

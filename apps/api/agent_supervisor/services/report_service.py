@@ -4,7 +4,7 @@ from collections import Counter
 from datetime import datetime, timezone
 from typing import Any, cast
 
-from ..ablation import build_policy_ablation
+from ..ablation import load_policy_ablation_report
 from ..assessment import build_attack_effectiveness
 from ..benign import evaluate_benign_cases
 from ..benign_workflows import evaluate_benign_workflows
@@ -26,7 +26,7 @@ def build_report() -> dict:
     surface_conclusion_eval = build_surface_conclusions(runs)
     output_filter_eval = build_output_filter_evidence()
     attack_effectiveness_eval = build_attack_effectiveness(runs)
-    policy_ablation_eval = build_policy_ablation()
+    policy_ablation_eval = load_policy_ablation_report()
     project_roadmap_eval = build_project_roadmap(runs)
     anomaly_calibration_eval = build_anomaly_calibration()
     surface_name = {surface["id"]: surface["name"] for surface in surfaces}
@@ -61,7 +61,7 @@ def build_report() -> dict:
                 "samples": surface["samples"],
                 "scripts": surface["scripts"],
                 "scenario_count": len(linked),
-                "demo_ready": surface["status"] == "可演示",
+                "demo_ready": surface["status"] in {"可演示", "可复现"},
                 "defense": surface["defense"],
             }
         )
@@ -107,7 +107,7 @@ def build_report() -> dict:
             "evidence": "监督器拦截工具调用并输出允许、拒绝、询问、隔离。",
         },
         {
-            "name": "模拟比赛工具",
+            "name": "本地靶场业务工具",
             "status": "已实现",
             "evidence": "覆盖邮件、文件、API、代码执行、记忆、环境变量工具。",
         },

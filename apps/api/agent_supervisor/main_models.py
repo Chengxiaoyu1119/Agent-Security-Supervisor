@@ -83,12 +83,23 @@ class DualModelJailbreakRequest(BaseModel):
     optimizer_role: str = Field(default="", max_length=3000)
     force_real_optimizer: bool = True
     force_real_target: bool = True
+    iteration_count: int = Field(default=1, ge=1, le=5)
+
+
+class AttackTestsetRunRequest(BaseModel):
+    surface_id: str = Field(default="all", max_length=80)
+    sample_ids: list[str] = Field(default_factory=list, max_length=50)
+    sample_overrides: dict[str, dict[str, Any]] = Field(default_factory=dict)
+    execute_in_sandbox: bool = True
+    planner_mode: Literal["fixed", "model"] = "fixed"
+    force_real_model: bool = False
 
 
 class AuthorizedTargetRunRequest(BaseModel):
     target_url: str = Field(..., max_length=1000)
     attack_input: str = Field(default="", max_length=8000)
     surface_id: str = Field(default="prompt-injection", max_length=80)
+    target_type: str = Field(default="openai-compatible", max_length=80)
     target_model: str = Field(default="authorized-target-model", max_length=160)
     authorization_confirmed: bool = False
     authorization_note: str = Field(default="", max_length=1200)
@@ -110,3 +121,13 @@ class ApprovalDecisionRequest(BaseModel):
 
 class RealModelEvaluationRequest(BaseModel):
     force_real: bool = True
+
+
+class ModelProfileRuntimeConfigUpdate(BaseModel):
+    provider_priority: list[str] | None = None
+    model_overrides: dict[str, str] | None = None
+
+
+class ModelRuntimeConfigUpdate(BaseModel):
+    real_api_enabled: bool | None = None
+    profiles: dict[str, ModelProfileRuntimeConfigUpdate] | None = None

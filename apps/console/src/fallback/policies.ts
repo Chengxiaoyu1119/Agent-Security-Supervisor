@@ -27,7 +27,7 @@ export const fallbackPolicies: Policy[] = [
     name: '邮件外发询问',
     decision: '询问',
     enabled: true,
-    description: '向外部收件人发送邮件时要求人工确认，第一版只写入假 outbox。'
+    description: '向外部收件人发送邮件时要求人工确认，只写入本地沙箱 outbox。'
   },
   {
     id: 'sensitive-api',

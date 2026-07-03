@@ -182,11 +182,11 @@ def execute_tool(
             "subject": args.get("subject"),
             "body": args.get("body"),
             "created_at": datetime.now(timezone.utc).isoformat(),
-            "note": "假发件箱记录，未发送真实邮件。",
+            "note": "本地沙箱 outbox 记录，未发送真实邮件。",
         }
         with (paths.outbox / "outbox.jsonl").open("a", encoding="utf-8") as fh:
             fh.write(json.dumps(record, ensure_ascii=False) + "\n")
-        return {"executed": True, "sandboxed": True, "output": "邮件已写入假 outbox，未真实发送。"}
+        return {"executed": True, "sandboxed": True, "output": "邮件已写入本地沙箱 outbox，未真实发送。"}
 
     if tool == "api.call":
         endpoint = str(args.get("endpoint", ""))

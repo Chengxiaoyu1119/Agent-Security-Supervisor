@@ -46,7 +46,7 @@ export function SupervisorDebugTab({
   return (
     <Space orientation="vertical" size="large" className="zh-tab-stack">
       <PanelCard
-        title="真实 Agent 工具调度演示"
+        title="真实 Agent 工具调度验证"
         type="inner"
         extra={
           <UiButton
@@ -55,7 +55,7 @@ export function SupervisorDebugTab({
             loading={runningExternalAgentDemo}
             icon={<TerminalSquare size={16} />}
           >
-            运行真实 Agent demo
+            运行真实 Agent 验证
           </UiButton>
         }
         className="zh-mb-24"
@@ -128,7 +128,7 @@ export function SupervisorDebugTab({
           </>
         ) : (
           <UiAlert
-            title="还没有运行真实 Agent demo。点击按钮后，系统会自动跑 4 个工具调用并写入审计证据。"
+            title="还没有运行真实 Agent 调度验证。点击按钮后，系统会自动跑 4 个工具调用并写入审计证据。"
             type="info"
             showIcon
           />

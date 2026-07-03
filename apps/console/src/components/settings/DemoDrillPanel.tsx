@@ -12,22 +12,22 @@ interface DemoDrillPanelProps {
 export function DemoDrillPanel({ demoDrill, runningDemoDrill, handleRunDemoDrill }: DemoDrillPanelProps) {
   return (
     <PanelCard
-      title="Judge Demo Mode (答辩一键演示)"
+      title="答辩复现实验"
       extra={
         <UiButton type="primary" icon={<Play size={16} />} onClick={handleRunDemoDrill} loading={runningDemoDrill}>
-          运行答辩演示
+          运行答辩复现
         </UiButton>
       }
       type="inner"
     >
       <Typography.Paragraph type="secondary">
-        一键跑完正常放行、外发复核、批量导出审批和记忆隔离，自动生成 audit_hash、review_hash 与报告文件。
+        一键跑完正常放行、外发复核、批量导出审批和记忆隔离，自动生成 audit_hash、review_hash 与本地证据文件。
       </Typography.Paragraph>
       {demoDrill && demoDrill.summary.stage_count > 0 ? (
         <>
           <Row gutter={[16, 16]} className="zh-mb-24">
             <Col xs={12} sm={8} md={4}>
-              <Metric label="演示步骤" value={`${demoDrill.summary.stage_count}`} />
+              <Metric label="复现步骤" value={`${demoDrill.summary.stage_count}`} />
             </Col>
             <Col xs={12} sm={8} md={4}>
               <Metric label="监督控制" value={`${demoDrill.summary.controlled_count}`} tone="green" />
@@ -110,7 +110,11 @@ export function DemoDrillPanel({ demoDrill, runningDemoDrill, handleRunDemoDrill
           </Space>
         </>
       ) : (
-        <UiAlert title="还没有运行答辩一键演示。点击按钮后会生成 4 步演示、审计证据和本地报告。" type="info" showIcon />
+        <UiAlert
+          title="还没有运行答辩复现实验。点击按钮后会生成 4 步运行记录、审计证据和本地报告。"
+          type="info"
+          showIcon
+        />
       )}
     </PanelCard>
   );

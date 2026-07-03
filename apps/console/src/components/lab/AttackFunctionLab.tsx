@@ -1,47 +1,35 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AlertCircle, Bot, FileWarning, FlaskConical, Play, ShieldCheck, TerminalSquare } from 'lucide-react';
+import { Play } from 'lucide-react';
 import { Col, Descriptions, Divider, Row, Space, Typography } from 'antd';
 import { fetchAttackLabModules, fetchTargetLabState, resetTargetLabState, runAttackLabModule } from '../../api';
 import type { AttackLabModule, AttackLabRunResult, TargetLabState } from '../../types';
-import {
-  DecisionPill,
-  EvidenceCodeBlock,
-  LabelTag,
-  MetricCard,
-  PanelCard,
-  UiAlert,
-  UiButton,
-  UiInput,
-  UiSelect,
-  UiSwitch
-} from '../ui';
+import { DecisionPill, LabelTag, MetricCard, PanelCard, UiAlert, UiButton, UiInput, UiSelect, UiSwitch } from '../ui';
 import { DEFAULT_ATTACK_LAB_MODULES } from './attackFunctionModules';
+import { AttackEvidenceTimeline } from './AttackEvidenceTimeline';
+import { AttackModuleOptionsPanel } from './AttackModuleOptionsPanel';
+import { defaultAttackModuleOptions, type AttackModuleOptions } from './attackModuleOptions';
 import { TargetLabStatePanel } from './TargetLabStatePanel';
+import { TargetLabDeltaPanel } from './TargetLabDeltaPanel';
+import { attackFunctionIcons, fallbackAttackFunctionIcon } from './attackFunctionIcons';
 
 type AttackFunctionLabProps = {
   refresh?: () => Promise<unknown>;
-};
-
-const moduleIcons: Record<string, JSX.Element> = {
-  'prompt-injection': <FileWarning size={18} />,
-  jailbreak: <Bot size={18} />,
-  'data-leakage': <AlertCircle size={18} />,
-  'tool-hijack': <TerminalSquare size={18} />,
-  'memory-poison': <FlaskConical size={18} />,
-  'environment-pollution': <ShieldCheck size={18} />,
-  'abuse-risk': <AlertCircle size={18} />
 };
 
 export function AttackFunctionLab({ refresh }: AttackFunctionLabProps) {
   const [modules, setModules] = useState<AttackLabModule[]>(DEFAULT_ATTACK_LAB_MODULES);
   const [selectedSurface, setSelectedSurface] = useState(DEFAULT_ATTACK_LAB_MODULES[0].surface_id);
   const [attackInput, setAttackInput] = useState(DEFAULT_ATTACK_LAB_MODULES[0].default_input);
+  const [moduleOptions, setModuleOptions] = useState<AttackModuleOptions>(
+    defaultAttackModuleOptions(DEFAULT_ATTACK_LAB_MODULES[0].surface_id)
+  );
   const [executeInSandbox, setExecuteInSandbox] = useState(true);
   const [plannerMode, setPlannerMode] = useState<'fixed' | 'model'>('model');
   const [running, setRunning] = useState(false);
   const [notice, setNotice] = useState('');
   const [result, setResult] = useState<AttackLabRunResult | null>(null);
   const [targetLab, setTargetLab] = useState<TargetLabState | null>(null);
+  const [targetLabBeforeRun, setTargetLabBeforeRun] = useState<TargetLabState | null>(null);
 
   useEffect(() => {
     let mounted = true;
@@ -53,6 +41,7 @@ export function AttackFunctionLab({ refresh }: AttackFunctionLabProps) {
         if (first) {
           setSelectedSurface(first.surface_id);
           setAttackInput(first.default_input);
+          setModuleOptions(defaultAttackModuleOptions(first.surface_id));
         }
       })
       .catch(() => {
@@ -77,6 +66,7 @@ export function AttackFunctionLab({ refresh }: AttackFunctionLabProps) {
   function selectModule(module: AttackLabModule) {
     setSelectedSurface(module.surface_id);
     setAttackInput(module.default_input);
+    setModuleOptions(defaultAttackModuleOptions(module.surface_id));
     setResult(null);
     setNotice('');
   }
@@ -86,12 +76,15 @@ export function AttackFunctionLab({ refresh }: AttackFunctionLabProps) {
     setRunning(true);
     setNotice('');
     try {
+      const beforeRun = await fetchTargetLabState().catch(() => targetLab);
+      setTargetLabBeforeRun(beforeRun);
       const nextResult = await runAttackLabModule({
         surface_id: activeModule.surface_id,
         attack_input: attackInput,
         execute_in_sandbox: executeInSandbox,
         planner_mode: plannerMode,
-        force_real_model: plannerMode === 'model'
+        force_real_model: plannerMode === 'model',
+        options: moduleOptions
       });
       setResult(nextResult);
       setTargetLab(nextResult.target_lab);
@@ -137,7 +130,7 @@ export function AttackFunctionLab({ refresh }: AttackFunctionLabProps) {
                   onClick={() => selectModule(module)}
                 >
                   <span className="zh-attack-lab__module-icon">
-                    {moduleIcons[module.surface_id] ?? <FlaskConical size={18} />}
+                    {attackFunctionIcons[module.surface_id] ?? fallbackAttackFunctionIcon}
                   </span>
                   <span className="zh-attack-lab__module-copy">
                     <strong>{module.name}</strong>
@@ -155,7 +148,7 @@ export function AttackFunctionLab({ refresh }: AttackFunctionLabProps) {
             subtitle={`${activeModule.target} · ${activeModule.risk_hint}`}
             className="zh-attack-lab__input-panel"
           >
-            <Space direction="vertical" size={16} className="zh-full-width">
+            <Space orientation="vertical" size={16} className="zh-full-width">
               <div className="zh-attack-lab__field">
                 <Typography.Text strong>工具调用生成方式</Typography.Text>
                 <UiSelect
@@ -184,6 +177,13 @@ export function AttackFunctionLab({ refresh }: AttackFunctionLabProps) {
                   maxLength={12000}
                 />
               </div>
+              <PanelCard title="可编辑工具参数" subtitle={activeModule.tool} type="inner">
+                <AttackModuleOptionsPanel
+                  surfaceId={activeModule.surface_id}
+                  value={moduleOptions}
+                  onChange={setModuleOptions}
+                />
+              </PanelCard>
               <div className="zh-attack-lab__switch-row">
                 <div>
                   <Typography.Text strong>沙箱执行</Typography.Text>
@@ -207,7 +207,7 @@ export function AttackFunctionLab({ refresh }: AttackFunctionLabProps) {
             className="zh-full-height"
           >
             {result ? (
-              <Space direction="vertical" size={14} className="zh-full-width">
+              <Space orientation="vertical" size={14} className="zh-full-width">
                 <Row gutter={[12, 12]}>
                   <Col span={12}>
                     <MetricCard
@@ -239,6 +239,8 @@ export function AttackFunctionLab({ refresh }: AttackFunctionLabProps) {
                   <Descriptions.Item label="风险分">{result.summary.risk_score}</Descriptions.Item>
                 </Descriptions>
                 <Divider className="zh-attack-lab__divider" />
+                <TargetLabDeltaPanel before={targetLabBeforeRun} after={result.target_lab} />
+                <Divider className="zh-attack-lab__divider" />
                 <div className="zh-attack-lab__explain-list">
                   {result.explanation.map((item) => (
                     <div key={item.title} className="zh-attack-lab__explain-item">
@@ -259,12 +261,10 @@ export function AttackFunctionLab({ refresh }: AttackFunctionLabProps) {
 
       {result && (
         <Row gutter={[20, 20]} className="zh-attack-lab__evidence-row">
-          <Col xs={24} lg={12}>
-            <PanelCard title="工具调用事件" subtitle={result.tool_call.tool}>
-              <EvidenceCodeBlock>{JSON.stringify(result.tool_call, null, 2)}</EvidenceCodeBlock>
-            </PanelCard>
+          <Col xs={24} lg={14}>
+            <AttackEvidenceTimeline result={result} />
           </Col>
-          <Col xs={24} lg={12}>
+          <Col xs={24} lg={10}>
             <PanelCard title="监督证据" subtitle={result.with_guard.audit_id}>
               <Descriptions column={1} size="small">
                 <Descriptions.Item label="处置方式">{result.summary.execution_mode}</Descriptions.Item>

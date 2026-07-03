@@ -1,7 +1,37 @@
 import { Row, Col, Typography, Space, Empty, Flex } from 'antd';
-import { Folder, Shield, AlertCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Clock3, Folder, Shield } from 'lucide-react';
 import type { SurfaceEvidencePackIndex } from '@/types';
 import { LabelTag, PanelCard, UiProgress } from '../ui';
+import { riskLabel } from '@/utils';
+
+function riskColor(risk: string) {
+  if (risk === 'critical') return 'error';
+  if (risk === 'high') return 'warning';
+  if (risk === 'medium') return 'processing';
+  return 'default';
+}
+
+function evidenceState(item: SurfaceEvidencePackIndex['surfaces'][number]) {
+  if (!item.run_count) {
+    return {
+      label: '待补运行证据',
+      color: 'warning',
+      icon: <Clock3 size={12} className="zh-tag-icon" />
+    };
+  }
+  if (item.control_rate >= 80) {
+    return {
+      label: `已验证 ${item.run_count} 条`,
+      color: 'success',
+      icon: <CheckCircle2 size={12} className="zh-tag-icon" />
+    };
+  }
+  return {
+    label: `需复核 ${item.run_count} 条`,
+    color: 'warning',
+    icon: <AlertCircle size={12} className="zh-tag-icon" />
+  };
+}
 
 export function SurfaceEvidenceIndexBoard({
   index,
@@ -45,10 +75,8 @@ export function SurfaceEvidenceIndexBoard({
       {!error && (
         <Row gutter={[16, 16]}>
           {(index?.surfaces ?? []).map((item) => {
-            let color = 'default';
-            if (item.risk === 'critical') color = 'error';
-            if (item.risk === 'high') color = 'warning';
-            if (item.risk === 'medium') color = 'processing';
+            const runtimeState = evidenceState(item);
+            const hasRuntimeEvidence = item.run_count > 0;
             return (
               <Col xs={24} md={12} xl={8} key={item.surface_id}>
                 <PanelCard
@@ -60,7 +88,7 @@ export function SurfaceEvidenceIndexBoard({
                   }`}
                 >
                   <div className="zh-surface-evidence-card__head">
-                    <div>
+                    <div className="zh-flex-min">
                       <Typography.Text strong className="zh-text-block">
                         {item.surface_name}
                       </Typography.Text>
@@ -68,9 +96,40 @@ export function SurfaceEvidenceIndexBoard({
                         {item.surface_id}
                       </Typography.Text>
                     </div>
-                    <LabelTag color={color} variant="filled" className="zh-fit-tag">
-                      {item.risk}
-                    </LabelTag>
+                    <div className="zh-surface-evidence-card__tag-rail">
+                      <LabelTag color={riskColor(item.risk)} variant="filled" className="zh-fit-tag">
+                        {riskLabel[item.risk] ?? item.risk}风险
+                      </LabelTag>
+                      <LabelTag
+                        color={runtimeState.color}
+                        variant="filled"
+                        icon={runtimeState.icon}
+                        className="zh-fit-tag"
+                      >
+                        {runtimeState.label}
+                      </LabelTag>
+                    </div>
+                  </div>
+
+                  <div className="zh-surface-evidence-card__meta-grid">
+                    <div>
+                      <Typography.Text type="secondary" className="zh-text-meta">
+                        脚本
+                      </Typography.Text>
+                      <Typography.Text strong>{item.scenario_count}</Typography.Text>
+                    </div>
+                    <div>
+                      <Typography.Text type="secondary" className="zh-text-meta">
+                        样本
+                      </Typography.Text>
+                      <Typography.Text strong>{item.sample_count}</Typography.Text>
+                    </div>
+                    <div>
+                      <Typography.Text type="secondary" className="zh-text-meta">
+                        策略
+                      </Typography.Text>
+                      <Typography.Text strong>{item.expected_policy_count}</Typography.Text>
+                    </div>
                   </div>
 
                   <div className="zh-mb-8">
@@ -89,13 +148,13 @@ export function SurfaceEvidenceIndexBoard({
                   <div className="zh-mb-12">
                     <div className="zh-split-row zh-text-meta">
                       <Typography.Text type="secondary">控制率</Typography.Text>
-                      <Typography.Text>{item.control_rate}%</Typography.Text>
+                      <Typography.Text>{hasRuntimeEvidence ? `${item.control_rate}%` : '待运行'}</Typography.Text>
                     </div>
                     <UiProgress
-                      percent={item.control_rate}
+                      percent={hasRuntimeEvidence ? item.control_rate : 0}
                       size="small"
                       showInfo={false}
-                      strokeColor="var(--ant-color-success)"
+                      strokeColor={hasRuntimeEvidence ? 'var(--ant-color-success)' : 'var(--ant-color-warning)'}
                     />
                   </div>
 
@@ -130,7 +189,7 @@ export function SurfaceEvidenceIndexBoard({
                         icon={<AlertCircle size={12} className="zh-tag-icon" />}
                         className="zh-title-flush"
                       >
-                        {item.gap_count} 项缺口
+                        待补 {item.gap_count} 项
                       </LabelTag>
                     )}
                   </Space>

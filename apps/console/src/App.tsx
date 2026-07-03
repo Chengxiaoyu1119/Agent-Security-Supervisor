@@ -2,7 +2,7 @@ import { lazy, useCallback, useEffect, useState } from 'react';
 import { AppLoading, AppShell, type AppTheme } from './app/AppShell';
 import { useAppActions } from './app/useAppActions';
 import { useAppData } from './app/useAppData';
-import { pageFromHash, pageToHash, type PageKey } from './app/navigation';
+import { isPageKey, pageFromHash, pageToHash, type PageKey } from './app/navigation';
 
 const Dashboard = lazy(() => import('./pages/Dashboard').then((module) => ({ default: module.Dashboard })));
 const ScenarioLibrary = lazy(() =>
@@ -98,9 +98,9 @@ export default function App() {
     window.addEventListener('hashchange', syncPageFromHash);
     window.addEventListener('popstate', syncPageFromHash);
 
-    const normalizedHash = pageToHash(pageFromHash(window.location.hash));
-    if (window.location.hash !== normalizedHash) {
-      window.history.replaceState(null, '', normalizedHash);
+    const hashPage = window.location.hash.replace(/^#\/?/, '').split(/[?#]/)[0].trim();
+    if (!isPageKey(hashPage)) {
+      window.history.replaceState(null, '', pageToHash(pageFromHash(window.location.hash)));
     }
 
     return () => {
@@ -137,6 +137,7 @@ export default function App() {
             setSelectedScenario(id);
             setPage('lab');
           }}
+          onOpenPage={setPage}
           onBatchCompare={(ids, label) => {
             void handleBatchCompare(ids, label);
           }}
@@ -195,7 +196,7 @@ export default function App() {
       {page === 'audit' && (
         <AuditLogPanel
           logs={
-            lastResult?.audit_logs?.length ? lastResult.audit_logs : auditLogs.length ? auditLogs : overview.audit_logs
+            auditLogs.length ? auditLogs : lastResult?.audit_logs?.length ? lastResult.audit_logs : overview.audit_logs
           }
           refresh={loadAuditLogs}
         />

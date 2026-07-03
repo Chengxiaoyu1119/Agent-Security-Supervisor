@@ -271,12 +271,12 @@ def build_surface_evidence_index_markdown(runs: list[dict[str, Any]] | None = No
     lines.extend(
         [
             "",
-            "## ????",
+            "## 复现与导出入口",
             "",
-            "- JSON API?`GET /api/attack_surfaces/{surface_id}/evidence_pack`",
-            "- Markdown API?`GET /api/attack_surfaces/{surface_id}/evidence_pack.md`",
-            "- CLI?`node scripts/agent-supervisor-cli.mjs surface-pack --surface prompt-injection --output apps/api/sandbox/reports`",
-            "- ???? CLI?`node scripts/agent-supervisor-cli.mjs surface-packs --output apps/api/sandbox/reports`",
+            "- JSON API：`GET /api/attack_surfaces/{surface_id}/evidence_pack`",
+            "- Markdown API：`GET /api/attack_surfaces/{surface_id}/evidence_pack.md`",
+            "- 单攻击面 CLI：`node scripts/agent-supervisor-cli.mjs surface-pack --surface prompt-injection --output apps/api/sandbox/reports`",
+            "- 全量证据包 CLI：`node scripts/agent-supervisor-cli.mjs surface-packs --output apps/api/sandbox/reports`",
         ]
     )
     return "\n".join(lines)

@@ -2,6 +2,9 @@ import type {
   AttackLabModulesResponse,
   AttackLabRunRequest,
   AttackLabRunResult,
+  AttackTestsetRunRequest,
+  AttackTestsetRunResult,
+  AttackTestsetsResponse,
   AuthorizedTargetRunRequest,
   AuthorizedTargetRunResult,
   CapabilityReplayResult,
@@ -25,6 +28,21 @@ export async function runAttackLabModule(payload: AttackLabRunRequest): Promise<
     method: 'POST',
     body: JSON.stringify(payload)
   });
+}
+
+export async function fetchAttackTestsets(): Promise<AttackTestsetsResponse> {
+  return request<AttackTestsetsResponse>('/api/attack_lab/testsets');
+}
+
+export async function runAttackTestset(payload: AttackTestsetRunRequest): Promise<AttackTestsetRunResult> {
+  return request<AttackTestsetRunResult>(
+    '/api/attack_lab/testsets/run',
+    {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    },
+    { timeoutMs: 90000 }
+  );
 }
 
 export async function runCapabilityReplay(): Promise<CapabilityReplayResult> {
@@ -71,7 +89,7 @@ export async function runDualModelJailbreak(payload: DualModelJailbreakRequest):
       method: 'POST',
       body: JSON.stringify(payload)
     },
-    { timeoutMs: 60000 }
+    { timeoutMs: 120000 }
   );
 }
 

@@ -35,7 +35,7 @@ export function ReportDeliveryTab({
           <Row gutter={[16, 16]} className="zh-mb-24">
             <Col span={6}>
               <Metric
-                label="可演示攻击面"
+                label="可复现攻击面"
                 value={`${competitionPackage.summary.demo_ready_surface_count}/7`}
                 tone="green"
               />

@@ -6,10 +6,12 @@ import {
   fetchAttackCaseDataset,
   fetchCompetitionReadiness,
   fetchDemoDrill,
+  fetchModelConfig,
   fetchOpenClawIntegrationBundle,
   runDemoDrill,
   runExternalAgentDemo,
   writeCompetitionReadiness,
+  updateModelConfig,
   writeOpenClawPluginPackage,
   writeOpenClawPluginValidation
 } from '@/api';
@@ -20,6 +22,7 @@ import type {
   CompetitionReadinessWriteResult,
   DemoDrillResult,
   ExternalAgentDemoResult,
+  ModelRuntimeConfig,
   OpenClawIntegrationBundle,
   OpenClawPluginPackageResult,
   OpenClawPluginValidationWriteResult,
@@ -39,11 +42,14 @@ export function useSettingsPanelController(refresh: () => Promise<unknown>) {
   const [agentIntegrationBundle, setAgentIntegrationBundle] = useState<AgentIntegrationBundle | null>(null);
   const [demoDrill, setDemoDrill] = useState<DemoDrillResult | null>(null);
   const [openClawPluginPackage, setOpenClawPluginPackage] = useState<OpenClawPluginPackageResult | null>(null);
-  const [openClawPluginValidation, setOpenClawPluginValidation] =
-    useState<OpenClawPluginValidationWriteResult | null>(null);
+  const [openClawPluginValidation, setOpenClawPluginValidation] = useState<OpenClawPluginValidationWriteResult | null>(
+    null
+  );
   const [competitionReadiness, setCompetitionReadiness] = useState<CompetitionReadiness | null>(null);
-  const [competitionReadinessOutput, setCompetitionReadinessOutput] =
-    useState<CompetitionReadinessWriteResult | null>(null);
+  const [competitionReadinessOutput, setCompetitionReadinessOutput] = useState<CompetitionReadinessWriteResult | null>(
+    null
+  );
+  const [modelConfig, setModelConfig] = useState<ModelRuntimeConfig | null>(null);
   const [evaluating, setEvaluating] = useState(false);
   const [batchEvaluating, setBatchEvaluating] = useState(false);
   const [runningExternalAgentDemo, setRunningExternalAgentDemo] = useState(false);
@@ -51,6 +57,7 @@ export function useSettingsPanelController(refresh: () => Promise<unknown>) {
   const [writingOpenClawPlugin, setWritingOpenClawPlugin] = useState(false);
   const [validatingOpenClawPlugin, setValidatingOpenClawPlugin] = useState(false);
   const [checkingReadiness, setCheckingReadiness] = useState(false);
+  const [savingModelConfig, setSavingModelConfig] = useState(false);
   const [evaluateError, setEvaluateError] = useState('');
 
   useEffect(() => {
@@ -59,7 +66,8 @@ export function useSettingsPanelController(refresh: () => Promise<unknown>) {
       fetchOpenClawIntegrationBundle().then(setIntegrationBundle).catch(ignore),
       fetchAgentIntegrationBundle().then(setAgentIntegrationBundle).catch(ignore),
       fetchDemoDrill().then(setDemoDrill).catch(ignore),
-      fetchCompetitionReadiness().then(setCompetitionReadiness).catch(ignore)
+      fetchCompetitionReadiness().then(setCompetitionReadiness).catch(ignore),
+      fetchModelConfig().then(setModelConfig).catch(ignore)
     ]);
   }, []);
 
@@ -99,7 +107,7 @@ export function useSettingsPanelController(refresh: () => Promise<unknown>) {
       setExternalAgentDemo(await runExternalAgentDemo());
       await refresh();
     } catch (error) {
-      setEvaluateError(error instanceof Error ? error.message : '外部 Agent 演示运行失败');
+      setEvaluateError(error instanceof Error ? error.message : '外部 Agent 验证运行失败');
     } finally {
       setRunningExternalAgentDemo(false);
     }
@@ -112,7 +120,7 @@ export function useSettingsPanelController(refresh: () => Promise<unknown>) {
       setDemoDrill(await runDemoDrill());
       await refresh();
     } catch (error) {
-      setEvaluateError(error instanceof Error ? error.message : '答辩一键演示运行失败');
+      setEvaluateError(error instanceof Error ? error.message : '答辩复现实验运行失败');
     } finally {
       setRunningDemoDrill(false);
     }
@@ -158,6 +166,26 @@ export function useSettingsPanelController(refresh: () => Promise<unknown>) {
     }
   }
 
+  async function handleSaveModelConfig() {
+    if (!modelConfig) {
+      return;
+    }
+    setSavingModelConfig(true);
+    setEvaluateError('');
+    try {
+      const result = await updateModelConfig({
+        real_api_enabled: modelConfig.real_api_enabled,
+        profiles: modelConfig.profiles
+      });
+      setModelConfig(result);
+      await refresh();
+    } catch (error) {
+      setEvaluateError(error instanceof Error ? error.message : '模型运行配置保存失败');
+    } finally {
+      setSavingModelConfig(false);
+    }
+  }
+
   function loadSingleExternalSample() {
     setEventJson(JSON.stringify(externalEventSample, null, 2));
     setEvaluation(null);
@@ -197,10 +225,12 @@ export function useSettingsPanelController(refresh: () => Promise<unknown>) {
       eventJson,
       externalAgentDemo,
       integrationBundle,
+      modelConfig,
       openClawPluginPackage,
       openClawPluginValidation,
       runningDemoDrill,
       runningExternalAgentDemo,
+      savingModelConfig,
       validatingOpenClawPlugin,
       writingOpenClawPlugin
     },
@@ -211,13 +241,15 @@ export function useSettingsPanelController(refresh: () => Promise<unknown>) {
       handleRunDemoDrill,
       handleRunExternalAgentDemo,
       handleRunReadiness,
+      handleSaveModelConfig,
       handleValidateOpenClawPlugin,
       handleWriteOpenClawPlugin,
       loadBatchExternalSample,
       loadSingleExternalSample,
       setBatchJson,
       setEventJson,
-      setEvaluateError
+      setEvaluateError,
+      setModelConfig
     }
   };
 }

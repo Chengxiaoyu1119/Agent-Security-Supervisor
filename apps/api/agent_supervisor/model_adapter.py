@@ -9,6 +9,13 @@ import urllib.request
 from pathlib import Path
 from typing import Iterable
 
+from .model_runtime_config import (
+    effective_provider_priority,
+    runtime_model_override,
+    runtime_provider_priority,
+    runtime_real_api_enabled,
+)
+
 DEFAULT_TIMEOUT_SECONDS = 12
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 TOOL_NAME_MAP = {
@@ -70,6 +77,9 @@ def _profile_env(profile: str, name: str, default: str = "") -> str:
 def _provider_priority(profile: str = "") -> list[str]:
     normalized = profile.strip().lower()
     scoped_name = profile.strip().upper().replace("-", "_")
+    runtime_priority = runtime_provider_priority(normalized)
+    if runtime_priority:
+        return runtime_priority
     scoped_priority = os.getenv(f"{scoped_name}_MODEL_PROVIDER_PRIORITY") if scoped_name else None
     if scoped_priority and scoped_priority.strip():
         configured = scoped_priority
@@ -79,8 +89,7 @@ def _provider_priority(profile: str = "") -> list[str]:
         configured = "deepseek,zhipu,openai-compatible"
     else:
         configured = os.getenv("MODEL_PROVIDER_PRIORITY", "openai-compatible,deepseek,zhipu")
-    priority = [item.strip().lower() for item in configured.split(",") if item.strip()]
-    return priority or ["deepseek", "zhipu"]
+    return effective_provider_priority(normalized, configured)
 
 
 def _deepseek_endpoint(profile: str = "") -> str:
@@ -110,12 +119,27 @@ def provider_status(profile: str = "") -> list[dict]:
     deepseek_key = bool(_profile_env(profile, "DEEPSEEK_API_KEY", ""))
     zhipu_key = bool(_profile_env(profile, "ZHIPU_API_KEY", ""))
     profile_label = profile.strip() or "global"
+    openai_compatible_model = runtime_model_override(profile, "openai-compatible") or _profile_env(
+        profile,
+        "OPENAI_COMPATIBLE_MODEL",
+        os.getenv("OPENAI_MODEL", "gpt-4.1-mini"),
+    )
+    deepseek_model = runtime_model_override(profile, "deepseek") or _profile_env(
+        profile,
+        "DEEPSEEK_MODEL",
+        "deepseek-v4-pro",
+    )
+    zhipu_model = runtime_model_override(profile, "zhipu") or _profile_env(
+        profile,
+        "ZHIPU_MODEL",
+        "glm-4.6v-flashx",
+    )
     return [
         {
             "profile": profile_label,
             "provider": "OpenAI 兼容接口",
             "configured": openai_compatible_key,
-            "model": _profile_env(profile, "OPENAI_COMPATIBLE_MODEL", os.getenv("OPENAI_MODEL", "gpt-4.1-mini")),
+            "model": openai_compatible_model,
             "endpoint": _openai_compatible_endpoint(profile),
             "mode": "real-api" if openai_compatible_key else "simulated",
         },
@@ -123,7 +147,7 @@ def provider_status(profile: str = "") -> list[dict]:
             "profile": profile_label,
             "provider": "DeepSeek",
             "configured": deepseek_key,
-            "model": _profile_env(profile, "DEEPSEEK_MODEL", "deepseek-v4-pro"),
+            "model": deepseek_model,
             "endpoint": _deepseek_endpoint(profile),
             "mode": "real-api" if deepseek_key else "simulated",
         },
@@ -131,7 +155,7 @@ def provider_status(profile: str = "") -> list[dict]:
             "profile": profile_label,
             "provider": "智谱",
             "configured": zhipu_key,
-            "model": _profile_env(profile, "ZHIPU_MODEL", "glm-4.6v-flashx"),
+            "model": zhipu_model,
             "endpoint": _zhipu_endpoint(profile),
             "mode": "real-api" if zhipu_key else "simulated",
         },
@@ -496,19 +520,20 @@ def _iter_configured_providers(profile: str = "") -> Iterable[dict]:
         "openai-compatible": {
             "provider": "OpenAI 兼容接口",
             "api_key": _profile_env(profile, "OPENAI_COMPATIBLE_API_KEY", os.getenv("OPENAI_API_KEY", "")),
-            "model": _profile_env(profile, "OPENAI_COMPATIBLE_MODEL", os.getenv("OPENAI_MODEL", "gpt-4.1-mini")),
+            "model": runtime_model_override(profile, "openai-compatible")
+            or _profile_env(profile, "OPENAI_COMPATIBLE_MODEL", os.getenv("OPENAI_MODEL", "gpt-4.1-mini")),
             "endpoint": _openai_compatible_endpoint(profile),
         },
         "deepseek": {
             "provider": "DeepSeek",
             "api_key": _profile_env(profile, "DEEPSEEK_API_KEY", ""),
-            "model": _profile_env(profile, "DEEPSEEK_MODEL", "deepseek-v4-pro"),
+            "model": runtime_model_override(profile, "deepseek") or _profile_env(profile, "DEEPSEEK_MODEL", "deepseek-v4-pro"),
             "endpoint": _deepseek_endpoint(profile),
         },
         "zhipu": {
             "provider": "智谱",
             "api_key": _profile_env(profile, "ZHIPU_API_KEY", ""),
-            "model": _profile_env(profile, "ZHIPU_MODEL", "glm-4.6v-flashx"),
+            "model": runtime_model_override(profile, "zhipu") or _profile_env(profile, "ZHIPU_MODEL", "glm-4.6v-flashx"),
             "endpoint": _zhipu_endpoint(profile),
         },
     }
@@ -520,7 +545,7 @@ def _iter_configured_providers(profile: str = "") -> Iterable[dict]:
 
 
 def generate_model_response(prompt: str, scenario_id: str) -> dict:
-    if not _env_bool("MODEL_REAL_API_ENABLED", False):
+    if not runtime_real_api_enabled(_env_bool("MODEL_REAL_API_ENABLED", False)):
         return simulate_model_response(prompt, scenario_id)
 
     failures = []
@@ -628,7 +653,7 @@ def generate_model_tool_plan(
     model_override: str = "",
     provider_profile: str = "target",
 ) -> dict:
-    if force_real or _env_bool("MODEL_REAL_API_ENABLED", False):
+    if force_real or runtime_real_api_enabled(_env_bool("MODEL_REAL_API_ENABLED", False)):
         failures = []
         for config in _iter_configured_providers(provider_profile):
             model = model_override or config["model"]

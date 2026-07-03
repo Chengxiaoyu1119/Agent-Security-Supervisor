@@ -56,9 +56,14 @@ export function ReportPanel({
     <div className="zh-page-stack">
       <PanelCard variant="borderless">
         <Flex justify="space-between" align="center">
-          <Typography.Title level={3} className="zh-title-flush">
-            初赛报告材料中心
-          </Typography.Title>
+          <div className="zh-flex-min">
+            <Typography.Title level={3} className="zh-title-flush">
+              比赛材料中心
+            </Typography.Title>
+            <Typography.Text type="secondary" className="zh-text-body zh-text-block zh-mt-4">
+              面向大模型及智能体应用安全，汇总攻击场景、对抗样本、智能体脚本、监督策略、审计告警和交付材料。
+            </Typography.Text>
+          </div>
           <UiButton icon={<Copy size={16} />} onClick={copyReport}>
             {copied ? '已复制' : '复制 Markdown'}
           </UiButton>

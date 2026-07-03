@@ -19,10 +19,11 @@ export function AnomalyCalibrationBlock({ calibration }: { calibration: AnomalyC
               异常检测校准
             </Typography.Text>
             <Typography.Title level={3} className="zh-title-flush zh-mb-8">
-              推荐阈值 anomaly_score ≥ {selected}
+              推荐复核阈值：异常分 ≥ {selected}
             </Typography.Title>
             <Typography.Paragraph type="secondary" className="zh-title-flush">
-              {calibration.conclusion || calibration.objective}
+              {calibration.conclusion || calibration.objective} 异常分对应后端字段
+              anomaly_score，用于把规则命中、工具风险和上下文异常统一成可复核分数。
             </Typography.Paragraph>
           </Col>
           <Col xs={24} sm={8} className="zh-text-right">
@@ -97,6 +98,9 @@ export function AnomalyCalibrationBlock({ calibration }: { calibration: AnomalyC
           <Typography.Title level={5} className="zh-mb-16">
             低于阈值但已控制 ({summary.policy_controlled_missed_count} 个)
           </Typography.Title>
+          <Typography.Paragraph type="secondary" className="zh-text-body zh-mb-16">
+            这些样本虽然异常分低于复核阈值，但已被确定性策略拦截，说明系统不是只依赖单一分数判断。
+          </Typography.Paragraph>
           {reviewItems.length ? (
             <Space orientation="vertical" className="zh-full-width">
               {reviewItems.map((item) => (

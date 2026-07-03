@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from .model_adapter import provider_status
+from .model_runtime_config import runtime_real_api_enabled
 from .paths import MEMORY_DIR, OUTBOX_DIR, SANDBOX_RUNTIME_DIR, WORKSPACE_DIR
 from .proxy_security import proxy_security_snapshot
 from .target_lab import target_lab_snapshot
@@ -49,7 +50,7 @@ def build_runtime_status() -> dict:
             "cors_origins": _cors_origins(),
         },
         "models": {
-            "real_api_enabled": _env_bool("MODEL_REAL_API_ENABLED"),
+            "real_api_enabled": runtime_real_api_enabled(_env_bool("MODEL_REAL_API_ENABLED")),
             "real_model_configured": real_model_configured,
             "global": global_models,
             "optimizer": optimizer_models,

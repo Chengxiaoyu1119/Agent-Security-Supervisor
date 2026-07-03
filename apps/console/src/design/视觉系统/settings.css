@@ -18,6 +18,7 @@
 .zh-settings-code-wrap,
 .zh-settings-code-tag,
 .zh-settings-path-tag {
+  color: var(--ant-color-text-secondary);
   white-space: normal;
   word-break: break-all;
 }
@@ -78,6 +79,8 @@
 
 .zh-settings-code-tag {
   margin: 0;
+  padding: 0;
+  background: transparent !important;
   font-family: monospace;
 }
 
@@ -174,6 +177,7 @@
 }
 
 .zh-settings-path-tag {
+  background: transparent !important;
   font-family: monospace;
 }
 
@@ -203,6 +207,7 @@
 
 .zh-settings-check-head {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 8px;
   margin-bottom: 4px;
@@ -211,10 +216,12 @@
 .zh-settings-check-title {
   display: block;
   margin-bottom: 4px;
+  line-height: 1.45;
 }
 
 .zh-settings-check-evidence {
   font-size: 13px;
+  line-height: 1.65;
 }
 
 .zh-settings-blocker-alert {
@@ -229,17 +236,58 @@
 
 .zh-settings-blocker-action {
   color: var(--ant-color-text-secondary);
+  line-height: 1.65;
 }
 
 .zh-settings-command-list {
   width: 100%;
-  margin-top: 24px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--ant-color-border-secondary);
 }
 
 .zh-settings-link-flush {
   padding-left: 0;
 }
 
+.zh-settings-dataset-surface-select {
+  min-width: 240px;
+  max-width: 420px;
+}
+
 .zh-settings-tag-flush {
   margin: 0;
+}
+
+.zh-settings-model-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: 8px;
+  background: var(--ant-color-fill-quaternary);
+}
+
+.zh-settings-model-card > .ant-card-body {
+  min-height: 246px;
+}
+
+.zh-settings-model-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.zh-settings-model-select,
+.zh-settings-model-input {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .zh-settings-model-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
 }

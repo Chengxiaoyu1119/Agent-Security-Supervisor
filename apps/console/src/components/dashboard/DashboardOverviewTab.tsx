@@ -13,6 +13,8 @@ import { ActionRow, MetricCard as Metric, PanelCard, UiButton } from '../ui';
 import { SurfaceResearchMatrix } from '../surface/SurfaceResearchMatrix';
 import type { AlertItem, Overview, Scenario } from '@/types';
 import { DashboardAgentNode } from './DashboardAgentNode';
+import type { PageKey } from '@/app/navigation';
+import { DashboardCompetitionGuide } from './DashboardCompetitionGuide';
 
 type DashboardPipelineNode = {
   label: string;
@@ -31,6 +33,7 @@ type DashboardOverviewTabProps = {
   highRiskSurfaceCount: number;
   pipelineNodes: DashboardPipelineNode[];
   onSelectScenario: (id: string) => void;
+  onOpenPage: (page: PageKey) => void;
   onBatchCompare: (ids: string[], label: string) => void;
 };
 
@@ -46,6 +49,7 @@ export function DashboardOverviewTab({
   highRiskSurfaceCount,
   pipelineNodes,
   onSelectScenario,
+  onOpenPage,
   onBatchCompare
 }: DashboardOverviewTabProps) {
   return (
@@ -95,7 +99,7 @@ export function DashboardOverviewTab({
                     {maxRiskScore}
                   </Typography.Title>
                   <Typography.Text type="secondary" className="zh-text-meta">
-                    {latestAlert ? latestAlert.title : '等待攻击演示'}
+                    {latestAlert ? latestAlert.title : '等待攻击验证'}
                   </Typography.Text>
                 </PanelCard>
                 <PanelCard
@@ -133,6 +137,12 @@ export function DashboardOverviewTab({
           ))}
         </Row>
       </PanelCard>
+
+      <DashboardCompetitionGuide
+        overview={overview}
+        completeSurfaceCount={completeSurfaceCount}
+        onOpenPage={onOpenPage}
+      />
 
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12} md={6}>
@@ -213,7 +223,7 @@ export function DashboardOverviewTab({
           <PanelCard
             title={
               <Space orientation="vertical" size={0}>
-                <Typography.Text strong>主演示攻击脚本</Typography.Text>
+                <Typography.Text strong>主运行攻击脚本</Typography.Text>
                 <Typography.Text type="secondary" className="zh-text-meta">
                   {overview.scenarios.length} 个可运行
                 </Typography.Text>

@@ -3,18 +3,21 @@ import { fetchSurfaceEvidencePack, fetchSurfaceEvidencePackIndex, writeAllSurfac
 import type { SurfaceEvidencePack, SurfaceEvidencePackWriteResult, SurfaceEvidencePackIndex, Overview } from '../types';
 import { DashboardEvidenceTab, DashboardOverviewTab, DashboardSurfacesTab } from '../components/dashboard';
 import { UiTabs } from '../components/ui';
+import type { PageKey } from '../app/navigation';
 
 export function Dashboard({
   overview,
   apiAvailable,
   running,
   onSelectScenario,
+  onOpenPage,
   onBatchCompare
 }: {
   overview: Overview;
   apiAvailable: boolean | null;
   running: boolean;
   onSelectScenario: (id: string) => void;
+  onOpenPage: (page: PageKey) => void;
   onBatchCompare: (ids: string[], label: string) => void;
 }) {
   const [selectedSurfaceId, setSelectedSurfaceId] = useState(overview.attack_surfaces[0]?.id ?? '');
@@ -194,6 +197,7 @@ export function Dashboard({
                 highRiskSurfaceCount={highRiskSurfaceCount}
                 pipelineNodes={pipelineNodes}
                 onSelectScenario={onSelectScenario}
+                onOpenPage={onOpenPage}
                 onBatchCompare={onBatchCompare}
               />
             )

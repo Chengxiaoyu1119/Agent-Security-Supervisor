@@ -3,6 +3,7 @@ import { Row, Col, Typography, Switch, Space, Descriptions, Flex } from 'antd';
 import { updatePolicyDetail, updatePolicyEnabled } from '@/api';
 import type { Policy } from '@/types';
 import { DecisionPill, LabelTag, MetricCard as Metric, PanelCard, UiAlert, UiButton, UiInput, UiSelect } from '../ui';
+import { PolicyDisableImpactPreview } from './PolicyDisableImpactPreview';
 
 export function PolicyCenter({
   policies,
@@ -25,11 +26,11 @@ export function PolicyCenter({
   const [policyError, setPolicyError] = useState('');
   const [editingPolicyId, setEditingPolicyId] = useState('');
   const [policyDraft, setPolicyDraft] = useState<Partial<Policy>>({});
+  const [pendingDisablePolicyId, setPendingDisablePolicyId] = useState('');
 
-  async function togglePolicy(id: string) {
+  async function savePolicyEnabled(id: string, enabled: boolean) {
     const current = policies.find((policy) => policy.id === id);
     if (!current) return;
-    const enabled = !current.enabled;
     const previousPolicies = policies;
     setPolicyError('');
     setSavingPolicyId(id);
@@ -37,6 +38,7 @@ export function PolicyCenter({
     try {
       const savedPolicy = await updatePolicyEnabled(id, enabled);
       setPolicies(previousPolicies.map((policy) => (policy.id === id ? savedPolicy : policy)));
+      setPendingDisablePolicyId('');
     } catch {
       setPolicies(previousPolicies);
       setPolicyError('策略状态保存失败，页面已恢复到保存前状态。');
@@ -45,8 +47,22 @@ export function PolicyCenter({
     }
   }
 
+  async function togglePolicy(id: string) {
+    const current = policies.find((policy) => policy.id === id);
+    if (!current) return;
+
+    if (current.enabled) {
+      setPolicyError('');
+      setPendingDisablePolicyId(id);
+      return;
+    }
+
+    await savePolicyEnabled(id, true);
+  }
+
   function startEdit(policy: Policy) {
     setEditingPolicyId(policy.id);
+    setPendingDisablePolicyId('');
     setPolicyDraft({
       description: policy.description,
       decision: policy.decision,
@@ -234,9 +250,13 @@ export function PolicyCenter({
                 </Space>
               ) : null}
 
-              {policy.disable_impact && (
-                <UiAlert type="warning" title={`关闭影响: ${policy.disable_impact}`} showIcon className="zh-mt-auto" />
-              )}
+              <PolicyDisableImpactPreview
+                policy={policy}
+                open={pendingDisablePolicyId === policy.id}
+                saving={savingPolicyId === policy.id}
+                onCancel={() => setPendingDisablePolicyId('')}
+                onConfirm={() => void savePolicyEnabled(policy.id, false)}
+              />
               {editingPolicyId !== policy.id ? (
                 <div className="zh-mt-16">
                   <UiButton size="small" onClick={() => startEdit(policy)}>

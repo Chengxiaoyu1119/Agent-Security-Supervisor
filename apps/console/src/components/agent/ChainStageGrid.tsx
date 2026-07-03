@@ -1,6 +1,6 @@
 import { Col, Flex, Row, Space, Typography } from 'antd';
 import type { AttackChain, AttackChainCompareResult, AttackChainStageRun } from '@/types';
-import { DecisionPill, LabelTag, PanelCard, UiBadge } from '../ui';
+import { DecisionPill, PanelCard, UiBadge } from '../ui';
 
 export function ChainStageGrid({
   activeChain,
@@ -34,13 +34,15 @@ export function ChainStageGrid({
                       {stage.name}
                     </Typography.Text>
                   </Space>
-                  <LabelTag className="zh-agent-chain-stage-tag">{stage.scenario.surface_id}</LabelTag>
+                  <Typography.Text type="secondary" className="zh-agent-chain-stage-tag">
+                    {stage.scenario.surface_id}
+                  </Typography.Text>
                 </Flex>
                 <Typography.Paragraph type="secondary" className="zh-agent-chain-stage-description">
                   {stage.tactic}
                 </Typography.Paragraph>
                 <Space className="zh-agent-chain-stage-meta">
-                  <Typography.Text code className="zh-agent-chain-stage-code">
+                  <Typography.Text type="secondary" className="zh-agent-chain-stage-code">
                     {stage.scenario.id}
                   </Typography.Text>
                 </Space>

@@ -117,11 +117,7 @@ export function RecentRunEvidence({
                   <EvidenceList
                     items={activeRun.audit_logs.map((log) => ({
                       key: log.id,
-                      title: (
-                        <Typography.Text code className="zh-break-anywhere">
-                          {log.tool}
-                        </Typography.Text>
-                      ),
+                      title: <Typography.Text className="zh-agent-tool-name">{log.tool}</Typography.Text>,
                       extra: <DecisionPill decision={log.decision} />,
                       description: log.reason,
                       meta: (

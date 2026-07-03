@@ -26,8 +26,25 @@
   background: linear-gradient(145deg, var(--ant-color-primary-bg) 0%, transparent 100%);
 }
 
-.zh-agent-chain-hero__tag {
+.zh-agent-chain-hero__risk {
+  display: inline-flex;
   margin-bottom: 16px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.zh-agent-chain-hero__risk--critical {
+  color: var(--ant-color-error);
+}
+
+.zh-agent-chain-hero__risk--high {
+  color: var(--ant-color-warning);
+}
+
+.zh-agent-chain-hero__risk--medium,
+.zh-agent-chain-hero__risk--low {
+  color: var(--ant-color-primary);
 }
 
 .zh-agent-chain-hero__stats {
@@ -35,11 +52,30 @@
 }
 
 .zh-agent-chain-defense-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
   margin-top: 24px;
+}
+
+.zh-agent-chain-defense-item {
+  min-height: 22px;
+  line-height: 22px;
 }
 
 .zh-agent-chain-stage-card {
   height: 100%;
+  min-height: 178px;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.zh-agent-chain-stage-card .ant-card-body {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
 }
 
 .zh-agent-chain-stage-card--controlled {
@@ -69,6 +105,10 @@
 
 .zh-agent-chain-stage-tag {
   margin: 0;
+  min-height: 22px;
+  font-size: 12px;
+  line-height: 22px;
+  white-space: nowrap;
 }
 
 .zh-agent-chain-stage-description {
@@ -77,16 +117,27 @@
 }
 
 .zh-agent-chain-stage-meta {
+  min-height: 22px;
   margin-bottom: 12px;
 }
 
 .zh-agent-chain-stage-code {
+  font-size: 12px;
+  line-height: 22px;
   white-space: normal;
   word-break: break-all;
 }
 
+.zh-agent-chain-stage-code code {
+  padding: 0;
+  color: inherit;
+  font-family: inherit;
+  background: transparent;
+  border: 0;
+}
+
 .zh-agent-chain-stage-footer {
-  margin-top: 12px;
+  margin-top: auto;
   padding-top: 12px;
   border-top: 1px solid var(--ant-color-border-secondary);
 }
@@ -131,10 +182,30 @@
 
 .zh-agent-runtime-item {
   background: var(--ant-color-bg-layout);
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .zh-agent-runtime-policy {
   margin-top: 8px;
+}
+
+.zh-agent-policy-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+}
+
+.zh-agent-policy-item {
+  display: inline-flex;
+  min-height: 22px;
+  align-items: center;
+  gap: 6px;
+  color: var(--ant-color-text-secondary);
+  font-size: 13px;
+  line-height: 22px;
 }
 
 .zh-agent-run-select {
@@ -144,6 +215,20 @@
 
 .zh-agent-run-card {
   margin-top: 24px;
+}
+
+.zh-agent-chain-stack .zh-metric-card,
+.zh-agent-run-card .zh-metric-card,
+.zh-agent-runtime-stack .zh-metric-card {
+  height: 96px;
+}
+
+.zh-agent-chain-stack .zh-metric-card .ant-card-body,
+.zh-agent-run-card .zh-metric-card .ant-card-body,
+.zh-agent-runtime-stack .zh-metric-card .ant-card-body {
+  display: flex;
+  height: 100%;
+  align-items: center;
 }
 
 .zh-agent-steps {
@@ -165,12 +250,18 @@
   font-size: 13px;
 }
 
+.zh-agent-tool-name {
+  color: var(--ant-color-text);
+  font-weight: 600;
+  word-break: break-all;
+}
+
 .zh-agent-timeline-message {
   margin: 0;
   padding: 8px;
   border-radius: 4px;
   font-size: 13px;
-  background: var(--ant-color-bg-layout);
+  background: var(--ant-color-fill-quaternary);
 }
 
 .zh-agent-result-title {
@@ -182,4 +273,10 @@
 .zh-agent-result-meta {
   margin-top: 16px;
   color: var(--ant-color-text-secondary);
+}
+
+html[data-theme='dark'] .zh-agent-chain-hero,
+html[data-theme='dark'] .zh-agent-runtime-item,
+html[data-theme='dark'] .zh-agent-timeline-message {
+  background-color: var(--ant-color-fill-quaternary);
 }

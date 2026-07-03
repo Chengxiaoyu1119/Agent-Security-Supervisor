@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { decideApprovalReview, fetchApprovalReviews } from '@/api';
 import type { ApprovalReview, ApprovalReviewList, AuditLog } from '@/types';
 import { riskLabel, writeClipboardText } from '@/utils';
+import { auditDeepLinkEvent, getAuditIdFromHash } from './auditDeepLink';
 
 type ApprovalAction = 'approve' | 'reject';
 
@@ -41,6 +42,7 @@ export function useAuditLogViewModel({ logs, refresh }: UseAuditLogViewModelPara
   const [approvalLoading, setApprovalLoading] = useState(false);
   const [approvalError, setApprovalError] = useState('');
   const [approvalBusyId, setApprovalBusyId] = useState('');
+  const [activeAuditLinkId, setActiveAuditLinkId] = useState('');
 
   const tools = useMemo(() => Array.from(new Set(logs.map((log) => log.tool))), [logs]);
 
@@ -51,7 +53,7 @@ export function useAuditLogViewModel({ logs, refresh }: UseAuditLogViewModelPara
     return logs
       .filter((log) => {
         const text =
-          `${log.tool} ${log.decision} ${log.risk_level} ${log.policy_id} ${log.reason} ${log.recommendation} ${(log.risk_factors ?? []).join(' ')} ${log.risk_score ?? ''}`.toLowerCase();
+          `${log.id} ${log.audit_hash ?? ''} ${log.previous_hash ?? ''} ${log.tool} ${log.decision} ${log.risk_level} ${log.policy_id} ${log.reason} ${log.recommendation} ${(log.risk_factors ?? []).join(' ')} ${log.risk_score ?? ''}`.toLowerCase();
 
         return (
           (!keyword || text.includes(keyword)) &&
@@ -101,8 +103,8 @@ export function useAuditLogViewModel({ logs, refresh }: UseAuditLogViewModelPara
           review.id,
           action,
           action === 'approve'
-            ? '演示批准：复核后确认可由上游比赛平台按最小权限重新发起。'
-            : '演示驳回：外部收件人或敏感数据范围未满足授权条件。',
+            ? '复核批准：确认可由上游比赛平台按最小权限重新发起。'
+            : '复核驳回：外部收件人或敏感数据范围未满足授权条件。',
           action === 'approve'
         );
         await loadApprovalReviews();
@@ -147,6 +149,21 @@ export function useAuditLogViewModel({ logs, refresh }: UseAuditLogViewModelPara
     setRiskScoreFilter('全部');
     setToolFilter('全部');
     setExecutionFilter('全部');
+    setActiveAuditLinkId('');
+  }, []);
+
+  const applyAuditDeepLink = useCallback((auditId: string) => {
+    const normalized = auditId.trim();
+    if (!normalized) return;
+
+    setQuery(normalized);
+    setDecisionFilter('全部');
+    setRiskFilter('全部');
+    setRiskScoreFilter('全部');
+    setToolFilter('全部');
+    setExecutionFilter('全部');
+    setSelectedLogId(normalized);
+    setActiveAuditLinkId(normalized);
   }, []);
 
   const copyEvidence = useCallback(async () => {
@@ -208,6 +225,25 @@ export function useAuditLogViewModel({ logs, refresh }: UseAuditLogViewModelPara
     return () => window.clearTimeout(timeoutId);
   }, [loadApprovalReviews]);
 
+  useEffect(() => {
+    const initialLinkTimer = window.setTimeout(() => applyAuditDeepLink(getAuditIdFromHash()), 0);
+
+    const handleHashChange = () => applyAuditDeepLink(getAuditIdFromHash());
+    const handleAuditDeepLink = (event: Event) => {
+      const auditId = (event as CustomEvent<{ auditId?: string }>).detail?.auditId ?? getAuditIdFromHash();
+      applyAuditDeepLink(auditId);
+    };
+
+    window.addEventListener('hashchange', handleHashChange);
+    window.addEventListener(auditDeepLinkEvent, handleAuditDeepLink);
+
+    return () => {
+      window.clearTimeout(initialLinkTimer);
+      window.removeEventListener('hashchange', handleHashChange);
+      window.removeEventListener(auditDeepLinkEvent, handleAuditDeepLink);
+    };
+  }, [applyAuditDeepLink]);
+
   return {
     query,
     setQuery,
@@ -227,6 +263,7 @@ export function useAuditLogViewModel({ logs, refresh }: UseAuditLogViewModelPara
     copied,
     copiedFiltered,
     copiedApprovalId,
+    activeAuditLinkId,
     approvalQueue,
     approvalLoading,
     approvalError,

@@ -17,7 +17,7 @@ export function RiskTag({ risk, suffix = '风险' }: RiskTagProps) {
 
   const label = riskLabel[risk] ?? risk;
   return (
-    <Tag color={color}>
+    <Tag color={color} className="zh-label-tag">
       {label}
       {suffix}
     </Tag>

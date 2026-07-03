@@ -1,10 +1,5 @@
 import { Col, Flex, Row, Space, Switch, Typography } from 'antd';
-import type {
-  AuthContext,
-  MemoryGovernance,
-  ObservabilityMetrics,
-  PolicySettings
-} from '@/types';
+import type { AuthContext, MemoryGovernance, ObservabilityMetrics, PolicySettings } from '@/types';
 import { LabelTag, MetricCard, PanelCard, UiButton, UiInputNumber } from '../ui';
 
 type RuntimeGovernanceTabProps = {
@@ -47,9 +42,7 @@ export function RuntimeGovernanceTab({
             <Typography.Title level={4} className="zh-title-flush">
               运行治理中心
             </Typography.Title>
-            <Typography.Text type="secondary">
-              角色、策略阈值、运行指标和记忆治理统一在这里维护。
-            </Typography.Text>
+            <Typography.Text type="secondary">角色、策略阈值、运行指标和记忆治理统一在这里维护。</Typography.Text>
           </Space>
           <UiButton loading={refreshingGovernance} onClick={() => void onRefreshGovernance()}>
             刷新治理状态

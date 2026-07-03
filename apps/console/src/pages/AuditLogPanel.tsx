@@ -42,6 +42,13 @@ export function AuditLogPanel({ logs, refresh }: { logs: AuditLog[]; refresh: ()
       />
 
       <PanelCard variant="borderless">
+        {view.activeAuditLinkId ? (
+          <div className="zh-audit-locator">
+            <Typography.Text type="secondary">正在定位</Typography.Text>
+            <Typography.Text code>{view.activeAuditLinkId}</Typography.Text>
+          </div>
+        ) : null}
+
         <AuditFilterBar
           query={view.query}
           decisionFilter={view.decisionFilter}

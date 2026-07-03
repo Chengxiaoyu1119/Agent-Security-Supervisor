@@ -13,10 +13,25 @@ vi.mock('../api', () => ({
   fetchPolicyConfig: vi.fn().mockResolvedValue({ settings: null }),
   fetchCompetitionReadiness: vi.fn().mockResolvedValue(null),
   fetchDemoDrill: vi.fn().mockResolvedValue(null),
+  fetchModelConfig: vi.fn().mockResolvedValue({
+    real_api_enabled: true,
+    real_api_enabled_source: 'runtime',
+    allowed_providers: [
+      { id: 'deepseek', label: 'DeepSeek' },
+      { id: 'zhipu', label: '智谱' },
+      { id: 'openai-compatible', label: 'OpenAI 兼容接口' }
+    ],
+    profiles: {
+      target: { provider_priority: ['deepseek', 'zhipu'], model_overrides: {} },
+      optimizer: { provider_priority: ['zhipu', 'deepseek'], model_overrides: {} },
+      global: { provider_priority: ['deepseek', 'zhipu'], model_overrides: {} }
+    }
+  }),
   rollbackLatestMemory: vi.fn(),
   runDemoDrill: vi.fn(),
   runExternalAgentDemo: vi.fn(),
   updateMemoryStatus: vi.fn(),
+  updateModelConfig: vi.fn(),
   updatePolicySettings: vi.fn(),
   writeCompetitionReadiness: vi.fn(),
   writeOpenClawPluginPackage: vi.fn(),

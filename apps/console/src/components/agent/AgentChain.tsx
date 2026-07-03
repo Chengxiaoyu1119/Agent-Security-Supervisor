@@ -2,7 +2,7 @@ import { Col, Flex, Row, Space, Typography } from 'antd';
 import { GitCompare, Play } from 'lucide-react';
 import type { AttackChain, AttackChainCompareResult, AttackChainRunResult, RunResult } from '@/types';
 import { riskLabel } from '@/utils';
-import { LabelTag, MetricCard as Metric, PanelCard, UiButton, UiSelect } from '../ui';
+import { MetricCard as Metric, PanelCard, UiButton, UiSelect } from '../ui';
 import { ChainRuntimeEvidence } from './ChainRuntimeEvidence';
 import { ChainStageGrid } from './ChainStageGrid';
 import { RecentRunEvidence } from './RecentRunEvidence';
@@ -101,18 +101,9 @@ export function AgentChain({
       <Row gutter={[24, 24]}>
         <Col xs={24} lg={16}>
           <PanelCard variant="borderless" className="zh-agent-chain-hero">
-            <LabelTag
-              color={
-                activeChain.severity === 'critical'
-                  ? 'error'
-                  : activeChain.severity === 'high'
-                    ? 'warning'
-                    : 'processing'
-              }
-              className="zh-agent-chain-hero__tag"
-            >
+            <Typography.Text className={`zh-agent-chain-hero__risk zh-agent-chain-hero__risk--${activeChain.severity}`}>
               {riskLabel[activeChain.severity]}风险组合链
-            </LabelTag>
+            </Typography.Text>
             <Typography.Title level={4}>{activeChain.title}</Typography.Title>
             <Typography.Paragraph>{activeChain.summary}</Typography.Paragraph>
             <Row gutter={24} className="zh-agent-chain-hero__stats">
@@ -129,13 +120,13 @@ export function AgentChain({
                 <Typography.Text strong>{activeChain.business_context}</Typography.Text>
               </Col>
             </Row>
-            <Space wrap className="zh-agent-chain-defense-tags">
+            <div className="zh-agent-chain-defense-tags">
               {activeChain.defense_focus.map((item) => (
-                <LabelTag key={item} color="cyan" className="zh-agent-chain-stage-tag">
+                <Typography.Text key={item} type="secondary" className="zh-agent-chain-defense-item">
                   {item}
-                </LabelTag>
+                </Typography.Text>
               ))}
-            </Space>
+            </div>
           </PanelCard>
         </Col>
         <Col xs={24} lg={8}>

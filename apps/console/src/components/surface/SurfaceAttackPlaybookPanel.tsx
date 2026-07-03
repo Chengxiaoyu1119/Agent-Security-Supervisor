@@ -23,7 +23,7 @@ function compactList(items: string[], className = 'zh-surface-brief-step') {
 
 function formatToolCalls(
   scenario?: Scenario,
-  expectedDecisions: SurfaceEvidencePack['scenarios'][number]['expected_decisions'] = [],
+  expectedDecisions: SurfaceEvidencePack['scenarios'][number]['expected_decisions'] = []
 ): string {
   if (!scenario || scenario.tool_calls.length === 0) {
     return '// 暂无工具调用脚本';
@@ -36,7 +36,7 @@ function formatToolCalls(
         `工具: ${call.tool}`,
         `入参: ${JSON.stringify(call.arguments, null, 2)}`,
         `期望监督动作: ${decision?.decision ?? '基于策略判断'}`,
-        `判定依据: ${decision?.reason ?? call.risk_hint}`,
+        `判定依据: ${decision?.reason ?? call.risk_hint}`
       ].join('\n');
     })
     .join('\n\n');
@@ -57,7 +57,7 @@ export function SurfaceAttackPlaybookPanel({
   pack,
   running = false,
   onOpenScenario,
-  onBatchCompare,
+  onBatchCompare
 }: SurfaceAttackPlaybookPanelProps) {
   const representativeScenario = scenarios[0];
   const packScenario =
@@ -81,7 +81,7 @@ export function SurfaceAttackPlaybookPanel({
       extra={<LabelTag color="red">{surface.risk} 风险</LabelTag>}
       className="zh-surface-attack-playbook"
     >
-      <Space direction="vertical" size={16} className="zh-full-width">
+      <Space orientation="vertical" size={16} className="zh-full-width">
         <Row gutter={[16, 16]} align="middle">
           <Col xs={24} lg={16}>
             <Typography.Paragraph className="zh-muted-text zh-zero-margin">
@@ -118,7 +118,7 @@ export function SurfaceAttackPlaybookPanel({
                     </div>
                   </Col>
                 </Row>
-              ),
+              )
             },
             {
               key: 'sample',
@@ -128,17 +128,25 @@ export function SurfaceAttackPlaybookPanel({
                   <Col xs={24} lg={12}>
                     <div className="zh-surface-brief-block">
                       <Typography.Text strong>代表性对抗输入</Typography.Text>
-                      {compactList(displayItems(representativeScenario?.adversarial_prompt ? [representativeScenario.adversarial_prompt] : []))}
+                      {compactList(
+                        displayItems(
+                          representativeScenario?.adversarial_prompt ? [representativeScenario.adversarial_prompt] : []
+                        )
+                      )}
                     </div>
                   </Col>
                   <Col xs={24} lg={12}>
                     <div className="zh-surface-brief-block">
                       <Typography.Text strong>越狱或伪装方式</Typography.Text>
-                      {compactList(displayItems(representativeScenario?.jailbreak_case ? [representativeScenario.jailbreak_case] : []))}
+                      {compactList(
+                        displayItems(
+                          representativeScenario?.jailbreak_case ? [representativeScenario.jailbreak_case] : []
+                        )
+                      )}
                     </div>
                   </Col>
                 </Row>
-              ),
+              )
             },
             {
               key: 'tool-script',
@@ -153,14 +161,14 @@ export function SurfaceAttackPlaybookPanel({
                   </Col>
                   <Col xs={24} lg={13}>
                     <div className="zh-surface-brief-block">
-                      <Typography.Text strong>模拟业务工具调用链</Typography.Text>
+                      <Typography.Text strong>本地靶场工具调用链</Typography.Text>
                       <EvidenceCodeBlock size="small" maxHeight="large">
                         {formatToolCalls(representativeScenario, expectedDecisions)}
                       </EvidenceCodeBlock>
                     </div>
                   </Col>
                 </Row>
-              ),
+              )
             },
             {
               key: 'defense',
@@ -179,9 +187,9 @@ export function SurfaceAttackPlaybookPanel({
                       {compactList(
                         displayItems(
                           expectedDecisions.map(
-                            (decision) => `${decision.tool}: ${decision.decision} - ${decision.reason}`,
-                          ),
-                        ),
+                            (decision) => `${decision.tool}: ${decision.decision} - ${decision.reason}`
+                          )
+                        )
                       )}
                     </div>
                   </Col>
@@ -193,15 +201,15 @@ export function SurfaceAttackPlaybookPanel({
                           [
                             ...(surface.mitigations?.length ? surface.mitigations : [surface.defense]),
                             ...attackPath,
-                            guardedAuditHash ? `审计证据哈希: ${guardedAuditHash}` : '',
-                          ].filter(Boolean),
-                        ),
+                            guardedAuditHash ? `审计证据哈希: ${guardedAuditHash}` : ''
+                          ].filter(Boolean)
+                        )
                       )}
                     </div>
                   </Col>
                 </Row>
-              ),
-            },
+              )
+            }
           ]}
         />
 
@@ -210,7 +218,9 @@ export function SurfaceAttackPlaybookPanel({
             type="primary"
             icon={<Play size={16} />}
             disabled={running || !representativeScenario}
-            onClick={() => representativeScenario && onBatchCompare?.([representativeScenario.id], representativeScenario.title)}
+            onClick={() =>
+              representativeScenario && onBatchCompare?.([representativeScenario.id], representativeScenario.title)
+            }
           >
             {running ? '验证中...' : '运行代表脚本'}
           </UiButton>

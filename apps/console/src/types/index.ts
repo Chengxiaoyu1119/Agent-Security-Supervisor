@@ -4,6 +4,7 @@ export * from './runtime';
 export * from './agent';
 export * from './report';
 export * from './supervisor';
+export * from './attackTestset';
 export * from './redteam';
 export * from './capability';
 export * from './penetration';

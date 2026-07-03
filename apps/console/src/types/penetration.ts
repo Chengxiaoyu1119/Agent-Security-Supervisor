@@ -1,4 +1,4 @@
-import type { SupervisorEvaluation } from './supervisor';
+import type { SupervisorEvaluation, TargetLabState } from './supervisor';
 
 export interface LearningLabScenario {
   id: string;
@@ -43,14 +43,7 @@ export interface LearningLabRunResult {
     tool_output: Record<string, unknown>;
   };
   guarded: SupervisorEvaluation;
-  target_lab: {
-    version: string;
-    updated_at: string;
-    api_call_count: number;
-    bulk_export_count: number;
-    sensitive_read_count: number;
-    latest_api_call: Record<string, unknown> | null;
-  };
+  target_lab: TargetLabState;
   summary: {
     exploited_without_guard: boolean;
     blocked_with_guard: boolean;

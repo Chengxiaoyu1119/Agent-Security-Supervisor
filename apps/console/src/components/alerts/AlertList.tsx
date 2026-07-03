@@ -39,7 +39,7 @@ export function AlertList({ alerts, selectedAlertId, onSelectAlert }: AlertListP
               <AlertTriangle size={20} color={getAlertIconColor(alert)} />
             </div>
             <div className="zh-flex-spacer">
-              <Space>
+              <Space wrap size={[8, 4]} align="center">
                 <Typography.Text strong className={selected ? 'zh-text-primary-active' : undefined}>
                   {alert.title}
                 </Typography.Text>

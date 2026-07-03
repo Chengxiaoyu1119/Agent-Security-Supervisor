@@ -1,6 +1,6 @@
 import { Col, Flex, Row, Space, Typography } from 'antd';
 import type { AttackChainCompareResult, AttackChainRunResult } from '@/types';
-import { LabelTag, MetricCard as Metric, PanelCard, UiBadge } from '../ui';
+import { MetricCard as Metric, PanelCard, UiBadge } from '../ui';
 
 export function ChainRuntimeEvidence({
   result,
@@ -77,7 +77,7 @@ export function ChainRuntimeEvidence({
                   </Space>
                 </Flex>
                 <div className="zh-agent-runtime-policy">
-                  <Typography.Text code className="zh-agent-chain-stage-code">
+                  <Typography.Text type="secondary" className="zh-agent-chain-stage-code">
                     {item.with_guard.policies.join(' / ') || '未命中策略'}
                   </Typography.Text>
                 </div>
@@ -132,13 +132,13 @@ export function ChainRuntimeEvidence({
         </Row>
 
         {Object.keys(result.summary.policy_distribution).length > 0 && (
-          <Space wrap size={[8, 8]}>
+          <div className="zh-agent-policy-list">
             {Object.entries(result.summary.policy_distribution).map(([policy, count]) => (
-              <LabelTag key={policy} color="blue">
+              <span key={policy} className="zh-agent-policy-item">
                 {policy} <UiBadge count={count} className="zh-agent-badge-brand" />
-              </LabelTag>
+              </span>
             ))}
-          </Space>
+          </div>
         )}
       </Space>
     </PanelCard>

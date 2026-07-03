@@ -32,7 +32,7 @@ export function CompetitionReadinessPanel({
       type="inner"
     >
       <Typography.Paragraph type="secondary">
-        自动检查攻击面、误报、连续流程、OpenClaw 插件和报告证据，直接给出演示就绪状态与 P0 补证项。
+        自动检查攻击面、误报、连续流程、OpenClaw 插件和报告证据，直接给出复现就绪状态与 P0 补证项。
       </Typography.Paragraph>
       {competitionReadiness ? (
         <>

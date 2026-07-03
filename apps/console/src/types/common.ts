@@ -10,6 +10,35 @@ export interface ModelStatus {
   endpoint?: string;
 }
 
+export interface ModelProviderOption {
+  id: string;
+  label: string;
+}
+
+export interface ModelProfileRuntimeConfig {
+  provider_priority: string[];
+  model_overrides: Record<string, string>;
+}
+
+export interface ModelRuntimeConfig {
+  real_api_enabled: boolean;
+  real_api_enabled_source: 'runtime' | 'env' | string;
+  allowed_providers: ModelProviderOption[];
+  profiles: Record<string, ModelProfileRuntimeConfig>;
+  config_path?: string;
+}
+
+export interface ModelRuntimeConfigUpdate {
+  real_api_enabled?: boolean;
+  profiles?: Record<
+    string,
+    {
+      provider_priority?: string[];
+      model_overrides?: Record<string, string>;
+    }
+  >;
+}
+
 export interface Policy {
   id: string;
   name: string;

@@ -2,6 +2,7 @@ import { Col, Descriptions, Divider, Row, Space, Typography } from 'antd';
 import { ClipboardList, ShieldCheck } from 'lucide-react';
 import { DecisionPill, MetricCard as Metric, PanelCard, UiAlert, UiButton, UiInput } from '../ui';
 import type { SupervisorBatchEvaluation, SupervisorEvaluation } from '@/types';
+import { AuditDeepLinkButton } from '../audit/AuditDeepLinkButton';
 
 type SupervisorManualDebugPanelProps = {
   eventJson: string;
@@ -104,7 +105,12 @@ export function SupervisorManualDebugPanel({
                   {evaluation.anomaly_score ?? evaluation.risk_evidence.anomaly_score ?? '-'}
                 </Descriptions.Item>
                 <Descriptions.Item label="审计编号" span={2}>
-                  <Typography.Text code>{evaluation.audit_id.slice(0, 8)}</Typography.Text>
+                  <Space wrap>
+                    <Typography.Text code>{evaluation.audit_id.slice(0, 8)}</Typography.Text>
+                    <AuditDeepLinkButton auditId={evaluation.audit_id} size="small">
+                      查看
+                    </AuditDeepLinkButton>
+                  </Space>
                 </Descriptions.Item>
                 <Descriptions.Item label="已落库">{evaluation.persisted ? '是' : '否'}</Descriptions.Item>
                 <Descriptions.Item label="告警">{evaluation.alert ? '已生成' : '未生成'}</Descriptions.Item>
