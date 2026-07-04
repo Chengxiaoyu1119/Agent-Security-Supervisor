@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { decideApprovalReview, fetchApprovalReviews } from '@/api';
 import type { ApprovalReview, ApprovalReviewList, AuditLog } from '@/types';
 import { riskLabel, writeClipboardText } from '@/utils';
+import { compareApprovalReviews } from './approvalReviewSorting';
 import { auditDeepLinkEvent, getAuditIdFromHash } from './auditDeepLink';
 
 type ApprovalAction = 'approve' | 'reject';
@@ -78,7 +79,7 @@ export function useAuditLogViewModel({ logs, refresh }: UseAuditLogViewModelPara
   const executedCount = logs.filter((log) => log.tool_output.executed).length;
 
   const latestReviews = useMemo(
-    () => [...approvalQueue.reviews].sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 5),
+    () => [...approvalQueue.reviews].sort(compareApprovalReviews).slice(0, 5),
     [approvalQueue.reviews]
   );
 

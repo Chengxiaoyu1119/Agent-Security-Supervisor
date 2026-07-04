@@ -9,8 +9,8 @@ export function ComparisonPanel({ comparison }: { comparison: CompareResult }) {
 
   return (
     <PanelCard type="inner" title="对比结果分析" className="zh-mt-24">
-      <Row gutter={24} align="middle">
-        <Col span={11}>
+      <Row gutter={[16, 16]} align="middle">
+        <Col xs={24} lg={11}>
           <PanelCard variant="borderless" className="zh-compare-card--danger">
             <Typography.Text type="secondary" className="zh-text-block">
               无防护复现
@@ -26,12 +26,12 @@ export function ComparisonPanel({ comparison }: { comparison: CompareResult }) {
             </Typography.Text>
           </PanelCard>
         </Col>
-        <Col span={2} className="zh-text-center">
+        <Col xs={24} lg={2} className="zh-text-center zh-compare-arrow-col">
           <Typography.Title level={3} type="secondary" className="zh-title-flush">
             →
           </Typography.Title>
         </Col>
-        <Col span={11}>
+        <Col xs={24} lg={11}>
           <PanelCard variant="borderless" className="zh-compare-card--success">
             <Typography.Text type="secondary" className="zh-text-block">
               有防护验证
@@ -50,21 +50,21 @@ export function ComparisonPanel({ comparison }: { comparison: CompareResult }) {
         </Col>
       </Row>
       <div className="zh-mt-24">
-        <Row gutter={24}>
-          <Col span={12}>
+        <Row gutter={[16, 16]}>
+          <Col xs={24} lg={12}>
             <RunEvidenceStrip title="无防护证据" run={before} compact />
           </Col>
-          <Col span={12}>
+          <Col xs={24} lg={12}>
             <RunEvidenceStrip title="有防护证据" run={after} compact />
           </Col>
         </Row>
       </div>
       <div className="zh-mt-24">
-        <Row gutter={24}>
-          <Col span={12}>
+        <Row gutter={[16, 16]}>
+          <Col xs={24} lg={12}>
             <RunAuditTimeline title="无防护全链路审计" logs={before.audit_logs} compact />
           </Col>
-          <Col span={12}>
+          <Col xs={24} lg={12}>
             <RunAuditTimeline title="有防护全链路审计" logs={after.audit_logs} compact />
           </Col>
         </Row>

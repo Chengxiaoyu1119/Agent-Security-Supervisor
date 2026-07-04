@@ -1,14 +1,18 @@
 import { Col, Row, Space, Typography } from 'antd';
-import { LabelTag, MetricCard as Metric, PanelCard, SectionTitle, UiTable } from '../ui';
+import { LabelTag, MetricCard as Metric, PanelCard, SectionTitle } from '../ui';
 import type { ReportData } from '@/types';
+import { ReportNormalCaseExplorer } from './ReportNormalCaseExplorer';
+import { ReportPolicyAblationActions } from './ReportPolicyAblationActions';
 
 type ReportNormalEvaluationTabProps = {
   report: ReportData;
+  onRefreshReport?: () => Promise<void> | void;
 };
 
-export function ReportNormalEvaluationTab({ report }: ReportNormalEvaluationTabProps) {
+export function ReportNormalEvaluationTab({ report, onRefreshReport }: ReportNormalEvaluationTabProps) {
   return (
     <Space orientation="vertical" size="large" className="zh-tab-stack">
+      <ReportPolicyAblationActions onRefreshReport={onRefreshReport} />
       {report.policy_ablation && (
         <PanelCard
           title={
@@ -20,27 +24,27 @@ export function ReportNormalEvaluationTab({ report }: ReportNormalEvaluationTabP
           variant="borderless"
         >
           <Row gutter={[16, 16]} className="zh-mb-24">
-            <Col span={5}>
+            <Col xs={24} sm={12} lg={5}>
               <Metric
                 label="基线控制率"
                 value={`${report.policy_ablation.summary.baseline_control_rate}%`}
                 tone="green"
               />
             </Col>
-            <Col span={5}>
+            <Col xs={24} sm={12} lg={5}>
               <Metric
                 label="消融后控制率"
                 value={`${report.policy_ablation.summary.ablated_control_rate}%`}
                 tone="amber"
               />
             </Col>
-            <Col span={4}>
+            <Col xs={24} sm={12} lg={4}>
               <Metric label="控制率下降" value={`${report.policy_ablation.summary.control_drop}%`} tone="red" />
             </Col>
-            <Col span={5}>
+            <Col xs={24} sm={12} lg={5}>
               <Metric label="风险暴露" value={`${report.policy_ablation.summary.risk_exposed_count}`} tone="red" />
             </Col>
-            <Col span={5}>
+            <Col xs={24} sm={12} lg={5}>
               <Metric label="兜底控制" value={`${report.policy_ablation.summary.fallback_control_count}`} tone="cyan" />
             </Col>
           </Row>
@@ -114,68 +118,34 @@ export function ReportNormalEvaluationTab({ report }: ReportNormalEvaluationTabP
         variant="borderless"
       >
         <Row gutter={[16, 16]} className="zh-mb-24">
-          <Col span={4}>
+          <Col xs={24} sm={12} lg={4}>
             <Metric label="正常样本" value={`${report.benign_evaluation.summary.case_count}`} tone="cyan" />
           </Col>
-          <Col span={4}>
+          <Col xs={24} sm={12} lg={4}>
             <Metric label="覆盖类别" value={`${report.benign_evaluation.summary.category_count}`} tone="cyan" />
           </Col>
-          <Col span={4}>
+          <Col xs={24} sm={12} lg={4}>
             <Metric label="工具类型" value={`${report.benign_evaluation.summary.tool_count}`} tone="amber" />
           </Col>
-          <Col span={4}>
+          <Col xs={24} sm={12} lg={4}>
             <Metric
               label="需确认/隔离"
               value={`${report.benign_evaluation.summary.expected_control_count}`}
               tone="amber"
             />
           </Col>
-          <Col span={4}>
+          <Col xs={24} sm={12} lg={4}>
             <Metric
               label="误报率"
               value={`${report.benign_evaluation.summary.false_positive_rate}%`}
               tone={report.benign_evaluation.summary.false_positive_rate > 0 ? 'red' : 'green'}
             />
           </Col>
-          <Col span={4}>
+          <Col xs={24} sm={12} lg={4}>
             <Metric label="匹配率" value={`${report.benign_evaluation.summary.expected_match_rate}%`} tone="green" />
           </Col>
         </Row>
-        <UiTable
-          dataSource={report.benign_evaluation.cases}
-          rowKey="id"
-          size="small"
-          pagination={{ pageSize: 10 }}
-          columns={[
-            {
-              title: '样本',
-              dataIndex: 'id',
-              render: (t) => <Typography.Text strong>{t}</Typography.Text>
-            },
-            { title: '类别', dataIndex: 'category' },
-            {
-              title: '工具',
-              key: 'tool',
-              render: (_, r) => <Typography.Text code>{r.tool_call.tool}</Typography.Text>
-            },
-            { title: '期望', dataIndex: 'expected_decision' },
-            { title: '实际', dataIndex: 'decision' },
-            {
-              title: '误报',
-              key: 'is_false_positive',
-              render: (_, r) => (
-                <LabelTag variant="filled" color={r.is_false_positive ? 'error' : 'success'}>
-                  {r.is_false_positive ? '是' : '否'}
-                </LabelTag>
-              )
-            },
-            {
-              title: '策略',
-              dataIndex: 'policy_id',
-              render: (t) => <Typography.Text code>{t}</Typography.Text>
-            }
-          ]}
-        />
+        <ReportNormalCaseExplorer evaluation={report.benign_evaluation} />
       </PanelCard>
       {report.benign_workflow_evaluation && (
         <PanelCard
@@ -188,35 +158,35 @@ export function ReportNormalEvaluationTab({ report }: ReportNormalEvaluationTabP
           variant="borderless"
         >
           <Row gutter={[16, 16]} className="zh-mb-24">
-            <Col span={5}>
+            <Col xs={24} sm={12} lg={5}>
               <Metric
                 label="流程通过率"
                 value={`${report.benign_workflow_evaluation.summary.workflow_pass_rate}%`}
                 tone="green"
               />
             </Col>
-            <Col span={5}>
+            <Col xs={24} sm={12} lg={5}>
               <Metric
                 label="步骤误报率"
                 value={`${report.benign_workflow_evaluation.summary.false_positive_rate}%`}
                 tone="amber"
               />
             </Col>
-            <Col span={5}>
+            <Col xs={24} sm={12} lg={5}>
               <Metric
                 label="匹配率"
                 value={`${report.benign_workflow_evaluation.summary.expected_match_rate}%`}
                 tone="cyan"
               />
             </Col>
-            <Col span={5}>
+            <Col xs={24} sm={12} lg={5}>
               <Metric
                 label="边界控制"
                 value={`${report.benign_workflow_evaluation.summary.expected_control_step_count}`}
                 tone="amber"
               />
             </Col>
-            <Col span={4}>
+            <Col xs={24} sm={12} lg={4}>
               <Metric
                 label="审计链有效"
                 value={`${report.benign_workflow_evaluation.summary.audit_chain_valid_count}`}

@@ -53,14 +53,15 @@ export function useAppActions({
   refresh,
   loadReport
 }: UseAppActionsOptions) {
-  const handleRun = useCallback(
-    async (compare = false) => {
-      if (!activeScenario) return;
+  const handleRunScenario = useCallback(
+    async (scenarioId: string, compare = false) => {
+      if (!scenarioId) return;
       setRunning(true);
       setApiNotice('');
+      setSelectedScenario(scenarioId);
       try {
         if (compare) {
-          const comparison = await compareScenario(activeScenario.id);
+          const comparison = await compareScenario(scenarioId);
           setCompareResult(comparison);
           setBatchResult(null);
           setLastResult(comparison.with_guard);
@@ -71,7 +72,7 @@ export function useAppActions({
             }。`
           );
         } else {
-          const result = await runScenario(activeScenario.id, guardEnabled);
+          const result = await runScenario(scenarioId, guardEnabled);
           setCompareResult(null);
           setBatchResult(null);
           setLastResult(result);
@@ -85,7 +86,6 @@ export function useAppActions({
       }
     },
     [
-      activeScenario,
       guardEnabled,
       refresh,
       setApiNotice,
@@ -94,8 +94,17 @@ export function useAppActions({
       setGuardEnabled,
       setLastResult,
       setPage,
-      setRunning
+      setRunning,
+      setSelectedScenario
     ]
+  );
+
+  const handleRun = useCallback(
+    async (compare = false) => {
+      if (!activeScenario) return;
+      await handleRunScenario(activeScenario.id, compare);
+    },
+    [activeScenario, handleRunScenario]
   );
 
   const handleBatchCompare = useCallback(
@@ -192,6 +201,7 @@ export function useAppActions({
 
   return {
     handleRun,
+    handleRunScenario,
     handleBatchCompare,
     handleAttackChain
   };

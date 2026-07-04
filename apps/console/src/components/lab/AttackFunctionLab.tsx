@@ -11,6 +11,10 @@ import { defaultAttackModuleOptions, type AttackModuleOptions } from './attackMo
 import { TargetLabStatePanel } from './TargetLabStatePanel';
 import { TargetLabDeltaPanel } from './TargetLabDeltaPanel';
 import { attackFunctionIcons, fallbackAttackFunctionIcon } from './attackFunctionIcons';
+import { attackFunctionFlowSteps } from './labRuntimeFlowPresets';
+import { LabModulePicker } from './LabModulePicker';
+import { LabRuntimeFlow } from './LabRuntimeFlow';
+import { ResultRunButton, RunResultEmptyState } from './RunResultActions';
 
 type AttackFunctionLabProps = {
   refresh?: () => Promise<unknown>;
@@ -71,6 +75,11 @@ export function AttackFunctionLab({ refresh }: AttackFunctionLabProps) {
     setNotice('');
   }
 
+  function selectModuleById(surfaceId: string) {
+    const module = modules.find((item) => item.surface_id === surfaceId);
+    if (module) selectModule(module);
+  }
+
   async function runModule() {
     if (!activeModule) return;
     setRunning(true);
@@ -114,32 +123,18 @@ export function AttackFunctionLab({ refresh }: AttackFunctionLabProps) {
       {notice && <UiAlert type="warning" showIcon title={notice} className="zh-mb-24" />}
       <Row gutter={[20, 20]} align="stretch">
         <Col xs={24} xl={7}>
-          <PanelCard
+          <LabModulePicker
             title="攻击功能"
             subtitle={`${modules.length} 类可运行攻击面`}
-            className="zh-attack-lab__module-panel"
-          >
-            <div className="zh-attack-lab__module-grid">
-              {modules.map((module) => (
-                <button
-                  type="button"
-                  key={module.surface_id}
-                  className={`zh-attack-lab__module-button ${
-                    module.surface_id === activeModule.surface_id ? 'zh-attack-lab__module-button--active' : ''
-                  }`}
-                  onClick={() => selectModule(module)}
-                >
-                  <span className="zh-attack-lab__module-icon">
-                    {attackFunctionIcons[module.surface_id] ?? fallbackAttackFunctionIcon}
-                  </span>
-                  <span className="zh-attack-lab__module-copy">
-                    <strong>{module.name}</strong>
-                    <span>{module.tool}</span>
-                  </span>
-                </button>
-              ))}
-            </div>
-          </PanelCard>
+            items={modules.map((module) => ({
+              id: module.surface_id,
+              title: module.name,
+              subtitle: module.tool,
+              icon: attackFunctionIcons[module.surface_id] ?? fallbackAttackFunctionIcon
+            }))}
+            activeId={activeModule.surface_id}
+            onSelect={selectModuleById}
+          />
         </Col>
 
         <Col xs={24} xl={9}>
@@ -155,8 +150,8 @@ export function AttackFunctionLab({ refresh }: AttackFunctionLabProps) {
                   value={plannerMode}
                   onChange={(value) => setPlannerMode(value)}
                   options={[
-                    { label: '后端配置模型真实规划', value: 'model' },
-                    { label: '功能模块固定映射', value: 'fixed' }
+                    { label: '真实模型规划（后端配置模型）', value: 'model' },
+                    { label: '离线规则规划（无模型时复核）', value: 'fixed' }
                   ]}
                 />
               </div>
@@ -167,6 +162,7 @@ export function AttackFunctionLab({ refresh }: AttackFunctionLabProps) {
                   message="运行时会优先调用后端已配置的大模型生成工具调用；接口不可用时才启用本地安全评测模型兜底。"
                 />
               )}
+              <LabRuntimeFlow compact steps={attackFunctionFlowSteps(plannerMode, executeInSandbox)} />
               <div className="zh-attack-lab__field">
                 <Typography.Text strong>攻击输入</Typography.Text>
                 <UiInput.TextArea
@@ -205,18 +201,27 @@ export function AttackFunctionLab({ refresh }: AttackFunctionLabProps) {
             title="攻防结果"
             subtitle={result ? result.summary.decision_change : '等待运行'}
             className="zh-full-height"
+            extra={
+              <ResultRunButton
+                hasResult={Boolean(result)}
+                idleLabel="运行"
+                rerunLabel="重新运行"
+                loading={running}
+                onClick={runModule}
+              />
+            }
           >
             {result ? (
               <Space orientation="vertical" size={14} className="zh-full-width">
-                <Row gutter={[12, 12]}>
-                  <Col span={12}>
+                <Row gutter={[12, 12]} align="stretch">
+                  <Col xs={12} sm={12}>
                     <MetricCard
                       label="无防护暴露"
                       value={result.summary.exposed_without_guard ? '是' : '否'}
                       tone={result.summary.exposed_without_guard ? 'red' : 'green'}
                     />
                   </Col>
-                  <Col span={12}>
+                  <Col xs={12} sm={12}>
                     <MetricCard
                       label="有防护控制"
                       value={result.summary.controlled_with_guard ? '是' : '否'}
@@ -251,9 +256,14 @@ export function AttackFunctionLab({ refresh }: AttackFunctionLabProps) {
                 </div>
               </Space>
             ) : (
-              <div className="zh-attack-lab__empty">
-                <Typography.Text type="secondary">选择攻击功能并运行后，这里展示无防护与有防护对比。</Typography.Text>
-              </div>
+              <RunResultEmptyState
+                icon={<Play size={28} />}
+                title="等待运行攻击实验"
+                description="会调用后端攻击模块、本地沙箱工具和监督器，生成无防护/有防护两组真实审计结果。"
+                actionLabel="运行攻击实验"
+                loading={running}
+                onAction={runModule}
+              />
             )}
           </PanelCard>
         </Col>

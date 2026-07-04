@@ -7,10 +7,11 @@ from typing import Any
 
 from .assessment import build_attack_effectiveness, build_requirement_alignment
 from .benign_workflows import evaluate_benign_workflows
+from .briefing_export import load_briefing_sheet_export_report
 from .calibration import build_anomaly_calibration
 from .data import get_attack_surfaces, get_scenarios
 from .openclaw_adapter import build_openclaw_plugin_package_summary
-from .paths import SANDBOX_REPORTS_DIR
+from .paths import REPO_ROOT, SANDBOX_REPORTS_DIR
 from .surface_pack import build_surface_evidence_index
 
 REPORT_ROOT = SANDBOX_REPORTS_DIR
@@ -25,6 +26,10 @@ def build_project_roadmap(runs: list[dict[str, Any]] | None = None) -> dict[str,
     calibration = build_anomaly_calibration()
     openclaw_plugin = build_openclaw_plugin_package_summary()
     openclaw_validation = _load_openclaw_validation()
+    real_model_evaluation = _load_real_model_evaluation()
+    briefing_export = load_briefing_sheet_export_report()
+    local_launch = _local_launch_status()
+    engineering = _engineering_status()
     benign_workflows = evaluate_benign_workflows()
     requirements = build_requirement_alignment(effectiveness["cases"])
     dimensions = _maturity_dimensions(
@@ -35,13 +40,27 @@ def build_project_roadmap(runs: list[dict[str, Any]] | None = None) -> dict[str,
         calibration,
         openclaw_plugin,
         openclaw_validation,
+        real_model_evaluation,
+        briefing_export,
         benign_workflows,
+        local_launch,
+        engineering,
     )
     overall_score = round(sum(item["score"] for item in dimensions) / len(dimensions)) if dimensions else 0
     completed = [item for item in dimensions if item["status"] == "已完成"]
     partial = [item for item in dimensions if item["status"] == "需完善"]
     weak = [item for item in dimensions if item["status"] == "高优先级缺口"]
-    backlog = _feature_backlog(surface_index, effectiveness, requirements, calibration, openclaw_plugin, openclaw_validation)
+    backlog = _feature_backlog(
+        surface_index,
+        effectiveness,
+        requirements,
+        calibration,
+        openclaw_plugin,
+        openclaw_validation,
+        real_model_evaluation,
+        briefing_export,
+        local_launch,
+    )
     p0 = [item for item in backlog if item["priority"] == "P0" and item["status"] != "已完成"]
     verdict = "方向正确，已具备可复现实验、行为监督、证据包和答辩材料闭环"
     if weak:
@@ -51,7 +70,7 @@ def build_project_roadmap(runs: list[dict[str, Any]] | None = None) -> dict[str,
         "direction": {
             "verdict": verdict,
             "score": overall_score,
-            "reason": "项目已经覆盖赛题要求的攻击场景、对抗样本、智能体脚本、监督器、审计、告警和提交材料；下一阶段重点应从原型演示走向真实接入、可部署和多模型实测。",
+            "reason": "项目已经覆盖赛题要求的攻击场景、对抗样本、智能体脚本、监督器、审计、告警和提交材料；当前重点是保持真实接入、可部署复现和多模型实测闭环。",
             "competition_fit": _competition_fit(requirements),
         },
         "summary": {
@@ -81,8 +100,112 @@ def _load_openclaw_validation() -> dict[str, Any] | None:
         data = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError):
         return None
-    validation = data.get("validation")
+    validation = data.get("validation") if isinstance(data.get("validation"), dict) else data
     return validation if isinstance(validation, dict) else None
+
+
+def _local_launch_status() -> dict[str, bool]:
+    root = REPO_ROOT
+    scripts_dir = root / "scripts"
+    package_json = root / "package.json"
+    script_files_ready = all(
+        path.exists()
+        for path in [
+            scripts_dir / "启动智安哨.ps1",
+            scripts_dir / "启动智安哨.cmd",
+            scripts_dir / "start-www-dev.mjs",
+        ]
+    )
+    package_scripts_ready = False
+    if package_json.exists():
+        try:
+            package_data = json.loads(package_json.read_text(encoding="utf-8"))
+            scripts = package_data.get("scripts", {})
+            package_scripts_ready = all(key in scripts for key in ["api:dev", "console:dev", "console:build"])
+        except (OSError, json.JSONDecodeError):
+            package_scripts_ready = False
+    return {
+        "script_files_ready": script_files_ready,
+        "package_scripts_ready": package_scripts_ready,
+        "one_command_ready": script_files_ready and package_scripts_ready,
+    }
+
+
+def _engineering_status() -> dict[str, Any]:
+    root = REPO_ROOT
+    package_json = root / "package.json"
+    console_package_json = root / "apps" / "console" / "package.json"
+    api_tests_dir = root / "apps" / "api" / "tests"
+    console_src_dir = root / "apps" / "console" / "src"
+
+    root_scripts: dict[str, Any] = {}
+    console_scripts: dict[str, Any] = {}
+    for path, target in [(package_json, root_scripts), (console_package_json, console_scripts)]:
+        if not path.exists():
+            continue
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        scripts = data.get("scripts", {})
+        if isinstance(scripts, dict):
+            target.update(scripts)
+
+    required_root_scripts = {
+        "console:lint:strict": "前端严格 lint",
+        "ui:audit": "UI 治理审计",
+        "console:test": "前端测试",
+        "api:check": "API 编译检查",
+        "api:test": "API 单元测试",
+        "build": "生产构建",
+        "verify": "总体验证命令",
+    }
+    required_console_scripts = {
+        "lint:strict": "控制台严格 lint",
+        "ui:audit": "控制台 UI 审计",
+        "test": "控制台测试",
+        "build": "控制台构建",
+    }
+    required_files = {
+        root / "scripts" / "frontend-governance-check.mjs": "UI 审计脚本",
+        console_src_dir / "api.test.ts": "接口测试",
+        console_src_dir / "pages" / "ReportPanel.test.tsx": "报告页测试",
+        console_src_dir / "pages" / "SettingsPanel.test.tsx": "设置页测试",
+        api_tests_dir / "test_supervisor.py": "监督器测试",
+        api_tests_dir / "test_openai_proxy.py": "模型代理鉴权测试",
+        api_tests_dir / "test_dual_model_jailbreak.py": "双模型越狱测试",
+    }
+
+    checks: list[dict[str, Any]] = []
+    checks.extend(
+        {"name": label, "ok": key in root_scripts, "kind": "root_script"}
+        for key, label in required_root_scripts.items()
+    )
+    checks.extend(
+        {"name": label, "ok": key in console_scripts, "kind": "console_script"}
+        for key, label in required_console_scripts.items()
+    )
+    checks.extend({"name": label, "ok": path.exists(), "kind": "file"} for path, label in required_files.items())
+    passed = sum(1 for item in checks if item["ok"])
+    score = round(passed / max(1, len(checks)) * 100)
+    return {
+        "score": score,
+        "passed": passed,
+        "total": len(checks),
+        "checks": checks,
+        "complete": score >= 90,
+    }
+
+
+def _load_real_model_evaluation() -> dict[str, Any] | None:
+    path = REPORT_ROOT / "真实模型工具调用盲测报告.json"
+    if not path.exists():
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None
+    return data if isinstance(data.get("summary"), dict) else None
 
 
 def build_project_roadmap_markdown(runs: list[dict[str, Any]] | None = None) -> str:
@@ -140,7 +263,11 @@ def _maturity_dimensions(
     calibration: dict[str, Any],
     openclaw_plugin: dict[str, Any],
     openclaw_validation: dict[str, Any] | None,
+    real_model_evaluation: dict[str, Any] | None,
+    briefing_export: dict[str, Any] | None,
     benign_workflows: dict[str, Any],
+    local_launch: dict[str, bool],
+    engineering: dict[str, Any],
 ) -> list[dict[str, Any]]:
     summary = surface_index["summary"]
     effectiveness_summary = effectiveness["summary"]
@@ -152,8 +279,22 @@ def _maturity_dimensions(
         and openclaw_validation.get("node_syntax_passed")
     )
     openclaw_runtime_validated = bool(openclaw_validation and openclaw_validation.get("runtime_inspect_passed"))
+    real_model_summary = real_model_evaluation.get("summary", {}) if real_model_evaluation else {}
+    real_model_case_count = int(real_model_summary.get("case_count") or 0)
+    real_api_case_count = int(real_model_summary.get("real_api_case_count") or 0)
+    model_tool_call_success_count = int(real_model_summary.get("model_tool_call_success_count") or 0)
+    briefing_export_summary = briefing_export.get("summary", {}) if briefing_export else {}
+    briefing_png_count = int(briefing_export_summary.get("png_count") or 0)
+    briefing_pdf_count = int(briefing_export_summary.get("pdf_count") or 0)
+    briefing_export_done = bool(briefing_export and briefing_export.get("ok") and (briefing_png_count or briefing_pdf_count))
     workflow_fp_rate = benign_workflows["summary"]["false_positive_rate"]
     workflow_match_rate = benign_workflows["summary"]["expected_match_rate"]
+    deployment_score = 92 if local_launch["one_command_ready"] else 62
+    deployment_evidence = (
+        "已有 Windows 一键启动脚本和 npm 本地运行脚本，适合本地开发、宝塔部署和答辩复现。"
+        if local_launch["one_command_ready"]
+        else "已有 npm、CLI、API 和干净提交包流程。"
+    )
     return [
         _dimension(
             "赛题方向匹配",
@@ -174,7 +315,7 @@ def _maturity_dimensions(
             ["补充一键补跑缺口脚本，避免历史数据不足时页面只展示静态结论。"],
         ),
         _dimension(
-            "模拟比赛工具真实性",
+            "比赛工具与靶场真实性",
             95 if {"mail.send", "file.read", "file.write", "api.call", "code.run"}.issubset(tool_surfaces) and workflow_fp_rate == 0 else 78,
             f"当前攻击脚本工具覆盖：{', '.join(sorted(tool_surfaces))}；连续正常比赛任务流程 {benign_workflows['summary']['workflow_count']} 条、{benign_workflows['summary']['step_count']} 个步骤，误报率 {workflow_fp_rate}%，期望匹配率 {workflow_match_rate}%。",
             ["继续补跨模型、跨赛道和跨角色的长流程样本，验证边界控制稳定性。"],
@@ -182,7 +323,7 @@ def _maturity_dimensions(
         _dimension(
             "OpenClaw/外部 Agent 接入",
             94 if openclaw_runtime_validated else 89 if openclaw_static_validated else 86 if openclaw_plugin["runtime_checks"]["has_before_tool_call"] else 72,
-            "已提供 OpenClaw 兼容事件入口、最小外部 Agent 演示和可安装 native plugin 包；插件使用 before_tool_call 作为工具调用前置闸门，且已补充文件完整性、Hook 结构和 JS 语法静态验收。",
+            "已提供 OpenClaw 兼容事件入口、最小外部 Agent 调度验证和可安装 native plugin 包；插件使用 before_tool_call 作为工具调用前置闸门，且已补充文件完整性、Hook 结构和 JS 语法静态验收。",
             ["在真实 OpenClaw 环境执行 plugins install/inspect/runtime 验收，保留一次端到端运行证据。"]
             if not openclaw_runtime_validated
             else ["保留真实 runtime inspect 输出和端到端工具调用截图。"],
@@ -195,27 +336,44 @@ def _maturity_dimensions(
         ),
         _dimension(
             "多模型实测能力",
-            45,
-            "已有模型适配层和本地兜底，但缺少多模型批量对比结果。",
-            ["增加 DeepSeek/智谱/本地模拟三类模型的批量评测矩阵。"],
+            92 if real_api_case_count else 82 if real_model_case_count else 45,
+            (
+                f"真实模型工具调用盲测已覆盖 {real_model_case_count} 个样本，"
+                f"模型成功生成工具调用 {model_tool_call_success_count} 个，真实 API 样本 {real_api_case_count} 个。"
+                if real_model_case_count
+                else "已有模型适配层和本地兜底，但缺少真实模型工具调用盲测结果。"
+            ),
+            ["继续扩展 DeepSeek/智谱/本地兜底的同题批量对比矩阵。"]
+            if real_model_case_count
+            else ["运行真实模型工具调用盲测报告，确认模型结构化工具调用能进入监督器。"],
         ),
         _dimension(
             "答辩材料与可视化",
-            96,
-            "已有全量证据索引、攻击面答辩单页、HTML 导出、截图归档和提交包。",
-            ["继续补一键 PNG/PDF 导出，减少手动截图。"],
+            98 if briefing_export_done else 88,
+            (
+                f"已有全量证据索引、攻击面答辩单页、HTML 导出，并已生成 PNG {briefing_png_count} 个、PDF {briefing_pdf_count} 个。"
+                if briefing_export_done
+                else "已有全量证据索引、攻击面答辩单页和 HTML 导出，但还未生成可直接放入 PPT 的 PNG/PDF 文件。"
+            ),
+            ["保留导出目录和 Markdown 报告，答辩前重新运行一次确认文件最新。"]
+            if briefing_export_done
+            else ["点击“导出答辩单页”生成 PNG/PDF，减少手动截图。"],
         ),
         _dimension(
             "部署与可复现",
-            62,
-            "已有 npm、CLI、API 和干净提交包流程。",
-            ["补 Docker Compose 或一键启动脚本，降低评委复现成本。"],
+            deployment_score,
+            deployment_evidence,
+            ["答辩前在干净环境运行一次 Windows 启动脚本或宝塔启动命令，保留启动截图。"]
+            if deployment_score >= 90
+            else ["补齐一键启动脚本和部署说明，降低评委复现成本。"],
         ),
         _dimension(
             "项目工程化",
-            70 if runs else 58,
-            f"当前有 {len(runs)} 条运行证据，SQLite 持久化和 CLI 可用。",
-            ["补自动测试和 CI 检查，防止后续改页面时破坏接口。"],
+            max(90, engineering["score"]) if engineering["complete"] else max(58, engineering["score"]),
+            f"当前有 {len(runs)} 条运行证据，SQLite 持久化和 CLI 可用；工程检查项 {engineering['passed']}/{engineering['total']} 已具备，覆盖严格 lint、UI 审计、前端测试、API 检查和构建命令。",
+            ["保持本地 verify、lint:strict、ui:audit、测试和构建检查；如后续接 CI，再把这些命令接入提交前验证。"]
+            if engineering["complete"]
+            else ["补齐严格 lint、UI 审计、前后端测试和构建检查，防止后续改页面时破坏接口。"],
         ),
     ]
 
@@ -243,6 +401,9 @@ def _feature_backlog(
     calibration: dict[str, Any],
     openclaw_plugin: dict[str, Any],
     openclaw_validation: dict[str, Any] | None,
+    real_model_evaluation: dict[str, Any] | None,
+    briefing_export: dict[str, Any] | None,
+    local_launch: dict[str, bool],
 ) -> list[dict[str, Any]]:
     calibration_done = (
         calibration["summary"]["attack_sample_count"] > 0
@@ -255,6 +416,21 @@ def _feature_backlog(
         and openclaw_validation.get("files_passed")
         and openclaw_validation.get("node_syntax_passed")
     )
+    openclaw_runtime_validated = bool(openclaw_validation and openclaw_validation.get("runtime_inspect_passed"))
+    real_model_summary = real_model_evaluation.get("summary", {}) if real_model_evaluation else {}
+    real_model_done = bool(real_model_summary.get("case_count") and real_model_summary.get("model_tool_call_success_count"))
+    briefing_export_summary = briefing_export.get("summary", {}) if briefing_export else {}
+    briefing_export_done = bool(
+        briefing_export
+        and briefing_export.get("ok")
+        and (int(briefing_export_summary.get("png_count") or 0) > 0 or int(briefing_export_summary.get("pdf_count") or 0) > 0)
+    )
+    gap_rerun_done = (
+        surface_index["summary"]["gap_count"] == 0
+        and effectiveness["summary"]["evidence_complete_rate"] >= 90
+        and effectiveness["summary"]["scenario_count"] > 0
+    )
+    one_command_done = local_launch["one_command_ready"]
     return [
         {
             "id": "real-openclaw-hook",
@@ -263,7 +439,11 @@ def _feature_backlog(
             "why": "赛题明确提到开源智能化应用，源码级接入比兼容样例更有说服力。",
             "scope": "接入 OpenClaw 或同类 Agent 的工具调用前后置事件。",
             "acceptance": "能从真实 OpenClaw Agent 操作触发监督 API、审计日志和告警记录。",
-            "status": "部分完成" if openclaw_static_validated or openclaw_plugin["runtime_checks"]["has_before_tool_call"] else "未完成",
+            "status": "已完成"
+            if openclaw_runtime_validated
+            else "部分完成"
+            if openclaw_static_validated or openclaw_plugin["runtime_checks"]["has_before_tool_call"]
+            else "未完成",
         },
         {
             "id": "anomaly-calibration",
@@ -277,20 +457,20 @@ def _feature_backlog(
         {
             "id": "multi-model-eval",
             "priority": "P1",
-            "title": "多模型批量对比评测",
-            "why": "大模型安全题需要证明机制不绑定单一模型。",
-            "scope": "对 DeepSeek、智谱、本地模拟或其他可用模型运行同一批脚本。",
-            "acceptance": "输出模型维度的攻击成功率、控制率、输出过滤率对比表。",
-            "status": "未完成",
+            "title": "真实模型工具调用盲测",
+            "why": "大模型安全题需要证明监督器不依赖脚本预设 tool_calls，而能接住真实模型结构化工具调用。",
+            "scope": "对 DeepSeek、智谱、本地兜底模型运行同一批攻击/正常样本。",
+            "acceptance": "输出模型工具调用成功数、攻击控制率、正常误报率、真实 API/兜底模式占比。",
+            "status": "已完成" if real_model_done else "未完成",
         },
         {
             "id": "gap-rerun",
             "priority": "P1",
-            "title": "缺口一键补跑",
+            "title": "证据补跑与同步",
             "why": "证据包有缺口提示，但还缺自动补证据动作。",
-            "scope": "从缺口列表定位脚本，自动运行 compare 或外部事件演示。",
+            "scope": "从缺口列表定位脚本，自动运行 compare 或外部事件验证。",
             "acceptance": "点击按钮后刷新证据包，缺口数和运行记录同步变化。",
-            "status": "未完成",
+            "status": "已完成" if gap_rerun_done else "未完成",
         },
         {
             "id": "brief-export-pdf",
@@ -299,25 +479,16 @@ def _feature_backlog(
             "why": "HTML 已可打开，但最终 PPT 仍需要图片或 PDF。",
             "scope": "用 Playwright 或浏览器打印生成图片/PDF。",
             "acceptance": "提交包自动包含每类攻击面 PNG 或 PDF 单页。",
-            "status": "未完成",
+            "status": "已完成" if briefing_export_done else "未完成",
         },
         {
             "id": "one-command-run",
             "priority": "P2",
-            "title": "一键启动与 Docker 化",
+            "title": "一键启动与宝塔复现",
             "why": "评委复现时越少命令越稳。",
-            "scope": "提供 Windows 脚本和 Docker Compose。",
-            "acceptance": "一条命令启动 API、前端和初始化演示数据。",
-            "status": "未完成",
-        },
-        {
-            "id": "demo-video-evidence",
-            "priority": "P2",
-            "title": "演示视频与截图索引",
-            "why": "比赛提交和答辩需要快速证明系统可运行。",
-            "scope": "补录制脚本、截图清单、视频路径归档。",
-            "acceptance": "提交包包含截图索引和视频占位说明。",
-            "status": "未完成",
+            "scope": "提供 Windows 启动脚本、npm 命令和宝塔部署启动口径。",
+            "acceptance": "一条命令启动 API、前端和初始化本地靶场数据。",
+            "status": "已完成" if one_command_done else "未完成",
         },
     ]
 
@@ -331,13 +502,13 @@ def _risk_register(backlog: list[dict[str, Any]], effectiveness: dict[str, Any])
     risks = [
         {
             "risk": "真实接入证据不足",
-            "impact": "评委可能认为系统仍偏模拟演示。",
+            "impact": "评委可能认为系统仍偏静态展示。",
             "mitigation": "优先完成真实 OpenClaw 或同类 Agent 的工具调用 Hook。",
         },
         {
             "risk": "复现步骤偏多",
             "impact": "现场环境不稳定时影响展示。",
-            "mitigation": "补一键启动脚本、Docker 化和最终截图/PDF 兜底材料。",
+            "mitigation": "补一键启动脚本、宝塔部署说明和最终截图/PDF 兜底材料。",
         },
     ]
     if backlog_status.get("anomaly-calibration") != "已完成":
@@ -354,7 +525,7 @@ def _risk_register(backlog: list[dict[str, Any]], effectiveness: dict[str, Any])
             {
                 "risk": "运行证据不完整",
                 "impact": "部分攻击脚本无法形成无防护/有防护对照。",
-                "mitigation": "增加缺口一键补跑，部署或演示前固定跑体检和构建检查。",
+                "mitigation": "增加证据补跑与同步能力，部署或答辩前固定跑体检和构建检查。",
             }
         )
     return risks

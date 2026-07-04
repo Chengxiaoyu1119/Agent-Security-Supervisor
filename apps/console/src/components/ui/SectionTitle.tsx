@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Space, Typography } from 'antd';
+import { Typography } from 'antd';
 
 export type SectionTitleProps = {
   title: ReactNode;
@@ -12,18 +12,14 @@ export function SectionTitle({ title, meta, orientation = 'horizontal', classNam
   if (!meta) {
     return <Typography.Text strong>{title}</Typography.Text>;
   }
+  const classes = ['zh-section-title', `zh-section-title--${orientation}`, className].filter(Boolean).join(' ');
 
   return (
-    <Space
-      className={className}
-      orientation={orientation}
-      size={orientation === 'vertical' ? 0 : 8}
-      wrap={orientation === 'horizontal'}
-    >
+    <div className={classes}>
       <Typography.Text strong>{title}</Typography.Text>
       <Typography.Text type="secondary" className="zh-section-title__meta">
         {meta}
       </Typography.Text>
-    </Space>
+    </div>
   );
 }

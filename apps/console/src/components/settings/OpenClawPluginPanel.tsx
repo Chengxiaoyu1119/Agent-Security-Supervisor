@@ -50,6 +50,20 @@ export function OpenClawPluginPanel({
       <Typography.Paragraph type="secondary">
         生成可安装的 native plugin 目录，使用 before_tool_call 在 OpenClaw 工具执行前接入智安哨监督器。
       </Typography.Paragraph>
+      <Space className="zh-settings-action-row" wrap>
+        <UiButton href="/api/integrations/openclaw/plugin_package" target="_blank">
+          查看插件摘要
+        </UiButton>
+        <UiButton href="/api/integrations/openclaw/plugin_package.md" target="_blank">
+          查看插件说明
+        </UiButton>
+        <UiButton href="/api/integrations/openclaw/plugin_package/validation" target="_blank">
+          查看验收 JSON
+        </UiButton>
+        <UiButton href="/api/integrations/openclaw/plugin_package/validation.md" target="_blank">
+          查看验收报告
+        </UiButton>
+      </Space>
 
       {openClawPluginPackage ? (
         <>
@@ -77,11 +91,23 @@ export function OpenClawPluginPanel({
                 检查通过
               </Typography.Text>
               <Typography.Text strong>
-                {Object.values(openClawPluginPackage.summary.runtime_checks).filter(Boolean).length}
+                {
+                  Object.entries(openClawPluginPackage.summary.runtime_checks).filter(
+                    ([key, value]) => key !== 'file_count' && value === true
+                  ).length
+                }
               </Typography.Text>
             </Col>
           </Row>
           <Space orientation="vertical" className="zh-settings-stack zh-settings-stack--mb-16">
+            <Space wrap>
+              <UiButton size="small" href="/api/integrations/openclaw/plugin_package.md" target="_blank">
+                打开插件说明
+              </UiButton>
+              <UiButton size="small" href="/api/integrations/openclaw/plugin_package" target="_blank">
+                打开插件摘要
+              </UiButton>
+            </Space>
             <Typography.Text code className="zh-settings-code-wrap">
               {openClawPluginPackage.package_dir}
             </Typography.Text>
@@ -120,17 +146,22 @@ export function OpenClawPluginPanel({
 
       {openClawPluginValidation && (
         <PanelCard size="small" type="inner" className="zh-settings-result-panel">
-          <Descriptions size="small" column={2} className="zh-settings-description">
+          <Descriptions size="small" column={{ xs: 1, md: 2 }} className="zh-settings-description">
             <Descriptions.Item label="验收状态">
               <LabelTag
                 variant="filled"
                 color={
-                  openClawPluginValidation.validation.overall_status === 'static-validated' ? 'success' : 'warning'
+                  openClawPluginValidation.validation.overall_status === 'runtime-validated' ||
+                  openClawPluginValidation.validation.overall_status === 'static-validated'
+                    ? 'success'
+                    : 'warning'
                 }
               >
-                {openClawPluginValidation.validation.overall_status === 'static-validated'
-                  ? '静态通过'
-                  : openClawPluginValidation.validation.overall_status}
+                {openClawPluginValidation.validation.overall_status === 'runtime-validated'
+                  ? '真实 runtime 通过'
+                  : openClawPluginValidation.validation.overall_status === 'static-validated'
+                    ? '静态通过'
+                    : openClawPluginValidation.validation.overall_status}
               </LabelTag>
             </Descriptions.Item>
             <Descriptions.Item label="文件完整">
@@ -164,8 +195,20 @@ export function OpenClawPluginPanel({
             </Descriptions.Item>
           </Descriptions>
           <Space orientation="vertical" className="zh-settings-stack zh-settings-stack--mb-16">
-            <Typography.Text code>{openClawPluginValidation.markdown_path}</Typography.Text>
-            <Typography.Text code>{openClawPluginValidation.json_path}</Typography.Text>
+            <Space wrap>
+              <UiButton size="small" href="/api/integrations/openclaw/plugin_package/validation.md" target="_blank">
+                打开验收报告
+              </UiButton>
+              <UiButton size="small" href="/api/integrations/openclaw/plugin_package/validation" target="_blank">
+                打开验收 JSON
+              </UiButton>
+            </Space>
+            <Typography.Text code className="zh-settings-code-wrap">
+              {openClawPluginValidation.markdown_path}
+            </Typography.Text>
+            <Typography.Text code className="zh-settings-code-wrap">
+              {openClawPluginValidation.json_path}
+            </Typography.Text>
           </Space>
           <Space wrap className="zh-settings-stack--mb-16">
             {Object.entries(openClawPluginValidation.validation.file_checks).map(([key, value]) => (

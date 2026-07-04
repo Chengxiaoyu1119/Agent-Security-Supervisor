@@ -1,14 +1,87 @@
+import { useState } from 'react';
 import { Col, Flex, Row, Space, Typography } from 'antd';
-import { MetricCard as Metric, PanelCard, SectionTitle, UiBadge, UiProgress } from '../ui';
+import { RefreshCw } from 'lucide-react';
+import { runAttackEffectivenessEvidence, writeProjectRoadmapEvidence } from '@/api';
+import { LabelTag, MetricCard as Metric, PanelCard, SectionTitle, UiAlert, UiButton, UiProgress } from '../ui';
 import type { ReportData } from '@/types';
+import type { PageKey } from '@/app/navigation';
 import { AnomalyCalibrationBlock } from './AnomalyCalibrationBlock';
 import { ProjectRoadmapBlock } from './ProjectRoadmapBlock';
+import { ReportMaturityActions } from './ReportMaturityActions';
+import { ReportOverviewSurfaceDistribution } from './ReportOverviewSurfaceDistribution';
 
 type ReportOverviewTabProps = {
   report: ReportData;
+  onRefreshReport?: () => Promise<void> | void;
+  onRefreshRuntime?: () => Promise<unknown> | void;
+  onOpenPage?: (page: PageKey) => void;
 };
 
-export function ReportOverviewTab({ report }: ReportOverviewTabProps) {
+export function ReportOverviewTab({ report, onRefreshReport, onRefreshRuntime, onOpenPage }: ReportOverviewTabProps) {
+  const [isRerunningCoreEvidence, setIsRerunningCoreEvidence] = useState(false);
+  const [coreEvidenceNotice, setCoreEvidenceNotice] = useState<{ type: 'success' | 'error'; message: string } | null>(
+    null
+  );
+  const coreMetrics = [
+    {
+      label: '防护控制率',
+      value: report.summary.control_rate,
+      color: 'var(--ant-color-success)',
+      description: '有监督器时，危险工具调用被拒绝、询问、隔离或过滤的比例。'
+    },
+    {
+      label: '攻击成功率',
+      value: report.summary.attack_success_rate,
+      color: 'var(--ant-color-error)',
+      description: '无防护对照中的暴露比例，用来证明攻击样本确实能复现，不代表防护失败。'
+    },
+    {
+      label: '正常比赛任务误报率',
+      value: report.summary.false_positive_rate,
+      color: 'var(--ant-color-warning)',
+      description: '正常业务工具调用被误拦的比例，越低说明系统越不影响正常使用。'
+    },
+    {
+      label: '期望决策匹配率',
+      value: report.summary.expected_match_rate,
+      color: 'var(--ant-color-info)',
+      description: '监督器最终动作与样本预期动作一致的比例，用来衡量策略稳定性。'
+    },
+    {
+      label: '输出过滤阻断率',
+      value: report.summary.output_filter_block_rate,
+      color: 'var(--ant-color-success)',
+      description: '模型输出触发泄露、滥用或越权内容过滤的比例。'
+    },
+    {
+      label: '策略启用率',
+      value: Math.round((report.summary.enabled_policy_count / Math.max(1, report.summary.policy_count)) * 100),
+      color: 'var(--ant-color-info)',
+      description: '当前策略库中已经参与运行判定的策略比例。'
+    }
+  ];
+
+  async function handleRerunCoreEvidence() {
+    setIsRerunningCoreEvidence(true);
+    setCoreEvidenceNotice(null);
+    try {
+      const result = await runAttackEffectivenessEvidence();
+      await writeProjectRoadmapEvidence();
+      await Promise.all([Promise.resolve(onRefreshReport?.()), Promise.resolve(onRefreshRuntime?.())]);
+      setCoreEvidenceNotice({
+        type: 'success',
+        message: `攻防证据已补跑：${result.run_result.summary.total} 个脚本，控制率 ${result.run_result.summary.control_rate}%。`
+      });
+    } catch (error) {
+      setCoreEvidenceNotice({
+        type: 'error',
+        message: `攻防证据补跑失败：${error instanceof Error ? error.message : '未知错误'}`
+      });
+    } finally {
+      setIsRerunningCoreEvidence(false);
+    }
+  }
+
   return (
     <Space orientation="vertical" size="large" className="zh-tab-stack">
       <Row gutter={[16, 16]}>
@@ -39,53 +112,45 @@ export function ReportOverviewTab({ report }: ReportOverviewTabProps) {
           <Metric label="平均延迟" value={`${report.summary.avg_latency_ms}ms`} tone="red" />
         </Col>
       </Row>
-      {report.project_roadmap && <ProjectRoadmapBlock roadmap={report.project_roadmap} />}
-      {report.anomaly_calibration && <AnomalyCalibrationBlock calibration={report.anomaly_calibration} />}
+      <ReportMaturityActions onRefreshReport={onRefreshReport} onRefreshRuntime={onRefreshRuntime} />
+      {report.project_roadmap && <ProjectRoadmapBlock roadmap={report.project_roadmap} onOpenPage={onOpenPage} />}
+      {report.anomaly_calibration && (
+        <AnomalyCalibrationBlock
+          calibration={report.anomaly_calibration}
+          onRefreshReport={onRefreshReport}
+          onRefreshRuntime={onRefreshRuntime}
+        />
+      )}
       <Row gutter={[24, 24]}>
-        <Col xs={24} lg={12}>
+        <Col xs={24} lg={13}>
           <PanelCard
             title={<SectionTitle title="核心评测曲线" meta={`${report.summary.run_count} 次实验运行`} />}
             variant="borderless"
             className="zh-full-height"
           >
-            <Space orientation="vertical" className="zh-full-width">
-              {[
-                {
-                  label: '防护控制率',
-                  value: report.summary.control_rate,
-                  color: 'var(--ant-color-success)'
-                },
-                {
-                  label: '攻击成功率',
-                  value: report.summary.attack_success_rate,
-                  color: 'var(--ant-color-error)'
-                },
-                {
-                  label: '正常比赛任务误报率',
-                  value: report.summary.false_positive_rate,
-                  color: 'var(--ant-color-warning)'
-                },
-                {
-                  label: '期望决策匹配率',
-                  value: report.summary.expected_match_rate,
-                  color: 'var(--ant-color-info)'
-                },
-                {
-                  label: '输出过滤阻断率',
-                  value: report.summary.output_filter_block_rate,
-                  color: 'var(--ant-color-success)'
-                },
-                {
-                  label: '策略启用率',
-                  value: Math.round(
-                    (report.summary.enabled_policy_count / Math.max(1, report.summary.policy_count)) * 100
-                  ),
-                  color: 'var(--ant-color-info)'
-                }
-              ].map((item) => (
-                <div key={item.label}>
-                  <Flex justify="space-between">
-                    <Typography.Text>{item.label}</Typography.Text>
+            <Space orientation="vertical" className="zh-full-width zh-report-curve-stack">
+              <div className="zh-report-card-toolbar">
+                <Typography.Text type="secondary">
+                  这里展示的是可复跑的攻防评测结果，不是手写结论；补跑后会同步刷新成熟度和报告证据。
+                </Typography.Text>
+                <UiButton
+                  size="small"
+                  icon={<RefreshCw size={15} />}
+                  loading={isRerunningCoreEvidence}
+                  onClick={() => {
+                    void handleRerunCoreEvidence();
+                  }}
+                >
+                  补跑攻防证据
+                </UiButton>
+              </div>
+              {coreEvidenceNotice && (
+                <UiAlert type={coreEvidenceNotice.type} message={coreEvidenceNotice.message} showIcon />
+              )}
+              {coreMetrics.map((item) => (
+                <PanelCard key={item.label} size="small" type="inner" className="zh-report-metric-row-card">
+                  <Flex justify="space-between" align="center" gap={12}>
+                    <Typography.Text strong>{item.label}</Typography.Text>
                     <Typography.Text strong>{item.value}%</Typography.Text>
                   </Flex>
                   <UiProgress
@@ -94,33 +159,16 @@ export function ReportOverviewTab({ report }: ReportOverviewTabProps) {
                     strokeColor={item.color}
                     size="small"
                   />
-                </div>
+                  <Typography.Text type="secondary" className="zh-text-meta">
+                    {item.description}
+                  </Typography.Text>
+                </PanelCard>
               ))}
             </Space>
           </PanelCard>
         </Col>
-        <Col xs={24} lg={12}>
-          <PanelCard title="攻击面脚本分布" variant="borderless" className="zh-full-height">
-            <Space orientation="vertical" className="zh-full-width">
-              {report.surface_coverage.map((surface) => {
-                const maxCount = Math.max(1, ...report.surface_coverage.map((i) => i.scenario_count));
-                return (
-                  <div key={surface.id}>
-                    <Flex justify="space-between">
-                      <Typography.Text>{surface.name}</Typography.Text>
-                      <Typography.Text strong>{surface.scenario_count}</Typography.Text>
-                    </Flex>
-                    <UiProgress
-                      percent={Math.max(2, Math.round((surface.scenario_count / maxCount) * 100))}
-                      showInfo={false}
-                      strokeColor="var(--ant-color-primary)"
-                      size="small"
-                    />
-                  </div>
-                );
-              })}
-            </Space>
-          </PanelCard>
+        <Col xs={24} lg={11}>
+          <ReportOverviewSurfaceDistribution report={report} onOpenPage={onOpenPage} />
         </Col>
       </Row>
       <Row gutter={[24, 24]}>
@@ -132,10 +180,10 @@ export function ReportOverviewTab({ report }: ReportOverviewTabProps) {
           >
             <div className="zh-column-stack">
               {report.deliverables.map((item, idx) => (
-                <div key={idx} className="zh-report-list-item">
+                <div key={idx} className="zh-report-list-item zh-report-list-item--deliverable">
                   <div className="zh-report-list-main">
                     <div className="zh-pt-4">
-                      <UiBadge status="processing" />
+                      <span className="zh-report-dot" />
                     </div>
                     <div>
                       <div>
@@ -146,7 +194,9 @@ export function ReportOverviewTab({ report }: ReportOverviewTabProps) {
                       </div>
                     </div>
                   </div>
-                  <Typography.Text strong>{item.status}</Typography.Text>
+                  <LabelTag color="blue" className="zh-report-status-tag">
+                    {item.status}
+                  </LabelTag>
                 </div>
               ))}
               {!report.deliverables.length && <div className="zh-empty-panel">暂无数据</div>}

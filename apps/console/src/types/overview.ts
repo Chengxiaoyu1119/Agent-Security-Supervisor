@@ -15,6 +15,9 @@ export interface Overview {
     scenario_count: number;
     recent_run_count: number;
     block_rate: number;
+    guarded_run_count?: number;
+    guarded_controlled_count?: number;
+    guarded_control_rate?: number;
     attack_success_rate: number;
     avg_latency_ms: number;
   };

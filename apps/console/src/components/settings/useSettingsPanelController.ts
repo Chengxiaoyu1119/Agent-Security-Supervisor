@@ -117,7 +117,11 @@ export function useSettingsPanelController(refresh: () => Promise<unknown>) {
     setRunningDemoDrill(true);
     setEvaluateError('');
     try {
-      setDemoDrill(await runDemoDrill());
+      const demoResult = await runDemoDrill();
+      setDemoDrill(demoResult);
+      const readinessResult = await writeCompetitionReadiness();
+      setCompetitionReadinessOutput(readinessResult);
+      setCompetitionReadiness(readinessResult.readiness);
       await refresh();
     } catch (error) {
       setEvaluateError(error instanceof Error ? error.message : '答辩复现实验运行失败');

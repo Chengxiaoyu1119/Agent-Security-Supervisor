@@ -211,35 +211,23 @@ def validate_openclaw_plugin_package(
                 [openclaw_cli, "plugins", "install", "-l", str(package_dir)],
                 command_label=install_command_label,
                 missing_message="未检测到 OpenClaw CLI，无法安装插件。",
+                timeout=180,
             )
             install_check["available"] = True
-            if install_check["passed"] is True:
-                enable_check = _run_command_check(
-                    [openclaw_cli, "plugins", "enable", OPENCLAW_PLUGIN_ID],
-                    command_label=enable_command_label,
-                    missing_message="未检测到 OpenClaw CLI，无法启用插件。",
-                )
-                enable_check["available"] = True
-            else:
-                enable_check = _skipped_command_check(
-                    enable_command_label,
-                    "OpenClaw 插件安装未通过，已跳过 enable。",
-                    available=True,
-                )
-
-            if enable_check["passed"] is True:
-                runtime_check = _run_command_check(
-                    [openclaw_cli, "plugins", "inspect", OPENCLAW_PLUGIN_ID, "--runtime", "--json"],
-                    command_label=inspect_command_label,
-                    missing_message="未检测到 OpenClaw CLI，无法执行真实 runtime inspect。",
-                )
-                runtime_check["available"] = True
-            else:
-                runtime_check = _skipped_command_check(
-                    inspect_command_label,
-                    "OpenClaw 插件未成功启用，已跳过 runtime inspect。",
-                    available=True,
-                )
+            enable_check = _run_command_check(
+                [openclaw_cli, "plugins", "enable", OPENCLAW_PLUGIN_ID],
+                command_label=enable_command_label,
+                missing_message="未检测到 OpenClaw CLI，无法启用插件。",
+                timeout=180,
+            )
+            enable_check["available"] = True
+            runtime_check = _run_command_check(
+                [openclaw_cli, "plugins", "inspect", OPENCLAW_PLUGIN_ID, "--runtime", "--json"],
+                command_label=inspect_command_label,
+                missing_message="未检测到 OpenClaw CLI，无法执行真实 runtime inspect。",
+                timeout=180,
+            )
+            runtime_check["available"] = True
         else:
             no_cli_reason = "当前环境未安装 OpenClaw CLI；请在安装 OpenClaw 后执行 install、enable 与 inspect 命令。"
             install_check = _skipped_command_check(install_command_label, no_cli_reason)
@@ -249,7 +237,7 @@ def validate_openclaw_plugin_package(
     static_passed = all(value is True for key, value in static_checks.items() if key != "file_count")
     files_passed = all(file_checks.values())
     node_passed = node_check["passed"] is True
-    runtime_passed = install_check["passed"] is True and enable_check["passed"] is True and runtime_check["passed"] is True
+    runtime_passed = _runtime_inspect_passed(runtime_check)
     remaining_gap = []
     if not runtime_passed:
         remaining_gap.append("真实 OpenClaw runtime inspect 尚未通过；需要在已安装 OpenClaw 的环境中安装、启用并检查插件。")
@@ -399,7 +387,13 @@ def _skipped_command_check(command_label: str, skipped_reason: str, *, available
     }
 
 
-def _run_command_check(command: list[str], *, command_label: str, missing_message: str) -> dict[str, Any]:
+def _run_command_check(
+    command: list[str],
+    *,
+    command_label: str,
+    missing_message: str,
+    timeout: int = 90,
+) -> dict[str, Any]:
     executable = shutil.which(command[0]) if command else None
     if not executable:
         return {
@@ -418,7 +412,7 @@ def _run_command_check(command: list[str], *, command_label: str, missing_messag
             text=True,
             encoding="utf-8",
             errors="replace",
-            timeout=90,
+            timeout=timeout,
             check=False,
         )
     except Exception as exc:  # noqa: BLE001 - validation should report failures, not crash packaging
@@ -440,3 +434,22 @@ def _run_command_check(command: list[str], *, command_label: str, missing_messag
         "stderr": completed.stderr.strip(),
         "skipped_reason": "",
     }
+
+
+def _runtime_inspect_passed(runtime_check: dict[str, Any]) -> bool:
+    if runtime_check.get("passed") is not True:
+        return False
+    try:
+        payload = json.loads(str(runtime_check.get("stdout") or "{}"))
+    except json.JSONDecodeError:
+        return False
+    plugin = payload.get("plugin") if isinstance(payload, dict) else {}
+    typed_hooks = payload.get("typedHooks") if isinstance(payload, dict) else []
+    hook_names = {str(item.get("name")) for item in typed_hooks if isinstance(item, dict)}
+    return (
+        isinstance(plugin, dict)
+        and plugin.get("id") == OPENCLAW_PLUGIN_ID
+        and plugin.get("status") == "loaded"
+        and plugin.get("enabled") is True
+        and "before_tool_call" in hook_names
+    )

@@ -27,24 +27,24 @@ export function ExperimentResultPanel({ result, compareResult, batchResult }: Ex
     >
       {result ? (
         <Space orientation="vertical" size="large" className="zh-full-width">
-          <Row gutter={[16, 16]}>
-            <Col span={8}>
+          <Row gutter={[16, 16]} align="stretch">
+            <Col xs={24} sm={12} lg={8}>
               <Metric
                 label="攻击成功"
                 value={result.attack_success ? '是' : '否'}
                 tone={result.attack_success ? 'red' : 'green'}
               />
             </Col>
-            <Col span={4}>
+            <Col xs={12} sm={6} lg={4}>
               <Metric label="阻断" value={`${result.metrics.blocked_count}`} tone="red" />
             </Col>
-            <Col span={4}>
+            <Col xs={12} sm={6} lg={4}>
               <Metric label="询问" value={`${result.metrics.asked_count}`} tone="amber" />
             </Col>
-            <Col span={4}>
+            <Col xs={12} sm={6} lg={4}>
               <Metric label="隔离" value={`${result.metrics.isolated_count}`} tone="cyan" />
             </Col>
-            <Col span={4}>
+            <Col xs={12} sm={6} lg={4}>
               <Metric label="检测延迟" value={`${result.metrics.detection_latency_ms}ms`} tone="green" />
             </Col>
           </Row>

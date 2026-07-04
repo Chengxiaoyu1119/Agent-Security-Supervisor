@@ -9,14 +9,21 @@ import {
   ReportOverviewTab
 } from '../components/report';
 import type { ReportData } from '../types';
+import type { PageKey } from '../app/navigation';
 import { writeClipboardText } from '../utils';
 
 export function ReportPanel({
   report,
-  onOpenScenario
+  onOpenScenario,
+  onOpenPage,
+  onRefreshReport,
+  onRefreshRuntime
 }: {
   report: ReportData | null;
   onOpenScenario: (id: string) => void;
+  onOpenPage?: (page: PageKey) => void;
+  onRefreshReport?: () => Promise<void> | void;
+  onRefreshRuntime?: () => Promise<unknown> | void;
 }) {
   const [copied, setCopied] = useState(false);
   const [copiedFile, setCopiedFile] = useState('');
@@ -55,8 +62,8 @@ export function ReportPanel({
   return (
     <div className="zh-page-stack">
       <PanelCard variant="borderless">
-        <Flex justify="space-between" align="center">
-          <div className="zh-flex-min">
+        <Flex justify="space-between" align="center" className="zh-report-hero-row">
+          <div className="zh-flex-min zh-report-hero-copy">
             <Typography.Title level={3} className="zh-title-flush">
               比赛材料中心
             </Typography.Title>
@@ -64,7 +71,7 @@ export function ReportPanel({
               面向大模型及智能体应用安全，汇总攻击场景、对抗样本、智能体脚本、监督策略、审计告警和交付材料。
             </Typography.Text>
           </div>
-          <UiButton icon={<Copy size={16} />} onClick={copyReport}>
+          <UiButton className="zh-report-copy-button" icon={<Copy size={16} />} onClick={copyReport}>
             {copied ? '已复制' : '复制 Markdown'}
           </UiButton>
         </Flex>
@@ -72,27 +79,42 @@ export function ReportPanel({
 
       {report ? (
         <UiTabs
+          className="zh-report-tabs"
           defaultActiveKey="1"
           size="large"
           items={[
             {
               key: '1',
-              label: '📊 报告概览与成熟度',
-              children: <ReportOverviewTab report={report} />
+              label: '报告概览与成熟度',
+              children: (
+                <ReportOverviewTab
+                  report={report}
+                  onRefreshReport={onRefreshReport}
+                  onRefreshRuntime={onRefreshRuntime}
+                  onOpenPage={onOpenPage}
+                />
+              )
             },
             {
               key: '2',
-              label: '🛡️ 攻防实战评测',
-              children: <ReportAttackEvaluationTab report={report} onOpenScenario={onOpenScenario} />
+              label: '攻防实战评测',
+              children: (
+                <ReportAttackEvaluationTab
+                  report={report}
+                  onOpenScenario={onOpenScenario}
+                  onRefreshReport={onRefreshReport}
+                  onRefreshRuntime={onRefreshRuntime}
+                />
+              )
             },
             {
               key: '3',
-              label: '🚦 正常与消融评测',
-              children: <ReportNormalEvaluationTab report={report} />
+              label: '正常与消融评测',
+              children: <ReportNormalEvaluationTab report={report} onRefreshReport={onRefreshReport} />
             },
             {
               key: '4',
-              label: '📦 比赛交付与接口',
+              label: '比赛交付与接口',
               children: (
                 <ReportDeliveryTab
                   competitionPackage={competitionPackage}

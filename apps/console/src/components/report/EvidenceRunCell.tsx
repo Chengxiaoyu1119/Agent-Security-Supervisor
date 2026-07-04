@@ -36,25 +36,25 @@ export function EvidenceRunCell({
         </Typography.Text>
       </div>
       <Row gutter={[8, 8]} className="zh-evidence-run-cell__metrics">
-        <Col span={12}>
+        <Col xs={12}>
           <Typography.Text type="secondary" className="zh-meta-block">
             决策
           </Typography.Text>
           <Typography.Text strong>{decision}</Typography.Text>
         </Col>
-        <Col span={12}>
+        <Col xs={12}>
           <Typography.Text type="secondary" className="zh-meta-block">
             策略
           </Typography.Text>
           <Typography.Text strong>{policy}</Typography.Text>
         </Col>
-        <Col span={12}>
+        <Col xs={12}>
           <Typography.Text type="secondary" className="zh-meta-block">
             风险
           </Typography.Text>
           <Typography.Text strong>{risk ?? '-'}</Typography.Text>
         </Col>
-        <Col span={12}>
+        <Col xs={12}>
           <Typography.Text type="secondary" className="zh-meta-block">
             异常
           </Typography.Text>

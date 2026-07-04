@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Globe2, KeyRound, Play } from 'lucide-react';
+import { Globe2, Play } from 'lucide-react';
 import { Col, Descriptions, Row, Space, Typography } from 'antd';
 import { runAuthorizedTarget } from '../../api';
 import type { AuthorizedTargetRunResult } from '../../types';
@@ -13,13 +13,16 @@ import {
   UiAlert,
   UiButton,
   UiInput,
-  UiSelect,
-  UiSwitch
+  UiSelect
 } from '../ui';
+import { AuthorizedTargetAuthFields } from './AuthorizedTargetAuthFields';
 import { AuthorizedTargetPreview } from './AuthorizedTargetPreview';
 import { AuthorizedTargetPrecheck } from './AuthorizedTargetPrecheck';
 import { AuthorizedTargetAuditItems } from './AuthorizedTargetAuditItems';
 import { AuthorizedTargetScopeCard } from './AuthorizedTargetScopeCard';
+import { authorizedTargetFlowSteps } from './labRuntimeFlowPresets';
+import { LabRuntimeFlow } from './LabRuntimeFlow';
+import { ResultRunButton, RunResultEmptyState } from './RunResultActions';
 
 type AuthorizedTargetLabProps = {
   refresh?: () => Promise<unknown>;
@@ -61,8 +64,13 @@ export function AuthorizedTargetLab({ refresh }: AuthorizedTargetLabProps) {
   const [running, setRunning] = useState(false);
   const [notice, setNotice] = useState('');
   const [result, setResult] = useState<AuthorizedTargetRunResult | null>(null);
+  const canRunAuthorizedTarget = Boolean(targetUrl.trim() && authorizationConfirmed);
 
   async function runLab() {
+    if (!canRunAuthorizedTarget) {
+      setNotice('请先填写授权靶场 URL，并确认该目标属于本人、团队或比赛授权范围。');
+      return;
+    }
     setRunning(true);
     setNotice('');
     try {
@@ -97,6 +105,7 @@ export function AuthorizedTargetLab({ refresh }: AuthorizedTargetLabProps) {
                 showIcon
                 message="这里不是任意网站攻击器。后端只允许公网 LLM/Agent 靶场路径，并拒绝本机、内网、保留地址和非模型接口。"
               />
+              <LabRuntimeFlow compact steps={authorizedTargetFlowSteps(authorizationConfirmed)} />
               <div className="zh-attack-lab__field">
                 <Typography.Text strong>靶场 URL</Typography.Text>
                 <UiInput
@@ -141,50 +150,22 @@ export function AuthorizedTargetLab({ refresh }: AuthorizedTargetLabProps) {
                   maxLength={8000}
                 />
               </div>
-              <div className="zh-attack-lab__field">
-                <Typography.Text strong>授权说明</Typography.Text>
-                <UiInput.TextArea
-                  value={authorizationNote}
-                  onChange={(event) => setAuthorizationNote(event.target.value)}
-                  rows={2}
-                  placeholder="说明该靶场属于本人、团队或比赛授权范围。"
-                  showCount
-                  maxLength={1200}
-                />
-              </div>
-              <Row gutter={[12, 12]} align="stretch">
-                <Col xs={24} md={12}>
-                  <form
-                    className="zh-attack-lab__field"
-                    autoComplete="off"
-                    onSubmit={(event) => event.preventDefault()}
-                  >
-                    <Typography.Text strong>
-                      <KeyRound size={14} className="zh-tag-icon" />
-                      Bearer Token
-                    </Typography.Text>
-                    <UiInput.Password
-                      value={bearerToken}
-                      onChange={(event) => setBearerToken(event.target.value)}
-                      autoComplete="off"
-                      placeholder="没有就留空"
-                    />
-                  </form>
-                </Col>
-                <Col xs={24} md={12}>
-                  <div className="zh-attack-lab__switch-row zh-attack-lab__switch-row--compact zh-full-height">
-                    <div>
-                      <Typography.Text strong>确认授权</Typography.Text>
-                      <Typography.Paragraph type="secondary" className="zh-attack-lab__hint">
-                        未确认授权时不会请求公网。
-                      </Typography.Paragraph>
-                    </div>
-                    <UiSwitch checked={authorizationConfirmed} onChange={setAuthorizationConfirmed} />
-                  </div>
-                </Col>
-              </Row>
+              <AuthorizedTargetAuthFields
+                authorizationNote={authorizationNote}
+                bearerToken={bearerToken}
+                authorizationConfirmed={authorizationConfirmed}
+                onAuthorizationNoteChange={setAuthorizationNote}
+                onBearerTokenChange={setBearerToken}
+                onAuthorizationConfirmedChange={setAuthorizationConfirmed}
+              />
               <AuthorizedTargetPrecheck targetUrl={targetUrl} authorizationConfirmed={authorizationConfirmed} />
-              <UiButton type="primary" icon={<Play size={16} />} loading={running} onClick={runLab}>
+              <UiButton
+                type="primary"
+                icon={<Play size={16} />}
+                loading={running}
+                disabled={!canRunAuthorizedTarget}
+                onClick={runLab}
+              >
                 运行授权靶场测试
               </UiButton>
               <AuthorizedTargetPreview
@@ -200,7 +181,21 @@ export function AuthorizedTargetLab({ refresh }: AuthorizedTargetLabProps) {
         </Col>
 
         <Col xs={24} xl={15}>
-          <PanelCard title="靶场调用结果" subtitle={result ? result.target_url : '等待运行'} className="zh-full-height">
+          <PanelCard
+            title="靶场调用结果"
+            subtitle={result ? result.target_url : '等待运行'}
+            className="zh-full-height"
+            extra={
+              <ResultRunButton
+                hasResult={Boolean(result)}
+                idleLabel="运行测试"
+                rerunLabel="重新测试"
+                loading={running}
+                disabled={!canRunAuthorizedTarget}
+                onClick={runLab}
+              />
+            }
+          >
             {result ? (
               <Space orientation="vertical" size={16} className="zh-full-width">
                 <Row gutter={[12, 12]}>
@@ -277,14 +272,15 @@ export function AuthorizedTargetLab({ refresh }: AuthorizedTargetLabProps) {
                 />
               </Space>
             ) : (
-              <div className="zh-attack-lab__empty">
-                <Space orientation="vertical" align="center">
-                  <Globe2 size={28} />
-                  <Typography.Text type="secondary">
-                    填写授权靶场地址后，系统会先预检，再发起一次受控 POST 测试。
-                  </Typography.Text>
-                </Space>
-              </div>
+              <RunResultEmptyState
+                icon={<Globe2 size={28} />}
+                title="等待授权后运行"
+                description="填写靶场 URL 并确认授权后，系统会先做边界预检，再发起一次受控 POST 测试并记录审计证据。"
+                actionLabel="运行授权靶场测试"
+                loading={running}
+                disabled={!canRunAuthorizedTarget}
+                onAction={runLab}
+              />
             )}
           </PanelCard>
         </Col>

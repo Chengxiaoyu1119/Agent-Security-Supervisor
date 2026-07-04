@@ -6,6 +6,7 @@ import type { LearningLabRunResult, LearningLabScenario, TargetLabState } from '
 import { AuditDeepLinkButton } from '../audit/AuditDeepLinkButton';
 import { DecisionPill, EvidenceCodeBlock, MetricCard, PanelCard, UiAlert, UiButton, UiInput, UiSwitch } from '../ui';
 import { TargetLabStatePanel } from './TargetLabStatePanel';
+import { LabModulePicker } from './LabModulePicker';
 import {
   FALLBACK_SCENARIOS,
   assetProfile,
@@ -14,6 +15,9 @@ import {
   stepLabels,
   stepState
 } from './penetrationLearningProfiles';
+import { penetrationFlowSteps } from './labRuntimeFlowPresets';
+import { LabRuntimeFlow } from './LabRuntimeFlow';
+import { ResultRunButton, RunResultEmptyState } from './RunResultActions';
 
 type PenetrationLearningLabProps = {
   refresh?: () => Promise<unknown>;
@@ -117,34 +121,27 @@ export function PenetrationLearningLab({ refresh }: PenetrationLearningLabProps)
             </div>
           ))}
         </div>
+        <LabRuntimeFlow
+          compact
+          title="本地靶场执行路径"
+          steps={penetrationFlowSteps(activeAsset.asset, activeScenario.category, executeInSandbox, Boolean(result))}
+        />
       </PanelCard>
 
       <Row gutter={[20, 20]} align="stretch">
         <Col xs={24} xl={6}>
-          <PanelCard
+          <LabModulePicker
             title="选择攻击面"
             subtitle={`${scenarios.length} 类本机授权靶场`}
-            className="zh-attack-lab__module-panel"
-          >
-            <div className="zh-attack-lab__module-grid">
-              {scenarios.map((scenario) => (
-                <button
-                  type="button"
-                  key={scenario.id}
-                  className={`zh-attack-lab__module-button ${
-                    scenario.id === activeScenario.id ? 'zh-attack-lab__module-button--active' : ''
-                  }`}
-                  onClick={() => selectScenario(scenario.id)}
-                >
-                  <span className="zh-attack-lab__module-icon">{scenarioIcon(scenario.id)}</span>
-                  <span className="zh-attack-lab__module-copy">
-                    <strong>{scenario.name}</strong>
-                    <span>{scenario.tool}</span>
-                  </span>
-                </button>
-              ))}
-            </div>
-          </PanelCard>
+            items={scenarios.map((scenario) => ({
+              id: scenario.id,
+              title: scenario.name,
+              subtitle: scenario.tool,
+              icon: scenarioIcon(scenario.id)
+            }))}
+            activeId={activeScenario.id}
+            onSelect={selectScenario}
+          />
         </Col>
 
         <Col xs={24} xl={9}>
@@ -204,6 +201,15 @@ export function PenetrationLearningLab({ refresh }: PenetrationLearningLabProps)
             title="攻破与防护结果"
             subtitle={result ? result.summary.decision_change : '等待执行'}
             className="zh-full-height"
+            extra={
+              <ResultRunButton
+                hasResult={Boolean(result)}
+                idleLabel="执行"
+                rerunLabel="重新执行"
+                loading={running}
+                onClick={runAttack}
+              />
+            }
           >
             {result ? (
               <Space orientation="vertical" size={16} className="zh-full-width">
@@ -269,11 +275,14 @@ export function PenetrationLearningLab({ refresh }: PenetrationLearningLabProps)
                 </PanelCard>
               </Space>
             ) : (
-              <div className="zh-attack-lab__empty">
-                <Typography.Text type="secondary">
-                  按步骤构造输入并执行后，这里会显示无防护攻破结果、监督器拦截结果和靶场状态变化。
-                </Typography.Text>
-              </div>
+              <RunResultEmptyState
+                icon={<Target size={28} />}
+                title="等待执行本地靶场"
+                description="会在项目内置靶场里执行当前攻击步骤，对比无防护响应、监督器拦截和靶场状态变化。"
+                actionLabel="执行当前攻击步骤"
+                loading={running}
+                onAction={runAttack}
+              />
             )}
           </PanelCard>
         </Col>

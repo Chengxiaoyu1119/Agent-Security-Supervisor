@@ -106,14 +106,14 @@ export function AgentChain({
             </Typography.Text>
             <Typography.Title level={4}>{activeChain.title}</Typography.Title>
             <Typography.Paragraph>{activeChain.summary}</Typography.Paragraph>
-            <Row gutter={24} className="zh-agent-chain-hero__stats">
-              <Col span={12}>
+            <Row gutter={[16, 16]} className="zh-agent-chain-hero__stats">
+              <Col xs={24} md={12}>
                 <Typography.Text type="secondary" className="zh-text-block">
                   攻击目标
                 </Typography.Text>
                 <Typography.Text strong>{activeChain.attacker_goal}</Typography.Text>
               </Col>
-              <Col span={12}>
+              <Col xs={24} md={12}>
                 <Typography.Text type="secondary" className="zh-text-block">
                   比赛场景
                 </Typography.Text>
@@ -131,17 +131,17 @@ export function AgentChain({
         </Col>
         <Col xs={24} lg={8}>
           <PanelCard variant="borderless" className="zh-full-height">
-            <Row gutter={[16, 16]}>
-              <Col span={12}>
+            <Row gutter={[16, 16]} align="stretch">
+              <Col xs={12}>
                 <Metric label="阶段" value={`${activeChain.summary_stats.stage_count}`} tone="cyan" />
               </Col>
-              <Col span={12}>
+              <Col xs={12}>
                 <Metric label="攻击面" value={`${activeChain.summary_stats.surface_count}`} tone="amber" />
               </Col>
-              <Col span={12}>
+              <Col xs={12}>
                 <Metric label="工具" value={`${activeChain.summary_stats.tool_count}`} tone="green" />
               </Col>
-              <Col span={12}>
+              <Col xs={12}>
                 <Metric
                   label="链路状态"
                   value={currentChainCompare || currentChainResult ? '已有证据' : '待运行'}

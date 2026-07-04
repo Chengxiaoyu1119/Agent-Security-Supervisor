@@ -1,13 +1,22 @@
+import re
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
+from fastapi.responses import FileResponse
 
-from ..ablation import build_policy_ablation, build_policy_ablation_markdown
+from ..ablation import build_policy_ablation, build_policy_ablation_markdown, write_policy_ablation_report
+from ..agents import batch_compare_scenarios
 from ..approvals import build_approval_review_markdown, decide_approval_review, list_approval_reviews, write_approval_review_report
 from ..assessment import build_attack_effectiveness
 from ..auth import current_security_role, require_api_token, require_role
 from ..benign import build_benign_cases_markdown, evaluate_benign_cases, get_benign_cases
 from ..benign_workflows import build_benign_workflow_markdown, evaluate_benign_workflows, write_benign_workflow_report
+from ..briefing_export import (
+    EXPORT_DIR_NAME,
+    build_briefing_sheet_export_markdown,
+    load_briefing_sheet_export_report,
+    write_briefing_sheet_exports,
+)
 from ..calibration import build_anomaly_calibration, build_anomaly_calibration_markdown, write_anomaly_calibration_report
 from ..database import latest_runs
 from ..datasets import build_attack_case_dataset, build_attack_case_markdown
@@ -18,7 +27,9 @@ from ..evidence import (
     build_surface_conclusions,
     build_surface_conclusions_markdown,
 )
+from ..gap_rerun import run_gap_rerun
 from ..main_models import ApprovalDecisionRequest, RealModelEvaluationRequest
+from ..paths import SANDBOX_REPORTS_DIR
 from ..readiness import build_competition_readiness, build_competition_readiness_markdown, write_competition_readiness_report
 from ..roadmap import build_project_roadmap, build_project_roadmap_markdown, write_project_roadmap
 from ..runtime_evaluation import (
@@ -195,6 +206,52 @@ def write_attack_surface_briefing_sheets() -> dict:
     return write_all_surface_briefing_sheets(runs=latest_runs(500))
 
 
+@router.get("/api/attack_surfaces/briefing_sheets/export")
+def attack_surface_briefing_sheet_exports() -> dict:
+    data = load_briefing_sheet_export_report()
+    if data:
+        return data
+    return {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "ok": False,
+        "reason": "尚未运行答辩单页 PNG/PDF 导出。",
+        "summary": {"png_count": 0, "pdf_count": 0, "output_dir": ""},
+        "export": {"files": []},
+    }
+
+
+@router.get("/api/attack_surfaces/briefing_sheets/export.md")
+def attack_surface_briefing_sheet_exports_markdown() -> Response:
+    return Response(build_briefing_sheet_export_markdown(), media_type="text/markdown; charset=utf-8")
+
+
+@router.post("/api/attack_surfaces/briefing_sheets/export")
+def write_attack_surface_briefing_sheet_exports(format_: str = Query("both", alias="format")) -> dict:
+    try:
+        return write_briefing_sheet_exports(format_)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.get("/api/attack_surfaces/briefing_sheets/export/files/{surface_id}.{file_format}")
+def attack_surface_briefing_sheet_export_file(surface_id: str, file_format: str) -> FileResponse:
+    if file_format not in {"png", "pdf"}:
+        raise HTTPException(status_code=400, detail="file_format must be png or pdf")
+    if not re.fullmatch(r"[A-Za-z0-9_-]+", surface_id):
+        raise HTTPException(status_code=400, detail="invalid surface_id")
+
+    file_path = SANDBOX_REPORTS_DIR / EXPORT_DIR_NAME / f"{surface_id}.{file_format}"
+    if not file_path.exists() or not file_path.is_file():
+        raise HTTPException(status_code=404, detail="导出文件不存在，请先运行答辩单页 PNG/PDF 导出。")
+
+    media_type = "image/png" if file_format == "png" else "application/pdf"
+    return FileResponse(
+        file_path,
+        media_type=media_type,
+        headers={"Content-Disposition": f'inline; filename="{file_path.name}"'},
+    )
+
+
 @router.get("/api/attack_surfaces/{surface_id}/evidence_pack")
 def attack_surface_evidence_pack(surface_id: str) -> dict:
     try:
@@ -294,6 +351,20 @@ def attack_effectiveness() -> dict:
     return build_attack_effectiveness(latest_runs(500))
 
 
+@router.post("/api/evaluations/attack_effectiveness/run")
+def run_attack_effectiveness() -> dict:
+    run_result = batch_compare_scenarios()
+    return {
+        "run_result": run_result,
+        "attack_effectiveness": build_attack_effectiveness(latest_runs(500)),
+    }
+
+
+@router.post("/api/evaluations/gap_rerun/run")
+def run_gap_rerun_evaluation() -> dict:
+    return run_gap_rerun()
+
+
 @router.get("/api/evaluations/policy_ablation")
 def policy_ablation() -> dict:
     return build_policy_ablation()
@@ -302,6 +373,11 @@ def policy_ablation() -> dict:
 @router.get("/api/evaluations/policy_ablation.md")
 def policy_ablation_markdown() -> Response:
     return Response(build_policy_ablation_markdown(), media_type="text/markdown; charset=utf-8")
+
+
+@router.post("/api/evaluations/policy_ablation/write")
+def write_policy_ablation() -> dict:
+    return write_policy_ablation_report()
 
 
 @router.get("/api/evaluations/requirements")

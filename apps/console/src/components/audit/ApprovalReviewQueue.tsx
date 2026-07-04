@@ -1,6 +1,8 @@
-import { Col, Row, Space, Statistic, Typography } from 'antd';
+import { useMemo } from 'react';
+import { Space, Typography } from 'antd';
 import type { ApprovalReview, ApprovalReviewList } from '@/types';
 import { LabelTag, PanelCard, UiButton } from '../ui';
+import { compareApprovalReviews } from './approvalReviewSorting';
 
 interface ApprovalReviewQueueProps {
   queue: ApprovalReviewList;
@@ -31,6 +33,8 @@ export function ApprovalReviewQueue({
   onDecision,
   onCopy
 }: ApprovalReviewQueueProps) {
+  const orderedReviews = useMemo(() => [...reviews].sort(compareApprovalReviews), [reviews]);
+
   return (
     <PanelCard
       title="人工复核队列"
@@ -41,38 +45,37 @@ export function ApprovalReviewQueue({
       }
       variant="borderless"
     >
-      <Row gutter={[16, 16]} className="zh-mb-16">
-        <Col span={6}>
-          <Statistic title="待复核" value={queue.summary.pending_count} />
-        </Col>
-        <Col span={6}>
-          <Statistic title="已批准" value={queue.summary.approved_count} />
-        </Col>
-        <Col span={6}>
-          <Statistic title="已驳回" value={queue.summary.rejected_count} />
-        </Col>
-        <Col span={6}>
-          <Statistic title="hash 有效" value={`${queue.summary.hash_valid_count}/${queue.summary.total}`} />
-        </Col>
-        <Col span={6}>
-          <Statistic title="SLA 超时" value={queue.summary.sla_breached_count ?? 0} />
-        </Col>
-      </Row>
+      <div className="zh-approval-summary-grid">
+        {[
+          { label: '待复核', value: queue.summary.pending_count, tone: 'amber' },
+          { label: '已批准', value: queue.summary.approved_count, tone: 'green' },
+          { label: '已驳回', value: queue.summary.rejected_count, tone: 'red' },
+          { label: 'hash 有效', value: `${queue.summary.hash_valid_count}/${queue.summary.total}`, tone: 'cyan' },
+          { label: 'SLA 超时', value: queue.summary.sla_breached_count ?? 0, tone: 'red' }
+        ].map((item) => (
+          <div key={item.label} className={`zh-approval-summary-item zh-approval-summary-item--${item.tone}`}>
+            <Typography.Text type="secondary">{item.label}</Typography.Text>
+            <Typography.Text className="zh-approval-summary-value">{item.value}</Typography.Text>
+          </div>
+        ))}
+      </div>
       {error ? (
         <Typography.Text type="danger" className="zh-text-block zh-mb-12">
           {error}
         </Typography.Text>
       ) : null}
-      <div className="zh-column-stack">
-        {reviews.map((review) => (
-          <div key={review.id} className="zh-report-list-item">
-            <div>
-              <Space>
+      <div className="zh-column-stack zh-approval-review-list">
+        {orderedReviews.map((review) => (
+          <div key={review.id} className="zh-approval-review-item">
+            <div className="zh-approval-review-copy">
+              <Space wrap className="zh-approval-review-tags">
                 <LabelTag variant="filled" color={approvalStatusColor(review.status)}>
                   {review.status}
                 </LabelTag>
                 <Typography.Text strong>{review.tool}</Typography.Text>
-                <Typography.Text code>{review.policy_id}</Typography.Text>
+                <Typography.Text type="secondary" className="zh-policy-inline">
+                  策略 {review.policy_id}
+                </Typography.Text>
                 {review.escalation_level ? (
                   <LabelTag variant="filled" color={review.sla_breached ? 'error' : 'warning'}>
                     {review.escalation_level} · {review.sla_breached ? '已超时' : `${review.sla_minutes ?? 30} 分钟`}
@@ -83,7 +86,7 @@ export function ApprovalReviewQueue({
                 <Typography.Text type="secondary">{review.reason}</Typography.Text>
               </div>
             </div>
-            <Space>
+            <Space className="zh-approval-review-actions">
               {review.status === '待复核' ? (
                 <UiButton
                   size="small"

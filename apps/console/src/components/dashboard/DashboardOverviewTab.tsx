@@ -52,6 +52,10 @@ export function DashboardOverviewTab({
   onOpenPage,
   onBatchCompare
 }: DashboardOverviewTabProps) {
+  const guardedControlRate = overview.summary.guarded_control_rate ?? overview.summary.block_rate;
+  const guardedRunCount = overview.summary.guarded_run_count ?? overview.summary.recent_run_count;
+  const auditControlRate = overview.summary.block_rate;
+
   return (
     <div className="zh-page-stack zh-mt-8">
       <Row gutter={[24, 24]}>
@@ -106,12 +110,12 @@ export function DashboardOverviewTab({
                   variant="borderless"
                   className="zh-dashboard-metric-panel zh-dashboard-metric-panel--control"
                 >
-                  <Typography.Text type="secondary">防护控制率</Typography.Text>
+                  <Typography.Text type="secondary">有防护运行控制率</Typography.Text>
                   <Typography.Title level={2} className="zh-title-flush zh-color-success">
-                    {overview.summary.block_rate}%
+                    {guardedControlRate}%
                   </Typography.Title>
                   <Typography.Text type="secondary" className="zh-text-meta">
-                    拒绝、询问均计入控制
+                    {guardedRunCount} 次有防护运行 · 最近审计动作占比 {auditControlRate}%
                   </Typography.Text>
                 </PanelCard>
               </div>
@@ -156,7 +160,7 @@ export function DashboardOverviewTab({
           <Metric label="攻击脚本" value={`${overview.summary.scenario_count}`} tone="amber" />
         </Col>
         <Col xs={24} sm={12} md={6}>
-          <Metric label="样本/脚本" value={`${totalSamples}/${totalScripts}`} tone="green" />
+          <Metric label="样本/可运行脚本" value={`${totalSamples}/${totalScripts}`} tone="green" />
         </Col>
         <Col xs={24} sm={12} md={6}>
           <Metric label="高风险面" value={`${highRiskSurfaceCount}`} tone="red" />

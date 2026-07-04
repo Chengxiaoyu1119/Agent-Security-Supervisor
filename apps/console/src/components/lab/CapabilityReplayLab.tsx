@@ -6,6 +6,9 @@ import { runCapabilityReplay } from '../../api';
 import type { CapabilityReplayProbe, CapabilityReplayResult } from '../../types';
 import { AuditDeepLinkButton } from '../audit/AuditDeepLinkButton';
 import { DecisionPill, EvidenceCodeBlock, LabelTag, MetricCard, PanelCard, UiAlert, UiButton, UiTable } from '../ui';
+import { capabilityReplayFlowSteps } from './labRuntimeFlowPresets';
+import { LabRuntimeFlow } from './LabRuntimeFlow';
+import { ResultRunButton, RunResultEmptyState } from './RunResultActions';
 
 type CapabilityReplayLabProps = {
   refresh?: () => Promise<unknown>;
@@ -113,6 +116,7 @@ export function CapabilityReplayLab({ refresh }: CapabilityReplayLabProps) {
                 showIcon
                 message="运行后会实际调用后端实验、沙箱工具、监督器和输出过滤器，并把审计证据集中展示。"
               />
+              <LabRuntimeFlow compact steps={capabilityReplayFlowSteps} />
               <UiButton type="primary" icon={<Play size={16} />} loading={running} onClick={runReplay}>
                 一键复现核心功能
               </UiButton>
@@ -132,6 +136,15 @@ export function CapabilityReplayLab({ refresh }: CapabilityReplayLabProps) {
           <PanelCard
             title="复现结果"
             subtitle={result ? `${result.summary.passed_count}/${result.summary.probe_count} 已通过` : '等待运行'}
+            extra={
+              <ResultRunButton
+                hasResult={Boolean(result)}
+                idleLabel="运行复现"
+                rerunLabel="重新复现"
+                loading={running}
+                onClick={runReplay}
+              />
+            }
           >
             {result ? (
               <Space orientation="vertical" size={16} className="zh-full-width">
@@ -192,11 +205,14 @@ export function CapabilityReplayLab({ refresh }: CapabilityReplayLabProps) {
                 />
               </Space>
             ) : (
-              <div className="zh-attack-lab__empty">
-                <Typography.Text type="secondary">
-                  点击运行后，这里会展示每个功能的真实调用结果和审计证据。
-                </Typography.Text>
-              </div>
+              <RunResultEmptyState
+                icon={<Play size={28} />}
+                title="等待复现核心功能"
+                description="会实际调用后端实验、沙箱工具、监督器和输出过滤器，集中展示每个功能的真实调用结果和审计证据。"
+                actionLabel="一键复现核心功能"
+                loading={running}
+                onAction={runReplay}
+              />
             )}
           </PanelCard>
         </Col>

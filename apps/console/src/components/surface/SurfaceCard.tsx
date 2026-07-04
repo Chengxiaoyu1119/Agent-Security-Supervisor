@@ -52,25 +52,25 @@ export function SurfaceCard({
       )}
 
       <Row gutter={[8, 8]} className="zh-surface-card__meta">
-        <Col span={6}>
+        <Col xs={12} sm={6}>
           <Typography.Text type="secondary" className="zh-meta-block">
             样本
           </Typography.Text>
           <Typography.Text strong>{surface.samples}</Typography.Text>
         </Col>
-        <Col span={6}>
+        <Col xs={12} sm={6}>
           <Typography.Text type="secondary" className="zh-meta-block">
-            脚本
+            条目
           </Typography.Text>
           <Typography.Text strong>{surface.scripts}</Typography.Text>
         </Col>
-        <Col span={6}>
+        <Col xs={12} sm={6}>
           <Typography.Text type="secondary" className="zh-meta-block">
-            脚本
+            可运行
           </Typography.Text>
           <Typography.Text strong>{scenarioCount}</Typography.Text>
         </Col>
-        <Col span={6}>
+        <Col xs={12} sm={6}>
           <Typography.Text type="secondary" className="zh-meta-block">
             状态
           </Typography.Text>

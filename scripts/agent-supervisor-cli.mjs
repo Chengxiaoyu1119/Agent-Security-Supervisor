@@ -23,6 +23,7 @@ const commandNames = new Set([
   'surface-briefs',
   'roadmap',
   'anomaly-calibration',
+  'real-model-eval',
   'openclaw-plugin',
   'openclaw-plugin-validate',
   'readiness',

@@ -1,7 +1,8 @@
 import { Col, Row, Space, Typography } from 'antd';
-import { Copy } from 'lucide-react';
-import { EvidenceCodeBlock, MetricCard as Metric, PanelCard, SectionTitle, UiBadge, UiButton } from '../ui';
+import { EvidenceCodeBlock, MetricCard as Metric, PanelCard, SectionTitle, UiBadge } from '../ui';
 import type { ReportData } from '@/types';
+import { ReportBriefingExportGallery } from './ReportBriefingExportGallery';
+import { ReportDeliveryPackageGrid } from './ReportDeliveryPackageGrid';
 
 type ReportDeliveryTabProps = {
   competitionPackage: ReportData['competition_package'];
@@ -22,6 +23,7 @@ export function ReportDeliveryTab({
 }: ReportDeliveryTabProps) {
   return (
     <Space orientation="vertical" size="large" className="zh-tab-stack">
+      <ReportBriefingExportGallery />
       {competitionPackage && (
         <PanelCard
           title={
@@ -33,56 +35,30 @@ export function ReportDeliveryTab({
           variant="borderless"
         >
           <Row gutter={[16, 16]} className="zh-mb-24">
-            <Col span={6}>
+            <Col xs={24} sm={12} lg={6}>
               <Metric
                 label="可复现攻击面"
                 value={`${competitionPackage.summary.demo_ready_surface_count}/7`}
                 tone="green"
               />
             </Col>
-            <Col span={6}>
+            <Col xs={24} sm={12} lg={6}>
               <Metric label="材料文件" value={`${competitionPackage.summary.file_count}`} tone="cyan" />
             </Col>
-            <Col span={6}>
+            <Col xs={24} sm={12} lg={6}>
               <Metric label="实验记录" value={`${competitionPackage.summary.run_count}`} tone="amber" />
             </Col>
-            <Col span={6}>
+            <Col xs={24} sm={12} lg={6}>
               <Metric label="控制率" value={`${competitionPackage.summary.control_rate}%`} tone="red" />
             </Col>
           </Row>
 
-          <Row gutter={[16, 16]}>
-            {packageFiles.map((file) => (
-              <Col xs={24} md={12} xl={8} key={file.filename}>
-                <PanelCard
-                  type="inner"
-                  title={file.title}
-                  extra={
-                    <Typography.Text type="secondary" className="zh-text-meta">
-                      {Math.max(1, Math.round(file.size / 1024))} KB
-                    </Typography.Text>
-                  }
-                  actions={[
-                    <UiButton type="text" size="small" onClick={() => copyPackageFile(file.filename, file.content)}>
-                      <Copy size={14} /> {copiedFile === file.filename ? '已复制' : '复制'}
-                    </UiButton>,
-                    <UiButton
-                      type="text"
-                      size="small"
-                      onClick={() => downloadPackageFile(file.filename, file.content, file.content_type)}
-                    >
-                      下载
-                    </UiButton>
-                  ]}
-                >
-                  <Typography.Paragraph type="secondary" className="zh-min-h-44">
-                    {file.description}
-                  </Typography.Paragraph>
-                  <Typography.Text code>{file.filename}</Typography.Text>
-                </PanelCard>
-              </Col>
-            ))}
-          </Row>
+          <ReportDeliveryPackageGrid
+            packageFiles={packageFiles}
+            copiedFile={copiedFile}
+            copyPackageFile={copyPackageFile}
+            downloadPackageFile={downloadPackageFile}
+          />
         </PanelCard>
       )}
       {competitionPackage && (

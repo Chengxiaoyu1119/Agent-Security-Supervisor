@@ -30,7 +30,7 @@ export function TargetLabDeltaPanel({ before, after }: TargetLabDeltaPanelProps)
         {TARGET_LAB_METRICS.map((item) => {
           const delta = metricDelta(before, after, item.key);
           return (
-            <Col span={12} key={String(item.key)}>
+            <Col xs={12} sm={12} key={String(item.key)}>
               <MetricCard
                 label={item.label}
                 value={`${metricValue(after, item.key)} (${delta >= 0 ? '+' : ''}${delta})`}

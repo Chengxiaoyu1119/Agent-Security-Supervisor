@@ -3,8 +3,12 @@ import { Database, Play } from 'lucide-react';
 import { Col, Row, Space, Typography } from 'antd';
 import { fetchAttackTestsets, runAttackTestset } from '../../api';
 import type { AttackTestsetSample, AttackTestsetRunResult, AttackTestsetsResponse } from '../../types';
-import { PanelCard, UiAlert, UiButton, UiInput, UiSelect, UiSwitch } from '../ui';
+import { PanelCard, UiAlert, UiButton, UiSelect, UiSwitch } from '../ui';
+import { AttackTestsetEditorPanel } from './AttackTestsetEditorPanel';
 import { AttackTestsetResultsPanel } from './AttackTestsetResultsPanel';
+import { attackTestsetFlowSteps } from './labRuntimeFlowPresets';
+import { LabRuntimeFlow } from './LabRuntimeFlow';
+import { ResultRunButton, RunResultEmptyState } from './RunResultActions';
 
 type PlannerMode = 'fixed' | 'model';
 
@@ -67,7 +71,9 @@ export function AttackTestsetLab() {
   );
 
   useEffect(() => {
-    const editorSyncTimer = window.setTimeout(() => {
+    let cancelled = false;
+    window.queueMicrotask(() => {
+      if (cancelled) return;
       if (!editableSample) {
         setEditableSampleId('');
         setEditableAttackInput('');
@@ -79,9 +85,10 @@ export function AttackTestsetLab() {
         setEditableAttackInput(editableSample.attack_input);
         setEditableOptionsText(stringifyOptions(editableSample));
       }
-    }, 0);
-
-    return () => window.clearTimeout(editorSyncTimer);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [editableSample, editableSampleId]);
 
   function loadSampleIntoEditor(sampleId: string) {
@@ -141,6 +148,7 @@ export function AttackTestsetLab() {
                 showIcon
                 message="测试集会批量运行本地靶场样本，并用检测器判断攻击是否复现、监督器是否控制。"
               />
+              <LabRuntimeFlow compact steps={attackTestsetFlowSteps(selectedSurface, plannerMode)} />
               <div className="zh-attack-lab__field">
                 <Typography.Text strong>攻击面范围</Typography.Text>
                 <UiSelect
@@ -174,43 +182,15 @@ export function AttackTestsetLab() {
                 />
               </div>
               {editableSample && (
-                <PanelCard title="当前样本可编辑" subtitle={editableSample.id} type="inner">
-                  <Space orientation="vertical" size={12} className="zh-full-width">
-                    <div className="zh-attack-lab__field">
-                      <Typography.Text strong>正在编辑的样本</Typography.Text>
-                      <UiSelect
-                        value={editableSample.id}
-                        onChange={(value) => loadSampleIntoEditor(String(value))}
-                        options={runnableSamples.map((sample) => ({
-                          label: `${sample.id} ${sample.title}`,
-                          value: sample.id
-                        }))}
-                      />
-                    </div>
-                    <div className="zh-attack-lab__field">
-                      <Typography.Text strong>攻击输入</Typography.Text>
-                      <UiInput.TextArea
-                        value={editableAttackInput}
-                        onChange={(event) => setEditableAttackInput(event.target.value)}
-                        rows={5}
-                        showCount
-                        maxLength={12000}
-                      />
-                    </div>
-                    <div className="zh-attack-lab__field">
-                      <Typography.Text strong>工具参数 JSON</Typography.Text>
-                      <UiInput.TextArea
-                        value={editableOptionsText}
-                        onChange={(event) => setEditableOptionsText(event.target.value)}
-                        rows={4}
-                        spellCheck={false}
-                      />
-                    </div>
-                    <Typography.Text type="secondary" className="zh-attack-lab__hint">
-                      批量运行时只覆盖当前编辑样本，其余样本使用测试集原始参数。
-                    </Typography.Text>
-                  </Space>
-                </PanelCard>
+                <AttackTestsetEditorPanel
+                  editableSample={editableSample}
+                  runnableSamples={runnableSamples}
+                  editableAttackInput={editableAttackInput}
+                  editableOptionsText={editableOptionsText}
+                  onSampleChange={loadSampleIntoEditor}
+                  onAttackInputChange={setEditableAttackInput}
+                  onOptionsTextChange={setEditableOptionsText}
+                />
               )}
               <div className="zh-attack-lab__field">
                 <Typography.Text strong>工具规划方式</Typography.Text>
@@ -218,8 +198,8 @@ export function AttackTestsetLab() {
                   value={plannerMode}
                   onChange={(value) => setPlannerMode(value as PlannerMode)}
                   options={[
-                    { label: '固定映射，适合快速批量验收', value: 'fixed' },
-                    { label: '真实模型规划，适合答辩展示', value: 'model' }
+                    { label: '本地批量规划（快速覆盖全部样本）', value: 'fixed' },
+                    { label: '真实模型规划（适合单样本复现）', value: 'model' }
                   ]}
                 />
               </div>
@@ -254,18 +234,53 @@ export function AttackTestsetLab() {
             title="测试集结果"
             subtitle={result ? `${result.sample_count} 条样本已运行` : '等待运行'}
             className="zh-full-height"
+            extra={
+              <Space size={8} wrap>
+                <ResultRunButton
+                  hasResult={Boolean(result)}
+                  idleLabel="运行范围"
+                  rerunLabel="重新运行"
+                  loading={running}
+                  onClick={() => runTestset()}
+                />
+                <UiButton
+                  size="small"
+                  icon={<Play size={14} />}
+                  loading={running}
+                  disabled={!editableSampleId}
+                  onClick={() => runTestset(editableSampleId ? [editableSampleId] : [])}
+                >
+                  编辑样本
+                </UiButton>
+              </Space>
+            }
           >
             {result ? (
               <AttackTestsetResultsPanel result={result} />
             ) : (
-              <div className="zh-attack-lab__empty">
-                <Space orientation="vertical" align="center">
-                  <Database size={28} />
-                  <Typography.Text type="secondary">
-                    选择攻击面后运行测试集，这里会显示批量复现率、检测命中率和防护控制率。
-                  </Typography.Text>
-                </Space>
-              </div>
+              <RunResultEmptyState
+                icon={<Database size={28} />}
+                title="等待批量运行测试集"
+                description="会逐条调用后端样本、检测器和监督器，输出复现率、检测命中率、防护控制率和审计编号。"
+                actionLabel="运行当前范围"
+                loading={running}
+                onAction={() => runTestset()}
+                extraActions={
+                  <Space size={8} wrap className="zh-attack-lab__empty-actions">
+                    <UiButton type="primary" icon={<Play size={16} />} loading={running} onClick={() => runTestset()}>
+                      运行当前范围
+                    </UiButton>
+                    <UiButton
+                      icon={<Play size={16} />}
+                      loading={running}
+                      disabled={!editableSampleId}
+                      onClick={() => runTestset(editableSampleId ? [editableSampleId] : [])}
+                    >
+                      只运行编辑样本
+                    </UiButton>
+                  </Space>
+                }
+              />
             )}
           </PanelCard>
         </Col>

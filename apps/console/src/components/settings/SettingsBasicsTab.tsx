@@ -2,6 +2,7 @@ import { Col, Flex, Row, Space, Typography } from 'antd';
 import { LabelTag, PanelCard, UiButton, UiInput, UiSelect, UiSwitch } from '../ui';
 import type { ModelRuntimeConfig, Overview } from '@/types';
 import { competitionCapabilityRows } from '@/utils';
+import { fallbackModelProviders, modelProfileMeta, normalizeProviderId } from './modelConfigHelpers';
 
 type SettingsBasicsTabProps = {
   overview: Overview;
@@ -11,18 +12,6 @@ type SettingsBasicsTabProps = {
   onSaveModelConfig: () => Promise<void>;
 };
 
-const fallbackProviders = [
-  { id: 'deepseek', label: 'DeepSeek' },
-  { id: 'zhipu', label: '智谱' },
-  { id: 'openai-compatible', label: 'OpenAI 兼容接口' }
-];
-
-const profileMeta = [
-  { id: 'target', title: '主模型', description: '负责响应安全评测输入，默认优先 DeepSeek。' },
-  { id: 'optimizer', title: '副模型', description: '负责优化本地靶场测试提示词，默认优先智谱。' },
-  { id: 'global', title: '全局默认模型', description: '用于普通模型调用和工具调用盲测。' }
-];
-
 export function SettingsBasicsTab({
   overview,
   modelConfig,
@@ -30,7 +19,7 @@ export function SettingsBasicsTab({
   onModelConfigChange,
   onSaveModelConfig
 }: SettingsBasicsTabProps) {
-  const providers = modelConfig?.allowed_providers?.length ? modelConfig.allowed_providers : fallbackProviders;
+  const providers = modelConfig?.allowed_providers?.length ? modelConfig.allowed_providers : fallbackModelProviders;
   const providerOptions = providers.map((provider) => ({ label: provider.label, value: provider.id }));
   const providerIds = providers.map((provider) => provider.id);
   const modelStatusByProvider = new Map(
@@ -38,6 +27,31 @@ export function SettingsBasicsTab({
       .map((model) => [normalizeProviderId(model.provider), model] as const)
       .filter(([providerId]) => providerIds.includes(providerId))
   );
+  const configuredModelCount = overview.models.filter((model) => model.configured).length;
+  const profileRuntimeRows = modelProfileMeta.map((profile) => {
+    const profileConfig = modelConfig?.profiles[profile.id] ?? {
+      provider_priority: providerIds,
+      model_overrides: {}
+    };
+    const primaryProvider = profileConfig.provider_priority?.[0] ?? providerIds[0];
+    const selectedProvider = providers.find((provider) => provider.id === primaryProvider) ?? providers[0];
+    const runtimeModel = modelStatusByProvider.get(primaryProvider);
+    const configured = Boolean(modelConfig?.real_api_enabled && runtimeModel?.configured);
+    const defaultModel = runtimeModel?.model ?? '';
+    const orderLabels = (profileConfig.provider_priority?.length ? profileConfig.provider_priority : providerIds)
+      .map((providerId) => providers.find((provider) => provider.id === providerId)?.label ?? providerId)
+      .join(' -> ');
+    return {
+      ...profile,
+      profileConfig,
+      primaryProvider,
+      selectedProvider,
+      runtimeModel,
+      configured,
+      defaultModel,
+      orderLabels
+    };
+  });
 
   function updateModelConfig(updater: (config: ModelRuntimeConfig) => ModelRuntimeConfig) {
     if (!modelConfig) {
@@ -93,28 +107,91 @@ export function SettingsBasicsTab({
 
   return (
     <Space orientation="vertical" size="large" className="zh-tab-stack">
-      <Row gutter={[16, 16]}>
-        {overview.models.map((model) => (
-          <Col xs={24} sm={12} md={8} lg={6} key={model.provider}>
-            <PanelCard type="inner" size="small" hoverable className="zh-full-height">
-              <Typography.Text strong className="zh-text-block">
-                {model.provider}
+      <PanelCard
+        title="真实模型链路状态"
+        subtitle="这里只展示运行状态，不展示 API 密钥；密钥仍由本地或服务器 .env 保存。"
+        type="inner"
+      >
+        <Row gutter={[16, 16]} className="zh-settings-status-grid">
+          <Col xs={24} sm={8}>
+            <div className="zh-settings-status-card">
+              <Typography.Text type="secondary" className="zh-meta-block">
+                调用模式
               </Typography.Text>
-              <Typography.Text type="secondary" className="zh-text-sm zh-text-block zh-mb-4">
-                {model.model}
+              <Typography.Text strong>
+                {modelConfig?.real_api_enabled ? '真实 API 优先' : '本地兜底模式'}
               </Typography.Text>
-              <div className="zh-mb-8">
-                <LabelTag variant="filled" color="processing" className="zh-code-tag">
-                  {model.endpoint ?? model.mode}
+            </div>
+          </Col>
+          <Col xs={24} sm={8}>
+            <div className="zh-settings-status-card">
+              <Typography.Text type="secondary" className="zh-meta-block">
+                已配置模型
+              </Typography.Text>
+              <Typography.Text strong>
+                {configuredModelCount}/{overview.models.length}
+              </Typography.Text>
+            </div>
+          </Col>
+          <Col xs={24} sm={8}>
+            <div className="zh-settings-status-card">
+              <Typography.Text type="secondary" className="zh-meta-block">
+                配置来源
+              </Typography.Text>
+              <Typography.Text strong>{modelConfig?.real_api_enabled_source ?? '读取中'}</Typography.Text>
+            </div>
+          </Col>
+        </Row>
+        <Row gutter={[16, 16]}>
+          {profileRuntimeRows.map((profile) => (
+            <Col xs={24} md={8} key={profile.id}>
+              <div className="zh-settings-profile-status">
+                <div>
+                  <Typography.Text strong className="zh-text-block">
+                    {profile.title}
+                  </Typography.Text>
+                  <Typography.Text type="secondary" className="zh-meta-block">
+                    {profile.selectedProvider.label} /{' '}
+                    {profile.profileConfig.model_overrides?.[profile.primaryProvider] ||
+                      profile.defaultModel ||
+                      '默认模型'}
+                  </Typography.Text>
+                </div>
+                <LabelTag
+                  variant="filled"
+                  color={profile.configured ? 'success' : 'warning'}
+                  className="zh-settings-tag-flush"
+                >
+                  {profile.configured ? '真实可用' : '兜底/待配置'}
                 </LabelTag>
               </div>
-              <Typography.Text type="secondary" className="zh-meta-block">
-                {model.configured ? '已配置真实 API' : '未配置，使用本地兜底模型'}
-              </Typography.Text>
-            </PanelCard>
-          </Col>
-        ))}
-      </Row>
+            </Col>
+          ))}
+        </Row>
+      </PanelCard>
+
+      <PanelCard title="模型连接明细" type="inner">
+        <Row gutter={[16, 16]}>
+          {overview.models.map((model) => (
+            <Col xs={24} sm={12} md={8} lg={6} key={model.provider}>
+              <PanelCard type="inner" size="small" hoverable className="zh-full-height zh-settings-provider-card">
+                <Typography.Text strong className="zh-text-block">
+                  {model.provider}
+                </Typography.Text>
+                <Typography.Text type="secondary" className="zh-text-sm zh-text-block zh-mb-4">
+                  {model.model}
+                </Typography.Text>
+                <Typography.Text className="zh-settings-provider-endpoint">
+                  {model.endpoint ?? model.mode}
+                </Typography.Text>
+                <LabelTag variant="filled" color={model.configured ? 'success' : 'warning'}>
+                  {model.configured ? '已接入真实 API' : '使用本地兜底'}
+                </LabelTag>
+              </PanelCard>
+            </Col>
+          ))}
+        </Row>
+      </PanelCard>
 
       <PanelCard title="大语言模型运行配置" type="inner">
         {modelConfig ? (
@@ -137,59 +214,53 @@ export function SettingsBasicsTab({
             </div>
 
             <Row gutter={[16, 16]}>
-              {profileMeta.map((profile) => {
-                const profileConfig = modelConfig.profiles[profile.id] ?? {
-                  provider_priority: providerIds,
-                  model_overrides: {}
-                };
-                const primaryProvider = profileConfig.provider_priority?.[0] ?? providerIds[0];
-                const selectedProvider = providers.find((provider) => provider.id === primaryProvider) ?? providers[0];
-                const defaultModel = modelStatusByProvider.get(primaryProvider)?.model ?? '';
-                const orderLabels = (profileConfig.provider_priority?.length ? profileConfig.provider_priority : providerIds)
-                  .map((providerId) => providers.find((provider) => provider.id === providerId)?.label ?? providerId)
-                  .join(' -> ');
-                return (
-                  <Col xs={24} md={8} key={profile.id}>
-                    <PanelCard type="inner" size="small" className="zh-full-height zh-settings-model-card">
-                      <Space orientation="vertical" size="middle" className="zh-settings-stack">
-                        <div>
-                          <Typography.Text strong className="zh-text-block">
-                            {profile.title}
-                          </Typography.Text>
-                          <Typography.Text type="secondary" className="zh-text-sm zh-text-block zh-mt-4">
-                            {profile.description}
-                          </Typography.Text>
-                        </div>
-                        <div className="zh-settings-model-field">
-                          <Typography.Text type="secondary" className="zh-settings-info-label">
-                            优先调用
-                          </Typography.Text>
-                          <UiSelect
-                            className="zh-settings-model-select"
-                            value={primaryProvider}
-                            options={providerOptions}
-                            onChange={(value) => updatePrimaryProvider(profile.id, value)}
-                          />
-                        </div>
-                        <div className="zh-settings-model-field">
-                          <Typography.Text type="secondary" className="zh-settings-info-label">
-                            模型名称
-                          </Typography.Text>
-                          <UiInput
-                            className="zh-settings-model-input"
-                            value={profileConfig.model_overrides?.[primaryProvider] ?? ''}
-                            placeholder={defaultModel ? `默认：${defaultModel}` : `默认：${selectedProvider.label}`}
-                            onChange={(event) => updateModelOverride(profile.id, primaryProvider, event.target.value)}
-                          />
-                        </div>
-                        <Typography.Text type="secondary" className="zh-code-sm">
-                          调用顺序：{orderLabels}
+              {profileRuntimeRows.map((profile) => (
+                <Col xs={24} md={8} key={profile.id}>
+                  <PanelCard type="inner" size="small" className="zh-full-height zh-settings-model-card">
+                    <Space orientation="vertical" size="middle" className="zh-settings-stack">
+                      <div>
+                        <Typography.Text strong className="zh-text-block">
+                          {profile.title}
                         </Typography.Text>
-                      </Space>
-                    </PanelCard>
-                  </Col>
-                );
-              })}
+                        <Typography.Text type="secondary" className="zh-text-sm zh-text-block zh-mt-4">
+                          {profile.description}
+                        </Typography.Text>
+                      </div>
+                      <div className="zh-settings-model-field">
+                        <Typography.Text type="secondary" className="zh-settings-info-label">
+                          优先调用
+                        </Typography.Text>
+                        <UiSelect
+                          className="zh-settings-model-select"
+                          value={profile.primaryProvider}
+                          options={providerOptions}
+                          onChange={(value) => updatePrimaryProvider(profile.id, value)}
+                        />
+                      </div>
+                      <div className="zh-settings-model-field">
+                        <Typography.Text type="secondary" className="zh-settings-info-label">
+                          模型名称
+                        </Typography.Text>
+                        <UiInput
+                          className="zh-settings-model-input"
+                          value={profile.profileConfig.model_overrides?.[profile.primaryProvider] ?? ''}
+                          placeholder={
+                            profile.defaultModel
+                              ? `默认：${profile.defaultModel}`
+                              : `默认：${profile.selectedProvider.label}`
+                          }
+                          onChange={(event) =>
+                            updateModelOverride(profile.id, profile.primaryProvider, event.target.value)
+                          }
+                        />
+                      </div>
+                      <Typography.Text type="secondary" className="zh-code-sm">
+                        调用顺序：{profile.orderLabels}
+                      </Typography.Text>
+                    </Space>
+                  </PanelCard>
+                </Col>
+              ))}
             </Row>
           </Space>
         ) : (
@@ -218,17 +289,4 @@ export function SettingsBasicsTab({
       </PanelCard>
     </Space>
   );
-}
-
-function normalizeProviderId(provider: string): string {
-  if (/deepseek/i.test(provider)) {
-    return 'deepseek';
-  }
-  if (/智谱|zhipu/i.test(provider)) {
-    return 'zhipu';
-  }
-  if (/openai|兼容接口/i.test(provider)) {
-    return 'openai-compatible';
-  }
-  return '';
 }

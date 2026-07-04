@@ -29,9 +29,54 @@ export function ExternalIntegrationTab({
   handleWriteOpenClawPlugin,
   handleValidateOpenClawPlugin
 }: ExternalIntegrationTabProps) {
+  const integrationChecks = [
+    {
+      label: '通用 Agent 监督',
+      value: agentIntegrationBundle ? '接口可用' : '读取中',
+      ready: Boolean(agentIntegrationBundle)
+    },
+    {
+      label: 'OpenClaw 兼容事件',
+      value: integrationBundle ? `${integrationBundle.endpoints.length} 个入口` : '读取中',
+      ready: Boolean(integrationBundle)
+    },
+    {
+      label: '源码级插件包',
+      value: openClawPluginPackage ? `${openClawPluginPackage.file_count} 个文件` : '待生成',
+      ready: Boolean(openClawPluginPackage)
+    },
+    {
+      label: '插件验收',
+      value: openClawPluginValidation?.validation.overall_status ?? '待验收',
+      ready: Boolean(openClawPluginValidation?.validation.static_passed)
+    }
+  ];
+
   return (
     <Space orientation="vertical" size="large" className="zh-tab-stack">
       <PanelCard title="外部智能体监督接入" type="inner">
+        <Row gutter={[16, 16]} className="zh-settings-status-grid">
+          {integrationChecks.map((item) => (
+            <Col xs={24} sm={12} lg={6} key={item.label}>
+              <div className="zh-settings-status-card">
+                <Typography.Text type="secondary" className="zh-meta-block">
+                  {item.label}
+                </Typography.Text>
+                <Flex justify="space-between" align="center" gap={8}>
+                  <Typography.Text strong>{item.value}</Typography.Text>
+                  <LabelTag
+                    variant="filled"
+                    color={item.ready ? 'success' : 'warning'}
+                    className="zh-settings-tag-flush"
+                  >
+                    {item.ready ? '已准备' : '待操作'}
+                  </LabelTag>
+                </Flex>
+              </div>
+            </Col>
+          ))}
+        </Row>
+
         <Row gutter={[16, 16]} className="zh-mb-24">
           <Col xs={24} sm={12} lg={6}>
             <PanelCard size="small" type="inner" className="zh-full-height">
@@ -69,7 +114,7 @@ export function ExternalIntegrationTab({
                 CLI 验证
               </Typography.Text>
               <Typography.Text code className="zh-settings-code-wrap">
-                npm run cli -- demo-external
+                npm run cli -- external-agent-demo
               </Typography.Text>
             </PanelCard>
           </Col>
@@ -209,6 +254,9 @@ export function ExternalIntegrationTab({
                 <Space wrap>
                   <UiButton size="small" href="/api/integrations/openclaw/bundle" target="_blank">
                     查看接入包 JSON
+                  </UiButton>
+                  <UiButton size="small" href="/api/integrations/openclaw/schema" target="_blank">
+                    查看事件结构
                   </UiButton>
                   <UiButton size="small" href="/api/integrations/openclaw/adapter.py" target="_blank">
                     查看适配器代码

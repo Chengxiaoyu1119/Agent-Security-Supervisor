@@ -58,17 +58,17 @@ export function BatchResultPanel({ batch }: { batch: BatchCompareResult }) {
       }
       className="zh-mt-24"
     >
-      <Row gutter={[16, 16]} className="zh-mb-24">
-        <Col span={6}>
+      <Row gutter={[16, 16]} className="zh-mb-24" align="stretch">
+        <Col xs={12} md={6}>
           <Metric label="无防护暴露" value={`${batch.summary.exposed_without_guard}`} tone="red" />
         </Col>
-        <Col span={6}>
+        <Col xs={12} md={6}>
           <Metric label="有防护控制" value={`${batch.summary.controlled_with_guard}`} tone="green" />
         </Col>
-        <Col span={6}>
+        <Col xs={12} md={6}>
           <Metric label="攻击下降" value={`${batch.summary.attack_success_reduced}`} tone="cyan" />
         </Col>
-        <Col span={6}>
+        <Col xs={12} md={6}>
           <Metric label="平均延迟" value={`${batch.summary.avg_latency_ms}ms`} tone="amber" />
         </Col>
       </Row>

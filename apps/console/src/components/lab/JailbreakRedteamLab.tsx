@@ -18,6 +18,9 @@ import {
   UiSwitch,
   UiTable
 } from '../ui';
+import { jailbreakFlowSteps } from './labRuntimeFlowPresets';
+import { LabRuntimeFlow } from './LabRuntimeFlow';
+import { ResultRunButton, RunResultEmptyState } from './RunResultActions';
 
 type JailbreakRedteamLabProps = {
   refresh?: () => Promise<unknown>;
@@ -124,6 +127,7 @@ export function JailbreakRedteamLab({ refresh }: JailbreakRedteamLabProps) {
                 showIcon
                 message="这个功能会生成多种越狱变体，优先调用后端已配置模型，再把输出送入监督器判定；接口不可用时才启用本地安全评测模型。"
               />
+              <LabRuntimeFlow compact steps={jailbreakFlowSteps(variantLimit, forceRealModel)} />
               <div className="zh-attack-lab__field">
                 <Typography.Text strong>目标模型名（可选）</Typography.Text>
                 <UiInput
@@ -181,6 +185,15 @@ export function JailbreakRedteamLab({ refresh }: JailbreakRedteamLabProps) {
             title="对测结果"
             subtitle={result ? `${result.summary.variant_count} 个变体` : '等待运行'}
             className="zh-full-height"
+            extra={
+              <ResultRunButton
+                hasResult={Boolean(result)}
+                idleLabel="运行对测"
+                rerunLabel="重新对测"
+                loading={running}
+                onClick={runLab}
+              />
+            }
           >
             {result ? (
               <Space orientation="vertical" size={16} className="zh-full-width">
@@ -229,12 +242,14 @@ export function JailbreakRedteamLab({ refresh }: JailbreakRedteamLabProps) {
                 />
               </Space>
             ) : (
-              <div className="zh-attack-lab__empty">
-                <Space orientation="vertical" align="center">
-                  <Bot size={28} />
-                  <Typography.Text type="secondary">运行后会显示每个越狱变体的模型输出和监督器判定。</Typography.Text>
-                </Space>
-              </div>
+              <RunResultEmptyState
+                icon={<Bot size={28} />}
+                title="等待运行模型越狱对测"
+                description="会生成多个越狱变体，调用真实模型或安全兜底模型，再展示每个变体的模型输出、过滤命中和监督器判定。"
+                actionLabel="运行模型越狱对测"
+                loading={running}
+                onAction={runLab}
+              />
             )}
           </PanelCard>
         </Col>

@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
 import { Col, Descriptions, Row, Space, Typography } from 'antd';
 import { Play } from 'lucide-react';
-import type { Scenario } from '@/types';
+import type { RunResult, Scenario } from '@/types';
 import { riskLabel } from '@/utils';
 import { EvidenceCodeBlock, LabelTag, PanelCard, UiButton, UiInput, UiSelect } from '../ui';
+import { ScenarioRunStatusPanel } from './ScenarioRunStatusPanel';
 
 const ALL_FILTER = '全部';
 
@@ -21,16 +22,43 @@ function surfaceLabel(surfaceId: string) {
   return ATTACK_SURFACE_LABELS[surfaceId] ?? surfaceId;
 }
 
+function ScenarioDetailBlock({ title, items }: { title: string; items: string[] }) {
+  return (
+    <div className="zh-scenario-detail-block">
+      <Typography.Text strong className="zh-scenario-detail-block__title">
+        {title}
+      </Typography.Text>
+      <ol className="zh-ordered-list zh-scenario-detail-block__list">
+        {items.map((item) => (
+          <li key={item}>
+            <Typography.Text>{item}</Typography.Text>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
+}
+
 export function ScenarioLibrary({
   scenarios,
   selected,
+  recentRuns,
+  running,
   onSelect,
-  onOpenLab
+  onOpenLab,
+  onRunScenario,
+  onCompareScenario,
+  onOpenAudit
 }: {
   scenarios: Scenario[];
   selected: string;
+  recentRuns: RunResult[];
+  running: boolean;
   onSelect: (id: string) => void;
-  onOpenLab: () => void;
+  onOpenLab: (id: string) => void;
+  onRunScenario: (id: string) => void;
+  onCompareScenario: (id: string) => void;
+  onOpenAudit: () => void;
 }) {
   const [query, setQuery] = useState('');
   const [surfaceFilter, setSurfaceFilter] = useState(ALL_FILTER);
@@ -60,6 +88,7 @@ export function ScenarioLibrary({
     });
   }, [query, scenarios, severityFilter, surfaceFilter]);
   const active = scenarios.find((scenario) => scenario.id === selected) ?? scenarios[0];
+
   return (
     <Row gutter={[24, 24]}>
       <Col xs={24} md={8} lg={6}>
@@ -164,12 +193,21 @@ export function ScenarioLibrary({
               </Space>
             }
             extra={
-              <UiButton type="primary" icon={<Play size={16} />} onClick={onOpenLab}>
+              <UiButton type="primary" icon={<Play size={16} />} onClick={() => onOpenLab(active.id)}>
                 带入实验室
               </UiButton>
             }
             variant="borderless"
           >
+            <ScenarioRunStatusPanel
+              scenario={active}
+              recentRuns={recentRuns}
+              running={running}
+              onRunScenario={onRunScenario}
+              onCompareScenario={onCompareScenario}
+              onOpenAudit={onOpenAudit}
+            />
+
             <div
               className={`zh-risk-summary ${
                 active.severity === 'critical' ? 'zh-risk-summary--critical' : 'zh-risk-summary--info'
@@ -190,42 +228,18 @@ export function ScenarioLibrary({
               <Descriptions.Item label="防御策略">{active.defense}</Descriptions.Item>
             </Descriptions>
 
-            <Row gutter={[24, 24]}>
-              <Col span={12}>
-                <PanelCard type="inner" title="智能体攻击脚本" size="small">
-                  <ol className="zh-ordered-list">
-                    {active.script_steps.map((step) => (
-                      <li key={step}>
-                        <Typography.Text>{step}</Typography.Text>
-                      </li>
-                    ))}
-                  </ol>
-                </PanelCard>
+            <Row gutter={[16, 16]} className="zh-scenario-detail-grid">
+              <Col xs={24} xl={12}>
+                <ScenarioDetailBlock title="智能体攻击脚本" items={active.script_steps} />
               </Col>
               {active.attack_path?.length ? (
-                <Col span={12}>
-                  <PanelCard type="inner" title="攻击链路" size="small">
-                    <ol className="zh-ordered-list">
-                      {active.attack_path.map((step) => (
-                        <li key={step}>
-                          <Typography.Text>{step}</Typography.Text>
-                        </li>
-                      ))}
-                    </ol>
-                  </PanelCard>
+                <Col xs={24} xl={12}>
+                  <ScenarioDetailBlock title="攻击链路" items={active.attack_path} />
                 </Col>
               ) : null}
               {active.success_criteria?.length ? (
-                <Col span={12}>
-                  <PanelCard type="inner" title="成功判据" size="small">
-                    <ol className="zh-ordered-list">
-                      {active.success_criteria.map((item) => (
-                        <li key={item}>
-                          <Typography.Text>{item}</Typography.Text>
-                        </li>
-                      ))}
-                    </ol>
-                  </PanelCard>
+                <Col xs={24} xl={12}>
+                  <ScenarioDetailBlock title="成功判据" items={active.success_criteria} />
                 </Col>
               ) : null}
             </Row>

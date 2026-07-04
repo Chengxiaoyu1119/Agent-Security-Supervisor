@@ -46,7 +46,15 @@ def overview() -> dict:
     alerts = [alert for run in runs for alert in run.get("alerts", [])][:8]
     audit_logs = [log for run in runs for log in run.get("audit_logs", [])][:12]
     total = len(runs)
-    blocked = sum(1 for run in runs if run["metrics"]["blocked_count"] > 0)
+    controlled_actions = sum(
+        1
+        for run in runs
+        if run["metrics"]["blocked_count"] > 0
+        or run["metrics"].get("asked_count", 0) > 0
+        or run["metrics"].get("isolated_count", 0) > 0
+    )
+    guarded_runs = [run for run in runs if run.get("guard_enabled")]
+    guarded_controlled = sum(1 for run in guarded_runs if not run.get("attack_success"))
     attack_successes = sum(1 for run in runs if run["attack_success"])
     return {
         "attack_surfaces": get_attack_surfaces(),
@@ -60,7 +68,10 @@ def overview() -> dict:
             "surface_count": len(get_attack_surfaces()),
             "scenario_count": len(get_scenarios()),
             "recent_run_count": total,
-            "block_rate": round((blocked / total) * 100) if total else 0,
+            "block_rate": round((controlled_actions / total) * 100) if total else 0,
+            "guarded_run_count": len(guarded_runs),
+            "guarded_controlled_count": guarded_controlled,
+            "guarded_control_rate": round((guarded_controlled / len(guarded_runs)) * 100) if guarded_runs else 0,
             "attack_success_rate": round((attack_successes / total) * 100) if total else 0,
             "avg_latency_ms": round(sum(run["metrics"]["detection_latency_ms"] for run in runs) / total) if total else 0,
         },

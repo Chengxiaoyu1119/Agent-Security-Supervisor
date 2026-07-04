@@ -2,16 +2,25 @@ import { Col, Row, Space, Typography } from 'antd';
 import { DecisionPill, LabelTag, MetricCard as Metric, PanelCard, SectionTitle, UiBadge, UiTable } from '../ui';
 import type { ReportData } from '@/types';
 import { riskLabel } from '@/utils';
+import { ReportAttackEvidenceActions } from './ReportAttackEvidenceActions';
 import { ReportDefenseEvidenceBoard } from './ReportDefenseEvidenceBoard';
 
 type ReportAttackEvaluationTabProps = {
   report: ReportData;
   onOpenScenario: (id: string) => void;
+  onRefreshReport?: () => Promise<void> | void;
+  onRefreshRuntime?: () => Promise<unknown> | void;
 };
 
-export function ReportAttackEvaluationTab({ report, onOpenScenario }: ReportAttackEvaluationTabProps) {
+export function ReportAttackEvaluationTab({
+  report,
+  onOpenScenario,
+  onRefreshReport,
+  onRefreshRuntime
+}: ReportAttackEvaluationTabProps) {
   return (
     <Space orientation="vertical" size="large" className="zh-tab-stack">
+      <ReportAttackEvidenceActions onRefreshReport={onRefreshReport} onRefreshRuntime={onRefreshRuntime} />
       {report.attack_effectiveness && (
         <PanelCard
           title={
@@ -23,28 +32,28 @@ export function ReportAttackEvaluationTab({ report, onOpenScenario }: ReportAtta
           variant="borderless"
         >
           <Row gutter={[16, 16]} className="zh-mb-24">
-            <Col span={6}>
+            <Col xs={24} sm={12} lg={6}>
               <Metric
                 label="无防护复现率"
                 value={`${report.attack_effectiveness.summary.attack_reproduced_rate}%`}
                 tone="red"
               />
             </Col>
-            <Col span={6}>
+            <Col xs={24} sm={12} lg={6}>
               <Metric
                 label="有防护控制率"
                 value={`${report.attack_effectiveness.summary.defense_effective_rate}%`}
                 tone="green"
               />
             </Col>
-            <Col span={6}>
+            <Col xs={24} sm={12} lg={6}>
               <Metric
                 label="策略匹配率"
                 value={`${report.attack_effectiveness.summary.expected_match_rate}%`}
                 tone="cyan"
               />
             </Col>
-            <Col span={6}>
+            <Col xs={24} sm={12} lg={6}>
               <Metric
                 label="证据完整率"
                 value={`${report.attack_effectiveness.summary.evidence_complete_rate}%`}

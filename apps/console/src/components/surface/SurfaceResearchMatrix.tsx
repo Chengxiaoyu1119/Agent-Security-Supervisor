@@ -91,8 +91,8 @@ export function SurfaceResearchMatrix({
                 </Typography.Paragraph>
 
                 <div className="zh-surface-matrix-strip">
-                  <Row gutter={16}>
-                    <Col span={8}>
+                  <Row gutter={[12, 12]}>
+                    <Col xs={24}>
                       <Typography.Text type="secondary" className="zh-surface-matrix-label">
                         <GitMerge size={12} className="zh-surface-matrix-label-icon" />
                         入口
@@ -110,7 +110,7 @@ export function SurfaceResearchMatrix({
                         ))}
                       </Space>
                     </Col>
-                    <Col span={8}>
+                    <Col xs={24}>
                       <Typography.Text type="secondary" className="zh-surface-matrix-label">
                         <Database size={12} className="zh-surface-matrix-label-icon" />
                         资产
@@ -128,7 +128,7 @@ export function SurfaceResearchMatrix({
                         ))}
                       </Space>
                     </Col>
-                    <Col span={8}>
+                    <Col xs={24}>
                       <Typography.Text type="secondary" className="zh-surface-matrix-label">
                         <ShieldAlert size={12} className="zh-surface-matrix-label-icon" />
                         监督

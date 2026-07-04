@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { ApiError, fetchOverview, fetchReport, setAuthTokenProvider } from './api';
+import { ApiError, fetchOverview, fetchReport, setAuthTokenProvider, writeOpenClawPluginValidation } from './api';
 import type { Overview, ReportData } from './types';
 
 afterEach(() => {
@@ -115,5 +115,25 @@ describe('api client', () => {
         body: 'forbidden'
       });
     }
+  });
+
+  it('requests OpenClaw runtime validation when writing plugin validation evidence', async () => {
+    const validation = {
+      validation: {
+        overall_status: 'runtime-validated'
+      }
+    };
+    const fetchMock = vi.fn<typeof fetch>().mockResolvedValue({
+      ok: true,
+      json: async () => validation
+    } as Response);
+
+    vi.stubGlobal('fetch', fetchMock);
+
+    await expect(writeOpenClawPluginValidation()).resolves.toEqual(validation);
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/integrations/openclaw/plugin_package/validation/write?inspect_runtime=true',
+      expect.objectContaining({ method: 'POST' })
+    );
   });
 });

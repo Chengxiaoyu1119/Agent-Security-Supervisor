@@ -1,6 +1,6 @@
 import { Col, Flex, Row, Space, Switch, Typography } from 'antd';
 import type { AuthContext, MemoryGovernance, ObservabilityMetrics, PolicySettings } from '@/types';
-import { LabelTag, MetricCard, PanelCard, UiButton, UiInputNumber } from '../ui';
+import { LabelTag, MetricCard, PanelCard, UiAlert, UiButton, UiInputNumber } from '../ui';
 
 type RuntimeGovernanceTabProps = {
   authContext: AuthContext | null;
@@ -33,6 +33,9 @@ export function RuntimeGovernanceTab({
     if (!policySettings) return;
     onSettingsChange({ ...policySettings, ...patch });
   }
+  const canEditPolicy = Boolean(authContext?.permissions.can_edit_policy);
+  const canReviewApproval = Boolean(authContext?.permissions.can_review_approval);
+  const memoryIsolated = (memoryGovernance?.summary.quarantined_count ?? 0) > 0;
 
   return (
     <Space orientation="vertical" size="large" className="zh-tab-stack">
@@ -48,6 +51,46 @@ export function RuntimeGovernanceTab({
             刷新治理状态
           </UiButton>
         </Flex>
+        <Row gutter={[16, 16]} className="zh-settings-status-grid">
+          <Col xs={24} sm={12} lg={6}>
+            <div className="zh-settings-status-card">
+              <Typography.Text type="secondary" className="zh-meta-block">
+                策略编辑
+              </Typography.Text>
+              <LabelTag variant="filled" color={canEditPolicy ? 'success' : 'warning'}>
+                {canEditPolicy ? '允许修改' : '只读'}
+              </LabelTag>
+            </div>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <div className="zh-settings-status-card">
+              <Typography.Text type="secondary" className="zh-meta-block">
+                人工复核
+              </Typography.Text>
+              <LabelTag variant="filled" color={canReviewApproval ? 'success' : 'warning'}>
+                {canReviewApproval ? '可处理' : '不可处理'}
+              </LabelTag>
+            </div>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <div className="zh-settings-status-card">
+              <Typography.Text type="secondary" className="zh-meta-block">
+                待复核队列
+              </Typography.Text>
+              <Typography.Text strong>{metrics?.summary.pending_review_count ?? 0} 条</Typography.Text>
+            </div>
+          </Col>
+          <Col xs={24} sm={12} lg={6}>
+            <div className="zh-settings-status-card">
+              <Typography.Text type="secondary" className="zh-meta-block">
+                记忆隔离
+              </Typography.Text>
+              <LabelTag variant="filled" color={memoryIsolated ? 'warning' : 'success'}>
+                {memoryIsolated ? '存在隔离项' : '无隔离项'}
+              </LabelTag>
+            </div>
+          </Col>
+        </Row>
       </PanelCard>
 
       <Row gutter={[16, 16]}>
@@ -63,6 +106,9 @@ export function RuntimeGovernanceTab({
       </Row>
 
       <PanelCard title="策略阈值" type="inner">
+        <Typography.Paragraph type="secondary">
+          阈值会影响监督器对工具调用的处置：达到询问阈值进入人工复核，达到拒绝阈值直接阻断或隔离。
+        </Typography.Paragraph>
         <Row gutter={[16, 16]}>
           <Col xs={24} sm={12} lg={6}>
             <Typography.Text type="secondary" className="zh-meta-block">
@@ -154,37 +200,45 @@ export function RuntimeGovernanceTab({
           </Space>
           <UiButton onClick={() => void onRollbackMemory()}>回滚最新非种子记忆</UiButton>
         </Flex>
-        <Space orientation="vertical" className="zh-full-width" size="middle">
-          {(memoryGovernance?.items ?? []).slice(0, 8).map((item) => (
-            <PanelCard key={item.id} size="small" bodyPadding={12}>
-              <Flex justify="space-between" align="flex-start" wrap="wrap" gap={12}>
-                <Space orientation="vertical" size={4} className="zh-settings-memory-copy">
-                  <Space wrap>
-                    <Typography.Text strong>{item.id}</Typography.Text>
-                    <LabelTag variant="filled" color={item.status === 'active' ? 'success' : 'warning'}>
-                      {item.status}
-                    </LabelTag>
-                    <LabelTag variant="filled" color="blue">
-                      可信度 {item.trust_score}
-                    </LabelTag>
+        {(memoryGovernance?.items ?? []).length ? (
+          <Space orientation="vertical" className="zh-full-width" size="middle">
+            {(memoryGovernance?.items ?? []).slice(0, 8).map((item) => (
+              <PanelCard key={item.id} size="small" bodyPadding={12}>
+                <Flex justify="space-between" align="flex-start" wrap="wrap" gap={12}>
+                  <Space orientation="vertical" size={4} className="zh-settings-memory-copy">
+                    <Space wrap>
+                      <Typography.Text strong>{item.id}</Typography.Text>
+                      <LabelTag variant="filled" color={item.status === 'active' ? 'success' : 'warning'}>
+                        {item.status}
+                      </LabelTag>
+                      <LabelTag variant="filled" color="blue">
+                        可信度 {item.trust_score}
+                      </LabelTag>
+                    </Space>
+                    <Typography.Text type="secondary">{item.content}</Typography.Text>
                   </Space>
-                  <Typography.Text type="secondary">{item.content}</Typography.Text>
-                </Space>
-                <Space wrap>
-                  <UiButton size="small" onClick={() => void onMemoryStatus(item.id, 'active')}>
-                    恢复
-                  </UiButton>
-                  <UiButton size="small" onClick={() => void onMemoryStatus(item.id, 'quarantined')}>
-                    隔离
-                  </UiButton>
-                  <UiButton size="small" danger onClick={() => void onMemoryStatus(item.id, 'removed')}>
-                    移除
-                  </UiButton>
-                </Space>
-              </Flex>
-            </PanelCard>
-          ))}
-        </Space>
+                  <Space wrap>
+                    <UiButton size="small" onClick={() => void onMemoryStatus(item.id, 'active')}>
+                      恢复
+                    </UiButton>
+                    <UiButton size="small" onClick={() => void onMemoryStatus(item.id, 'quarantined')}>
+                      隔离
+                    </UiButton>
+                    <UiButton size="small" danger onClick={() => void onMemoryStatus(item.id, 'removed')}>
+                      移除
+                    </UiButton>
+                  </Space>
+                </Flex>
+              </PanelCard>
+            ))}
+          </Space>
+        ) : (
+          <UiAlert
+            title="暂无记忆记录。运行记忆中毒或上下文隔离相关实验后，这里会出现可隔离、恢复或移除的记忆项。"
+            type="info"
+            showIcon
+          />
+        )}
       </PanelCard>
     </Space>
   );

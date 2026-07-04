@@ -63,40 +63,63 @@ export function SupervisorDebugTab({
         <Typography.Paragraph type="secondary">
           从页面直接运行最小外部 Agent，让监督器在工具执行前做允许、拒绝或询问决策，并生成可提交的证据文件。
         </Typography.Paragraph>
+        <Space className="zh-settings-action-row" wrap>
+          <LabelTag variant="filled" className="zh-settings-code-tag">
+            POST /api/integrations/openclaw/minimal_agent_demo
+          </LabelTag>
+          <UiButton href="/api/integrations/openclaw/bundle" target="_blank">
+            查看接入包
+          </UiButton>
+          <UiButton href="/api/integrations/openclaw/adapter.py" target="_blank">
+            查看适配器代码
+          </UiButton>
+        </Space>
 
         {externalAgentDemo ? (
           <>
-            <Row gutter={16} className="zh-settings-row-mb-16">
-              <Col span={4}>
+            <Row gutter={[16, 16]} className="zh-settings-row-mb-16">
+              <Col xs={12} sm={8} md={4}>
                 <Metric label="任务总数" value={`${externalAgentDemo.summary.task_count}`} />
               </Col>
-              <Col span={4}>
+              <Col xs={12} sm={8} md={4}>
                 <Metric label="被控制" value={`${externalAgentDemo.summary.controlled_count}`} tone="green" />
               </Col>
-              <Col span={4}>
+              <Col xs={12} sm={8} md={4}>
                 <Metric label="真实执行" value={`${externalAgentDemo.summary.executed_count}`} />
               </Col>
-              <Col span={4}>
+              <Col xs={12} sm={8} md={4}>
                 <Metric label="控制率" value={`${externalAgentDemo.summary.control_rate}%`} tone="amber" />
               </Col>
-              <Col span={4}>
+              <Col xs={12} sm={8} md={4}>
                 <Metric label="审计 hash" value={`${externalAgentDemo.summary.audit_hash_count}`} />
               </Col>
             </Row>
             <Space orientation="vertical" className="zh-settings-stack zh-settings-stack--mb-24">
-              <Typography.Text code>{externalAgentDemo.markdown_path}</Typography.Text>
-              <Typography.Text code>{externalAgentDemo.json_path}</Typography.Text>
+              <Space wrap>
+                <LabelTag variant="filled" color="success">
+                  证据已写入本地
+                </LabelTag>
+                <Typography.Text type="secondary" className="zh-settings-meta-sm">
+                  页面展示的任务结果来自后端真实调度，不是前端静态回放。
+                </Typography.Text>
+              </Space>
+              <Typography.Text code className="zh-settings-code-wrap">
+                {externalAgentDemo.markdown_path}
+              </Typography.Text>
+              <Typography.Text code className="zh-settings-code-wrap">
+                {externalAgentDemo.json_path}
+              </Typography.Text>
             </Space>
             <div className="zh-column-stack">
               {externalAgentDemo.records.map((record, index) => (
                 <div key={index} className="zh-settings-record">
-                  <Row className="zh-settings-row-full" align="top" gutter={16}>
-                    <Col span={2}>
+                  <Row className="zh-settings-row-full" align="top" gutter={[16, 16]}>
+                    <Col xs={4} md={2}>
                       <Typography.Text strong className="zh-settings-record-index">
                         {String(index + 1).padStart(2, '0')}
                       </Typography.Text>
                     </Col>
-                    <Col span={10}>
+                    <Col xs={20} md={10}>
                       <Typography.Text strong className="zh-settings-record-title">
                         {record.title}
                       </Typography.Text>
@@ -107,7 +130,7 @@ export function SupervisorDebugTab({
                         {record.tool} {JSON.stringify(record.arguments)}
                       </Typography.Text>
                     </Col>
-                    <Col span={12} className="zh-settings-align-right">
+                    <Col xs={24} md={12} className="zh-settings-align-right zh-settings-align-right-responsive">
                       <Space orientation="vertical" align="end" size={4}>
                         <DecisionPill decision={record.decision} />
                         <LabelTag variant="filled" color={record.executed ? 'success' : 'default'}>

@@ -23,6 +23,7 @@ export function DashboardCompetitionGuide({
   completeSurfaceCount: number;
   onOpenPage: (page: PageKey) => void;
 }) {
+  const guardedControlRate = overview.summary.guarded_control_rate ?? overview.summary.block_rate;
   const items: CompetitionGuideItem[] = [
     {
       title: '攻击研究',
@@ -51,7 +52,7 @@ export function DashboardCompetitionGuide({
     {
       title: '验收交付',
       desc: '汇总风险分析、阻断率、误报率、OpenClaw 接入、模型代理和答辩证据包。',
-      metric: `${overview.summary.block_rate}% 防护控制率`,
+      metric: `${guardedControlRate}% 有防护运行控制率`,
       icon: <FileWarning size={18} />,
       action: '打开报告',
       page: 'report'

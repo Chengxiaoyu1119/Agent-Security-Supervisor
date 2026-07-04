@@ -70,7 +70,7 @@ export default function App() {
     loadAlerts,
     activeScenario
   } = appData;
-  const { handleRun, handleBatchCompare, handleAttackChain } = useAppActions({
+  const { handleRun, handleRunScenario, handleBatchCompare, handleAttackChain } = useAppActions({
     page,
     setPage,
     scenarios,
@@ -147,8 +147,20 @@ export default function App() {
         <ScenarioLibrary
           scenarios={scenarios}
           selected={selectedScenario}
+          recentRuns={overview.recent_runs}
+          running={running}
           onSelect={setSelectedScenario}
-          onOpenLab={() => setPage('lab')}
+          onOpenLab={(id) => {
+            setSelectedScenario(id);
+            setPage('lab');
+          }}
+          onRunScenario={(id) => {
+            void handleRunScenario(id, false);
+          }}
+          onCompareScenario={(id) => {
+            void handleRunScenario(id, true);
+          }}
+          onOpenAudit={() => setPage('audit')}
         />
       )}
       {page === 'lab' && activeScenario && (
@@ -211,10 +223,13 @@ export default function App() {
       {page === 'report' && (
         <ReportPanel
           report={report}
+          onRefreshReport={loadReport}
+          onRefreshRuntime={refresh}
           onOpenScenario={(id) => {
             setSelectedScenario(id);
             setPage('lab');
           }}
+          onOpenPage={setPage}
         />
       )}
       {page === 'settings' && <SettingsPanel overview={overview} refresh={refresh} />}

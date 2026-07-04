@@ -1,6 +1,12 @@
-import { Descriptions, Space, Typography } from 'antd';
+import { Space, Typography } from 'antd';
 import type { Scenario } from '@/types';
 import { PanelCard } from '../ui';
+
+const SAMPLE_ITEMS = [
+  { key: 'adversarial_prompt', label: '模型对抗样本' },
+  { key: 'jailbreak_case', label: '越狱测试用例' },
+  { key: 'defense', label: '防御策略' }
+] as const;
 
 export function ScenarioSamplePanel({ scenario }: { scenario: Scenario }) {
   return (
@@ -15,11 +21,16 @@ export function ScenarioSamplePanel({ scenario }: { scenario: Scenario }) {
       }
       variant="borderless"
     >
-      <Descriptions column={1} layout="vertical" size="small" bordered>
-        <Descriptions.Item label="模型对抗样本">{scenario.adversarial_prompt}</Descriptions.Item>
-        <Descriptions.Item label="越狱测试用例">{scenario.jailbreak_case}</Descriptions.Item>
-        <Descriptions.Item label="防御策略">{scenario.defense}</Descriptions.Item>
-      </Descriptions>
+      <div className="zh-scenario-sample-list">
+        {SAMPLE_ITEMS.map((item) => (
+          <div key={item.key} className="zh-scenario-sample-item">
+            <Typography.Text type="secondary" className="zh-text-meta">
+              {item.label}
+            </Typography.Text>
+            <Typography.Text>{scenario[item.key]}</Typography.Text>
+          </div>
+        ))}
+      </div>
     </PanelCard>
   );
 }

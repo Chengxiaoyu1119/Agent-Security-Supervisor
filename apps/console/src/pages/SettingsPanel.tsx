@@ -19,12 +19,13 @@ export function SettingsPanel({ overview, refresh }: { overview: Overview; refre
     <div className="zh-page-stack">
       <Typography.Title level={2}>模型与系统设置</Typography.Title>
       <UiTabs
+        className="zh-settings-tabs"
         defaultActiveKey="1"
         size="large"
         items={[
           {
             key: '1',
-            label: '🤖 基础配置与成果对齐',
+            label: '基础配置与成果对齐',
             children: (
               <SettingsBasicsTab
                 overview={overview}
@@ -37,7 +38,7 @@ export function SettingsPanel({ overview, refresh }: { overview: Overview; refre
           },
           {
             key: '2',
-            label: '🎯 运行体检与赛前核验',
+            label: '运行体检与赛前核验',
             children: (
               <DemoReadinessTab
                 overview={overview}
@@ -54,7 +55,7 @@ export function SettingsPanel({ overview, refresh }: { overview: Overview; refre
           },
           {
             key: '3',
-            label: '🔗 外部接入与开放集成',
+            label: '外部接入与开放集成',
             children: (
               <ExternalIntegrationTab
                 integrationBundle={state.integrationBundle}
@@ -70,7 +71,7 @@ export function SettingsPanel({ overview, refresh }: { overview: Overview; refre
           },
           {
             key: '4',
-            label: '🧭 运行治理中心',
+            label: '运行治理中心',
             children: (
               <RuntimeGovernanceTab
                 authContext={governance.authContext}
@@ -89,7 +90,7 @@ export function SettingsPanel({ overview, refresh }: { overview: Overview; refre
           },
           {
             key: '5',
-            label: '🛠️ 测试与手工调试',
+            label: '测试与手工调试',
             children: (
               <SupervisorDebugTab
                 externalAgentDemo={state.externalAgentDemo}

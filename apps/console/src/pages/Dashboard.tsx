@@ -68,7 +68,7 @@ export function Dashboard({
     [activeSurfaceId, overview.scenarios]
   );
   const totalSamples = overview.attack_surfaces.reduce((sum, surface) => sum + surface.samples, 0);
-  const totalScripts = overview.attack_surfaces.reduce((sum, surface) => sum + surface.scripts, 0);
+  const totalScripts = overview.summary.scenario_count;
   const highRiskSurfaceCount = overview.attack_surfaces.filter((surface) =>
     ['critical', 'high'].includes(surface.risk)
   ).length;

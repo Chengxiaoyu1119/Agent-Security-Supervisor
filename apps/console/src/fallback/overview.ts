@@ -192,6 +192,9 @@ export const fallbackOverview: Overview = {
     scenario_count: fallbackScenarios.length,
     recent_run_count: 0,
     block_rate: 0,
+    guarded_run_count: 0,
+    guarded_controlled_count: 0,
+    guarded_control_rate: 0,
     attack_success_rate: 0,
     avg_latency_ms: 0
   }

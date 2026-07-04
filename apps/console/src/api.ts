@@ -36,6 +36,7 @@ import { ApiError, request } from './app/apiRequest';
 export { ApiError, setAuthTokenProvider, subscribeRuntimeEvents } from './app/apiRequest';
 export * from './app/attackLabApi';
 export * from './app/governanceApi';
+export * from './app/reportEvaluationApi';
 export type { ApiErrorCode, RequestOptions } from './app/apiRequest';
 
 function shouldUseFallback(error: unknown) {
@@ -236,10 +237,13 @@ export async function writeOpenClawPluginPackage(): Promise<OpenClawPluginPackag
 }
 
 export async function writeOpenClawPluginValidation(): Promise<OpenClawPluginValidationWriteResult> {
-  return request<OpenClawPluginValidationWriteResult>('/api/integrations/openclaw/plugin_package/validation/write', {
-    method: 'POST',
-    body: JSON.stringify({})
-  });
+  return request<OpenClawPluginValidationWriteResult>(
+    '/api/integrations/openclaw/plugin_package/validation/write?inspect_runtime=true',
+    {
+      method: 'POST',
+      body: JSON.stringify({})
+    }
+  );
 }
 
 export async function fetchCompetitionReadiness(): Promise<CompetitionReadiness> {

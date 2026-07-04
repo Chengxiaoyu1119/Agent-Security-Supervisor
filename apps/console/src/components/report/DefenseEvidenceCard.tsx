@@ -41,8 +41,8 @@ export function DefenseEvidenceCard({ item, onOpenScenario }: DefenseEvidenceCar
           </Space>
         </Col>
         <Col xs={24} md={16}>
-          <Row gutter={16}>
-            <Col span={11}>
+          <Row gutter={[16, 16]} align="middle">
+            <Col xs={24} lg={11}>
               <EvidenceRunCell
                 title="无防护复现"
                 state={item.attack_reproduced_without_guard ? '攻击暴露' : '未复现'}
@@ -55,12 +55,12 @@ export function DefenseEvidenceCard({ item, onOpenScenario }: DefenseEvidenceCar
                 hashValid={item.unguarded_hash_status?.valid}
               />
             </Col>
-            <Col span={2} className="zh-defense-evidence-arrow-col">
+            <Col xs={24} lg={2} className="zh-defense-evidence-arrow-col">
               <Typography.Text type="secondary" className="zh-defense-evidence-arrow">
                 →
               </Typography.Text>
             </Col>
-            <Col span={11}>
+            <Col xs={24} lg={11}>
               <EvidenceRunCell
                 title="有防护验证"
                 state={item.defense_effective_with_guard ? '风险已控制' : '仍需补强'}
@@ -77,8 +77,8 @@ export function DefenseEvidenceCard({ item, onOpenScenario }: DefenseEvidenceCar
         </Col>
       </Row>
       <div className="zh-defense-evidence-summary">
-        <Row gutter={16}>
-          <Col span={6}>
+        <Row gutter={[16, 16]}>
+          <Col xs={12} md={6}>
             <Typography.Text type="secondary" className="zh-meta-block">
               预期策略
             </Typography.Text>
@@ -86,7 +86,7 @@ export function DefenseEvidenceCard({ item, onOpenScenario }: DefenseEvidenceCar
               {item.expected_decisions.map((decision) => decision.policy_id).join(' / ') || '未记录'}
             </Typography.Text>
           </Col>
-          <Col span={6}>
+          <Col xs={12} md={6}>
             <Typography.Text type="secondary" className="zh-meta-block">
               实际策略
             </Typography.Text>
@@ -94,7 +94,7 @@ export function DefenseEvidenceCard({ item, onOpenScenario }: DefenseEvidenceCar
               {item.observed_decisions.map((decision) => decision.policy_id ?? '未记录').join(' / ') || '未记录'}
             </Typography.Text>
           </Col>
-          <Col span={6}>
+          <Col xs={12} md={6}>
             <Typography.Text type="secondary" className="zh-meta-block">
               匹配
             </Typography.Text>
@@ -103,7 +103,7 @@ export function DefenseEvidenceCard({ item, onOpenScenario }: DefenseEvidenceCar
               text={item.expected_decision_match ? '一致' : '待复核'}
             />
           </Col>
-          <Col span={6}>
+          <Col xs={12} md={6}>
             <Typography.Text type="secondary" className="zh-meta-block">
               证据
             </Typography.Text>

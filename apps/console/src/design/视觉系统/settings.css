@@ -4,6 +4,10 @@
   font-size: 12px;
 }
 
+.zh-settings-tabs .ant-tabs-nav {
+  margin-bottom: 16px;
+}
+
 .zh-settings-field-title {
   display: block;
   margin-bottom: 8px;
@@ -130,6 +134,16 @@
   text-align: right;
 }
 
+@media (max-width: 768px) {
+  .zh-settings-align-right-responsive {
+    text-align: left;
+  }
+
+  .zh-settings-align-right-responsive .ant-space {
+    align-items: flex-start !important;
+  }
+}
+
 .zh-settings-evaluation-head {
   display: flex;
   justify-content: space-between;
@@ -191,6 +205,14 @@
 .zh-settings-readiness-score {
   margin: 0;
   color: var(--ant-color-primary);
+}
+
+.zh-settings-readiness-counts {
+  width: 100%;
+}
+
+.zh-settings-readiness-counts > .ant-space-item {
+  min-width: 58px;
 }
 
 .zh-settings-check-card--pass {
@@ -259,6 +281,62 @@
   margin: 0;
 }
 
+.zh-settings-status-grid {
+  margin-bottom: 16px;
+}
+
+.zh-settings-status-card,
+.zh-settings-profile-status {
+  min-height: 76px;
+  padding: 14px 16px;
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: 8px;
+  background: var(--ant-color-fill-quaternary);
+}
+
+.zh-settings-status-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 6px;
+}
+
+.zh-settings-profile-status {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.zh-settings-profile-status .zh-label-tag {
+  flex-shrink: 0;
+}
+
+.zh-settings-action-row {
+  width: 100%;
+  margin-bottom: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--ant-color-border-secondary);
+}
+
+.zh-settings-filter-row {
+  width: min(100%, 680px);
+}
+
+.zh-settings-filter-row .ant-select {
+  flex: 1 1 auto;
+}
+
+.zh-settings-debug-column {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+}
+
+.zh-settings-debug-column .zh-settings-editor {
+  min-height: 240px;
+}
+
 .zh-settings-model-toolbar {
   display: flex;
   align-items: center;
@@ -274,6 +352,29 @@
   min-height: 246px;
 }
 
+.zh-settings-provider-card > .ant-card-body {
+  display: flex;
+  min-height: 136px;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.zh-settings-provider-endpoint {
+  display: block;
+  width: 100%;
+  margin: 4px 0 12px;
+  color: var(--ant-color-text-secondary);
+  font-size: 12px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  background: transparent !important;
+}
+
+.zh-settings-provider-card .zh-label-tag {
+  margin-top: auto;
+}
+
 .zh-settings-model-field {
   display: flex;
   flex-direction: column;
@@ -286,8 +387,65 @@
 }
 
 @media (max-width: 768px) {
+  .zh-settings-tabs .ant-tabs-nav-wrap {
+    overflow: visible;
+  }
+
+  .zh-settings-tabs .ant-tabs-nav-list {
+    width: 100%;
+    min-width: 0;
+    flex-wrap: wrap;
+    row-gap: 4px;
+    transform: none !important;
+  }
+
+  .zh-settings-tabs .ant-tabs-tab {
+    margin: 0 20px 0 0 !important;
+    padding: 8px 0;
+  }
+
+  .zh-settings-tabs .ant-tabs-tab-btn {
+    line-height: 1.4;
+  }
+
+  .zh-settings-tabs .ant-tabs-nav-operations {
+    display: none !important;
+  }
+
+  .zh-tab-stack .ant-card-head-wrapper {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .zh-tab-stack .ant-card-head-title {
+    white-space: normal;
+  }
+
+  .zh-tab-stack .ant-card-extra {
+    width: 100%;
+    margin-inline-start: 0;
+  }
+
+  .zh-tab-stack .ant-card-extra .ant-space {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .zh-tab-stack .ant-card-extra .ant-btn {
+    max-width: 100%;
+  }
+
   .zh-settings-model-toolbar {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .zh-settings-profile-status {
+    min-height: auto;
+  }
+
+  .zh-settings-filter-row {
+    width: 100%;
   }
 }

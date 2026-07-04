@@ -15,7 +15,11 @@ import {
   UiInput,
   UiInputNumber
 } from '../ui';
+import { DualModelFixedChain } from './DualModelFixedChain';
 import { DualModelRoundsPanel } from './DualModelRoundsPanel';
+import { dualModelFlowSteps } from './labRuntimeFlowPresets';
+import { LabRuntimeFlow } from './LabRuntimeFlow';
+import { ResultRunButton, RunResultEmptyState } from './RunResultActions';
 
 type DualModelJailbreakLabProps = {
   refresh?: () => Promise<unknown>;
@@ -87,27 +91,8 @@ export function DualModelJailbreakLab({ refresh }: DualModelJailbreakLabProps) {
             className="zh-full-height zh-dual-model-config-card"
           >
             <Space orientation="vertical" size={16} className="zh-full-width">
-              <UiAlert
-                type="info"
-                showIcon
-                message="页面不再手动选择模型。后端固定使用项目已接入的大模型：副模型优先智谱，主模型优先 DeepSeek；真实接口不可用时才启用本地安全评测模型兜底。"
-              />
-              <Row gutter={[12, 12]} className="zh-dual-model-fixed-chain">
-                <Col xs={24} sm={12}>
-                  <div className="zh-dual-model-fixed-node">
-                    <Typography.Text type="secondary">副模型</Typography.Text>
-                    <Typography.Title level={5}>智谱优先</Typography.Title>
-                    <Typography.Text type="secondary">负责生成/优化对抗评测输入</Typography.Text>
-                  </div>
-                </Col>
-                <Col xs={24} sm={12}>
-                  <div className="zh-dual-model-fixed-node">
-                    <Typography.Text type="secondary">主模型</Typography.Text>
-                    <Typography.Title level={5}>DeepSeek 优先</Typography.Title>
-                    <Typography.Text type="secondary">负责响应副模型生成的评测输入</Typography.Text>
-                  </div>
-                </Col>
-              </Row>
+              <DualModelFixedChain />
+              <LabRuntimeFlow compact steps={dualModelFlowSteps} />
               <div className="zh-attack-lab__field">
                 <Typography.Text strong>副模型角色</Typography.Text>
                 <UiInput.TextArea
@@ -153,6 +138,15 @@ export function DualModelJailbreakLab({ refresh }: DualModelJailbreakLabProps) {
             title="双模型链路结果"
             subtitle={result ? result.summary.decision_change : '等待运行'}
             className="zh-full-height"
+            extra={
+              <ResultRunButton
+                hasResult={Boolean(result)}
+                idleLabel="运行对测"
+                rerunLabel="重新对测"
+                loading={running}
+                onClick={runLab}
+              />
+            }
           >
             {result ? (
               <Space orientation="vertical" size={16} className="zh-full-width">
@@ -283,11 +277,14 @@ export function DualModelJailbreakLab({ refresh }: DualModelJailbreakLabProps) {
                 <DualModelRoundsPanel rounds={result.rounds ?? []} />
               </Space>
             ) : (
-              <div className="zh-attack-lab__empty">
-                <Typography.Text type="secondary">
-                  运行后会显示副模型优化提示词、主模型输出和监督器判定。
-                </Typography.Text>
-              </div>
+              <RunResultEmptyState
+                icon={<Bot size={28} />}
+                title="等待双模型对测"
+                description="会让副模型优化提示词，再调用主模型响应，并把输出送入监督器和过滤器生成审计证据。"
+                actionLabel="运行多轮双模型对测"
+                loading={running}
+                onAction={runLab}
+              />
             )}
           </PanelCard>
         </Col>

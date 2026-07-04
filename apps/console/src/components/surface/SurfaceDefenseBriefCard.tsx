@@ -68,15 +68,15 @@ export function SurfaceDefenseBriefCard({
       </div>
 
       <Row gutter={[16, 16]} className="zh-surface-brief__stats">
-        <Col span={6}>
+        <Col xs={12} sm={6}>
           <Typography.Text type="secondary" className="zh-meta-block">
-            脚本
+            可运行
           </Typography.Text>
           <Typography.Text strong>{displayValue(summary?.scenario_count ?? scenarios.length)}</Typography.Text>
         </Col>
-        <Col span={6}>
+        <Col xs={12} sm={6}>
           <Typography.Text type="secondary" className="zh-meta-block">
-            样本/脚本
+            样本/条目
           </Typography.Text>
           <Typography.Text strong>
             {displayValue(
@@ -84,13 +84,13 @@ export function SurfaceDefenseBriefCard({
             )}
           </Typography.Text>
         </Col>
-        <Col span={6}>
+        <Col xs={12} sm={6}>
           <Typography.Text type="secondary" className="zh-meta-block">
             控制率
           </Typography.Text>
           <Typography.Text strong>{displayValue(`${summary?.control_rate ?? 0}%`)}</Typography.Text>
         </Col>
-        <Col span={6}>
+        <Col xs={12} sm={6}>
           <Typography.Text type="secondary" className="zh-meta-block">
             缺口
           </Typography.Text>
@@ -98,8 +98,8 @@ export function SurfaceDefenseBriefCard({
         </Col>
       </Row>
 
-      <Row gutter={24}>
-        <Col span={8}>
+      <Row gutter={[24, 24]}>
+        <Col xs={24} lg={8}>
           <Typography.Text strong className="zh-surface-section-title">
             攻击链路
           </Typography.Text>
@@ -120,7 +120,7 @@ export function SurfaceDefenseBriefCard({
           </Space>
         </Col>
 
-        <Col span={8}>
+        <Col xs={24} lg={8}>
           <Typography.Text strong className="zh-surface-section-title">
             监督命中
           </Typography.Text>
@@ -162,7 +162,7 @@ export function SurfaceDefenseBriefCard({
           </Space>
         </Col>
 
-        <Col span={8}>
+        <Col xs={24} lg={8}>
           <Typography.Text strong className="zh-surface-section-title">
             验收闭环{' '}
             <Typography.Text type="secondary">

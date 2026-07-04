@@ -16,6 +16,11 @@ export function CompetitionReadinessPanel({
   checkingReadiness,
   handleRunReadiness
 }: CompetitionReadinessPanelProps) {
+  const warningActions =
+    competitionReadiness?.next_actions.filter((item) =>
+      competitionReadiness.checks.some((check) => check.id === item.id && check.status === 'warning')
+    ) ?? [];
+
   return (
     <PanelCard
       title="赛前一键体检"
@@ -34,6 +39,17 @@ export function CompetitionReadinessPanel({
       <Typography.Paragraph type="secondary">
         自动检查攻击面、误报、连续流程、OpenClaw 插件和报告证据，直接给出复现就绪状态与 P0 补证项。
       </Typography.Paragraph>
+      <Space className="zh-settings-action-row" wrap>
+        <UiButton href="/api/readiness" target="_blank">
+          查看体检 JSON
+        </UiButton>
+        <UiButton href="/api/readiness.md" target="_blank">
+          查看体检 Markdown
+        </UiButton>
+        <LabelTag variant="filled" className="zh-settings-code-tag">
+          POST /api/readiness/write
+        </LabelTag>
+      </Space>
       {competitionReadiness ? (
         <>
           <Row gutter={[16, 16]} className="zh-settings-readiness-summary">
@@ -52,12 +68,24 @@ export function CompetitionReadinessPanel({
               <Typography.Text strong>{competitionReadiness.verdict}</Typography.Text>
             </Col>
             <Col xs={24} md={12}>
-              <Space size="large" wrap>
+              <Space size="large" wrap className="zh-settings-readiness-counts">
+                <div>
+                  <Typography.Text type="secondary" className="zh-meta-block">
+                    总项
+                  </Typography.Text>
+                  <Typography.Text strong>{competitionReadiness.summary.check_count}</Typography.Text>
+                </div>
                 <div>
                   <Typography.Text type="secondary" className="zh-meta-block">
                     通过
                   </Typography.Text>
                   <Typography.Text strong>{competitionReadiness.summary.passed_count}</Typography.Text>
+                </div>
+                <div>
+                  <Typography.Text type="secondary" className="zh-meta-block">
+                    需补强
+                  </Typography.Text>
+                  <Typography.Text strong>{competitionReadiness.summary.warning_count}</Typography.Text>
                 </div>
                 <div>
                   <Typography.Text type="secondary" className="zh-meta-block">
@@ -75,9 +103,9 @@ export function CompetitionReadinessPanel({
                 <PanelCard
                   size="small"
                   className={
-                    check.status === 'pass'
+                    check.status === 'passed'
                       ? 'zh-settings-check-card--pass'
-                      : check.status === 'block'
+                      : check.status === 'blocked'
                         ? 'zh-settings-check-card--block'
                         : 'zh-settings-check-card--warning'
                   }
@@ -88,7 +116,7 @@ export function CompetitionReadinessPanel({
                     </Typography.Text>
                     <LabelTag
                       variant="filled"
-                      color={check.status === 'pass' ? 'success' : check.status === 'block' ? 'error' : 'warning'}
+                      color={check.status === 'passed' ? 'success' : check.status === 'blocked' ? 'error' : 'warning'}
                     >
                       {check.status_label}
                     </LabelTag>
@@ -125,6 +153,27 @@ export function CompetitionReadinessPanel({
             />
           )}
 
+          {competitionReadiness.blockers.length === 0 && warningActions.length > 0 && (
+            <UiAlert
+              title="还有需补强项"
+              type="warning"
+              showIcon
+              className="zh-settings-blocker-alert"
+              description={
+                <div className="zh-column-stack">
+                  {warningActions.map((item) => (
+                    <div key={item.id} className="zh-settings-blocker-item">
+                      <Typography.Text strong>
+                        {item.severity}: {item.title}
+                      </Typography.Text>
+                      <div className="zh-settings-blocker-action">{item.action}</div>
+                    </div>
+                  ))}
+                </div>
+              }
+            />
+          )}
+
           <Space orientation="vertical" className="zh-settings-command-list">
             {competitionReadiness.acceptance_commands.map((command) => (
               <LabelTag variant="filled" key={command} className="zh-settings-code-tag">
@@ -132,14 +181,24 @@ export function CompetitionReadinessPanel({
               </LabelTag>
             ))}
             {competitionReadinessOutput && (
-              <Typography.Text code className="zh-settings-code-wrap">
-                {competitionReadinessOutput.markdown_path}
-              </Typography.Text>
+              <Space wrap>
+                <UiButton size="small" href="/api/readiness.md" target="_blank">
+                  打开报告
+                </UiButton>
+                <Typography.Text code className="zh-settings-code-wrap">
+                  {competitionReadinessOutput.markdown_path}
+                </Typography.Text>
+              </Space>
             )}
             {competitionReadinessOutput && (
-              <Typography.Text code className="zh-settings-code-wrap">
-                {competitionReadinessOutput.json_path}
-              </Typography.Text>
+              <Space wrap>
+                <UiButton size="small" href="/api/readiness" target="_blank">
+                  打开 JSON
+                </UiButton>
+                <Typography.Text code className="zh-settings-code-wrap">
+                  {competitionReadinessOutput.json_path}
+                </Typography.Text>
+              </Space>
             )}
           </Space>
         </>

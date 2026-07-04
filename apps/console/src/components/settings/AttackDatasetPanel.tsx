@@ -61,14 +61,18 @@ export function AttackDatasetPanel({ overview, attackDataset }: AttackDatasetPan
         <Typography.Text strong className="zh-settings-field-title">
           按攻击面筛选
         </Typography.Text>
-        <Space.Compact block>
+        <Typography.Text type="secondary" className="zh-meta-block zh-mb-8">
+          这里读取后端生成的数据集接口，筛选后可直接打开对应攻击面的样本、越狱用例和工具调用复现入口。
+        </Typography.Text>
+        <Space.Compact block className="zh-settings-filter-row">
           <UiSelect
             value={selectedSurfaceId}
             onChange={setSelectedSurfaceId}
             options={surfaceOptions}
             className="zh-settings-dataset-surface-select"
+            disabled={surfaceOptions.length === 0}
           />
-          <UiButton href={exportUrl} target="_blank">
+          <UiButton href={exportUrl} target="_blank" disabled={surfaceOptions.length === 0}>
             打开筛选数据
           </UiButton>
         </Space.Compact>

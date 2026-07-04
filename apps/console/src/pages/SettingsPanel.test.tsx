@@ -81,10 +81,10 @@ describe('SettingsPanel', () => {
 
     expect(await screen.findByText('模型与系统设置')).toBeInTheDocument();
     expect(screen.getByText('本地安全评测模型')).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: '🤖 基础配置与成果对齐' })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: '🎯 运行体检与赛前核验' })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: '🔗 外部接入与开放集成' })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: '🧭 运行治理中心' })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: '🛠️ 测试与手工调试' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: '基础配置与成果对齐' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: '运行体检与赛前核验' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: '外部接入与开放集成' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: '运行治理中心' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: '测试与手工调试' })).toBeInTheDocument();
   });
 });
