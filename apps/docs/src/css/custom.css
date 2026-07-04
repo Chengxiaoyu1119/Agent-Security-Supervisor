@@ -63,6 +63,17 @@
   border-radius: 6px;
 }
 
+.theme-code-block button.clean-btn,
+.theme-code-block [class*='copyButton'] {
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+.theme-code-block button.clean-btn:hover,
+.theme-code-block [class*='copyButton']:hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+}
+
 .theme-doc-sidebar-container {
   border-right: 1px solid var(--ifm-toc-border-color);
 }
