@@ -1,17 +1,21 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import {
   ArrowRight,
-  Blocks,
-  FileText,
-  GitBranch,
+  CheckCircle2,
   Github,
-  LockKeyhole,
+  Moon,
   Play,
   ShieldCheck,
-  TerminalSquare,
-  Zap
+  Sun,
 } from 'lucide-react';
-import { metrics, productRows, scenarios, surfaces, workflow, type Scenario, type Surface } from './content';
+
+type ThemeMode = 'light' | 'dark';
+
+type CardItem = {
+  title: string;
+  body: string;
+  meta?: string;
+};
 
 const consoleUrl =
   import.meta.env.VITE_AGENT_SUPERVISOR_CONSOLE_URL ??
@@ -23,276 +27,229 @@ const docsUrl =
 
 const repoUrl = 'https://github.com/Chengxiaoyu1119/agent-security-supervisor';
 
-const riskLabels = {
-  critical: '严重',
-  high: '高危',
-  medium: '中危'
-} as const;
+const gateCards: CardItem[] = [
+  { title: '请求来源', body: '外部任务、邮件、文档、API 调用先进入统一入口。', meta: '上下文标记' },
+  { title: '风险判定', body: '来源、工具、参数和策略命中合成一次执行前判断。', meta: '策略命中 3 项' },
+  { title: '执行动作', body: '阻断、复核、隔离或放行都会形成审计记录。', meta: '动作可回放' }
+];
 
-const pageSections = [
-  { id: 'top', label: '首页' },
-  { id: 'supervision', label: '监督链路' },
-  { id: 'surfaces', label: '风险覆盖' },
-  { id: 'product', label: '产品界面' },
-  { id: 'start', label: '开始使用' }
-] as const;
+const evidenceCards: CardItem[] = [
+  { title: '参数快照', body: '记录工具名、调用参数、目标路径和调用来源。', meta: 'arg_12c8' },
+  { title: '策略命中', body: '把来源隔离、敏感路径和批量外发规则串起来。', meta: 'policy trace' },
+  { title: '复核结论', body: '输出阻断原因、复核建议和可交付证据链。', meta: 'review ready' }
+];
 
-type PageSectionId = (typeof pageSections)[number]['id'];
+const surfaceCards: CardItem[] = [
+  { title: '提示注入', body: '识别不可信文本试图覆盖系统规则的行为。', meta: '3 脚本' },
+  { title: '工具劫持', body: '拦截危险工具参数、路径越界和伪造返回。', meta: '4 脚本' },
+  { title: '数据泄露', body: '检测批量读取、外发目标和敏感资源访问。', meta: '18 样本' },
+  { title: '记忆中毒', body: '复核长期记忆写入，避免后续任务被污染。', meta: '2 脚本' }
+];
+
+const storyCards: CardItem[] = [
+  { title: '事件进入', body: '把工具名、参数、上下文来源统一成标准事件。', meta: '01' },
+  { title: '策略融合', body: '策略命中、异常评分和敏感资源共同参与判断。', meta: '02' },
+  { title: '证据输出', body: '生成参数快照、动作结论和复核链路。', meta: '03' }
+];
+
+const productCards: CardItem[] = [
+  { title: '标准事件入口', body: '控制台接收工具名、参数和上下文来源。', meta: 'event' },
+  { title: '策略前置闸门', body: '执行前完成评分、阻断、询问或隔离。', meta: 'policy' },
+  { title: '审计报告输出', body: '生成复核链路和接入验收材料。', meta: 'report' }
+];
 
 export function App() {
-  const [scenario, setScenario] = useState<Scenario>(scenarios[0]);
-  const [surface, setSurface] = useState<Surface>(surfaces[0]);
-  const [step, setStep] = useState(2);
-  const [running, setRunning] = useState(false);
-  const [activeSection, setActiveSection] = useState<PageSectionId>(pageSections[0].id);
-
-  const activeStep = workflow[step];
-
-  const runDemo = () => {
-    setRunning(true);
-    window.setTimeout(() => setRunning(false), 620);
-  };
+  const [theme, setTheme] = useState<ThemeMode>('light');
+  const [storyIndex, setStoryIndex] = useState(0);
 
   useEffect(() => {
+    const stored = window.localStorage.getItem('agent-supervisor-theme') as ThemeMode | null;
+    const preferred: ThemeMode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    setTheme(stored === 'light' || stored === 'dark' ? stored : preferred);
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    window.localStorage.setItem('agent-supervisor-theme', theme);
+  }, [theme]);
+
+  useEffect(() => {
+    const sections = Array.from(document.querySelectorAll<HTMLElement>('[data-scroll-fx]'));
     const observer = new IntersectionObserver(
       (entries) => {
-        const isAtPageEnd =
-          window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 8;
-
-        if (isAtPageEnd) {
-          setActiveSection('start');
-          return;
-        }
-
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-
-        if (visible?.target.id) {
-          setActiveSection(visible.target.id as PageSectionId);
-        }
+        entries.forEach((entry) => {
+          entry.target.classList.toggle('is-inview', entry.isIntersecting);
+        });
       },
-      {
-        rootMargin: '-18% 0px -24% 0px',
-        threshold: [0.08, 0.24, 0.5]
-      }
+      { rootMargin: '-18% 0px -18% 0px', threshold: 0.18 }
     );
 
-    pageSections.forEach(({ id }) => {
-      const section = document.getElementById(id);
-      if (section) observer.observe(section);
-    });
+    sections.forEach((section) => observer.observe(section));
 
-    const handlePageEnd = () => {
-      if (window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 8) {
-        setActiveSection('start');
-      }
+    return () => observer.disconnect();
+  }, []);
+
+  useEffect(() => {
+    let frame = 0;
+
+    const updateHeroMotion = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => {
+        const scrollY = window.scrollY;
+        const progress = Math.min(1, scrollY / Math.max(1, window.innerHeight * 0.92));
+        const root = document.documentElement;
+
+        root.style.setProperty('--hero-y', `${progress * -26}px`);
+        root.style.setProperty('--hero-scale', `${1 - progress * 0.035}`);
+        root.style.setProperty('--hero-opacity', `${1 - progress * 0.18}`);
+        root.style.setProperty('--bg-shift', `${scrollY * -0.035}px`);
+      });
     };
 
-    window.addEventListener('scroll', handlePageEnd, { passive: true });
+    updateHeroMotion();
+    window.addEventListener('scroll', updateHeroMotion, { passive: true });
+    window.addEventListener('resize', updateHeroMotion);
 
     return () => {
-      observer.disconnect();
-      window.removeEventListener('scroll', handlePageEnd);
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', updateHeroMotion);
+      window.removeEventListener('resize', updateHeroMotion);
     };
   }, []);
 
-  const navigateToSection = (id: string) => {
-    setActiveSection(id as PageSectionId);
-    const section = document.getElementById(id);
+  useEffect(() => {
+    const updateStory = () => {
+      const section = document.querySelector<HTMLElement>('[data-story-scroll]');
+      if (!section) return;
 
-    if (!section) return;
+      const rect = section.getBoundingClientRect();
+      const progress = Math.min(1, Math.max(0, -rect.top / Math.max(1, rect.height - window.innerHeight)));
+      setStoryIndex(Math.min(storyCards.length - 1, Math.floor(progress * storyCards.length)));
+    };
 
-    const sectionTop = section.getBoundingClientRect().top + window.scrollY;
-    const centeredTop = sectionTop + (section.offsetHeight - window.innerHeight) / 2;
+    updateStory();
+    window.addEventListener('scroll', updateStory, { passive: true });
+    window.addEventListener('resize', updateStory);
 
-    window.history.replaceState(null, '', `#${id}`);
-    window.scrollTo({
-      top: Math.max(0, centeredTop),
-      behavior: 'smooth'
-    });
-  };
+    return () => {
+      window.removeEventListener('scroll', updateStory);
+      window.removeEventListener('resize', updateStory);
+    };
+  }, []);
+
+  const toggleTheme = () => setTheme((current) => (current === 'dark' ? 'light' : 'dark'));
 
   return (
     <div className="site-shell">
-      <Header />
-      <SectionNavigator
-        activeSection={activeSection}
-        onNavigate={navigateToSection}
-      />
+      <Header theme={theme} onToggleTheme={toggleTheme} />
+      <FoliaBackground />
 
       <main>
-        <section className="hero section-frame" id="top">
-          <div className="hero__grid">
-            <div className="hero__copy">
-              <h1>每次工具调用，先过安全闸门。</h1>
-              <p className="hero__lead">
-                智安哨把工具名、参数、上下文来源、策略命中和审计证据串成一条可回放链路，
-                在文件、邮件、接口、代码执行和外部智能体接入前完成拦截、询问或复核。
-              </p>
-
-              <p className="hero__proof">覆盖 7 类攻击面、22 个攻击脚本和 13 条监督策略。</p>
-              <div className="hero__sequence" aria-label="监督链路">
-                <span>工具请求</span>
-                <span>风险判定</span>
-                <span>执行动作</span>
-                <span>审计留痕</span>
-              </div>
+        <section className="landing-section hero-section" id="top" data-scroll-fx>
+          <div className="hero-center">
+            <p className="hero-kicker">LLM Agent Attack Lab</p>
+            <h1>智安哨</h1>
+            <p className="hero-subtitle">
+              把智能体每一次工具调用变成可审计、可阻断、可回放的安全链路。
+            </p>
+            <div className="hero-actions">
+              <a className="site-button site-button--primary" href={consoleUrl}>
+                <Play size={18} />
+                进入控制台
+              </a>
+              <a className="site-button site-button--soft" href={docsUrl}>
+                查看文档
+              </a>
+              <a className="site-button site-button--link" href={repoUrl} target="_blank" rel="noreferrer">
+                GitHub 仓库
+              </a>
             </div>
           </div>
         </section>
 
-        <section className="section-frame supervision-section" id="supervision">
-          <SectionHeading
-            title="一次调用，一条完整监督链路。"
-            body="点击步骤查看监督过程，再选择事件运行判定。流程和结果放在同一个工作区，不再拆成两个重复区块。"
-          />
+        <FeatureSection
+          eyebrow="调用前置闸门"
+          title={
+            <>
+              工具执行前，
+              <br />
+              先过安全闸门。
+            </>
+          }
+          body="外部 Agent、邮件、文件、API 和代码执行请求进入真实工具前，先由智安哨统一整理上下文、识别来源、计算风险并输出动作。"
+          visual={<ReferenceCardStack cards={gateCards} tone="gate" />}
+        />
 
-          <div className="supervision-layout">
-            <div className="workflow-rail" role="tablist" aria-label="监督流程">
-              {workflow.map((item, index) => (
-                <button
-                  type="button"
-                  key={item.title}
-                  className={step === index ? 'is-active' : ''}
-                  onClick={() => setStep(index)}
-                  aria-selected={step === index}
-                >
-                  <span>{String(index + 1).padStart(2, '0')}</span>
-                  <strong>{item.title}</strong>
-                </button>
-              ))}
-            </div>
+        <FeatureSection
+          eyebrow="审计链路"
+          title={
+            <>
+              判定不是黑盒，
+              <br />
+              每一步都能回放。
+            </>
+          }
+          body="策略命中、异常评分、参数快照和最终动作会串成一条证据链，演示、验收、复盘时不用再从日志里拼答案。"
+          visual={<ReferenceCardStack cards={evidenceCards} tone="evidence" />}
+          reverse
+        />
 
-            <div className="supervision-stage">
-              <article className="workflow-detail">
-                <h3>{activeStep.title}</h3>
-                <p>{activeStep.body}</p>
-                <div className="workflow-signal" aria-hidden="true">
-                  <span style={{ width: `${42 + step * 10}%` }} />
-                </div>
-              </article>
+        <FeatureSection
+          eyebrow="攻防覆盖"
+          title={
+            <>
+              攻击脚本、
+              <br />
+              样本和策略放在一起。
+            </>
+          }
+          body="提示注入、工具调用劫持、数据泄露、记忆中毒等攻击面都能和脚本、样本、策略一一对应，适合做红队实验和防护验收。"
+          visual={<ReferenceCardStack cards={surfaceCards} tone="surface" />}
+        />
 
-              <div className="scenario-switcher" role="tablist" aria-label="选择监督事件">
-                {scenarios.map((item) => (
-                  <button
-                    type="button"
-                    key={item.id}
-                    className={scenario.id === item.id ? 'is-active' : ''}
-                    onClick={() => setScenario(item)}
-                    aria-selected={scenario.id === item.id}
-                  >
-                    <span>{item.action}</span>
-                    <strong>{item.label}</strong>
-                  </button>
+        <section className="landing-section sticky-story" data-story-scroll data-story-index={storyIndex}>
+          <div className="story-pin">
+            <div className="story-copy">
+              <p>{storyCards[storyIndex].title}</p>
+              <h2>滚动时，监督链路逐步展开。</h2>
+              <p>{storyCards[storyIndex].body}</p>
+              <div className="story-dots" aria-hidden="true">
+                {storyCards.map((item, index) => (
+                  <span key={item.title} className={index === storyIndex ? 'active' : ''} />
                 ))}
               </div>
-
-              <article className={`decision-lab tone-${scenario.tone} ${running ? 'is-running' : ''}`}>
-                <div className="decision-lab__score">
-                  <span>风险分</span>
-                  <strong>{scenario.score}</strong>
-                  <i style={{ width: `${scenario.score}%` }} />
-                </div>
-                <div className="decision-lab__content">
-                  <h3>{running ? '监督器分析中' : scenario.decision}</h3>
-                  <p>{running ? '正在融合策略命中、上下文边界和工具敏感度。' : scenario.reason}</p>
-                  <small>{running ? '策略命中 · 异常评分 · 审计留痕' : scenario.evidence}</small>
-                </div>
-                <button type="button" className="button button--primary" onClick={runDemo} disabled={running}>
-                  <Play size={17} />
-                  {running ? '运行中' : '运行监督'}
-                </button>
-              </article>
             </div>
+            <ReferenceCardStack cards={storyCards} activeIndex={storyIndex} tone="story" />
           </div>
         </section>
 
-        <section className="section-frame surface-section" id="surfaces">
-          <SectionHeading
-            title="重点风险、脚本和证据集中查看。"
-            body="选择攻击面即可查看风险等级、样本证据和对应策略。"
-          />
+        <FeatureSection
+          eyebrow="产品工作台"
+          title={
+            <>
+              从官网理解，
+              <br />
+              到控制台执行。
+            </>
+          }
+          body="官网负责讲清楚判断逻辑；控制台负责跑攻击脚本、看实时事件、调策略和导出报告。"
+          visual={<ReferenceCardStack cards={productCards} tone="product" />}
+          reverse
+        />
 
-          <div className="metric-strip" aria-label="核心覆盖数据">
-            {metrics.map((item) => (
-              <div className="metric-strip__item" key={item.label}>
-                <strong>{item.value}</strong>
-                <span>{item.label}</span>
-                <small>{item.note}</small>
-              </div>
-            ))}
-          </div>
-
-          <div className="surface-lab">
-            <div className="surface-list">
-              {surfaces.map((item) => (
-                <button
-                  type="button"
-                  key={item.name}
-                  className={surface.name === item.name ? 'is-active' : ''}
-                  onClick={() => setSurface(item)}
-                >
-                  <strong>{item.name}</strong>
-                  <span className={`risk risk--${item.level}`}>{riskLabels[item.level]}</span>
-                </button>
-              ))}
+        <section className="landing-section final-section" data-scroll-fx>
+          <div className="final-copy">
+            <p>Ready for Lab</p>
+            <h2>开始运行一次真实的工具调用监督实验。</h2>
+            <div className="hero-actions">
+              <a className="site-button site-button--primary" href={consoleUrl}>
+                进入控制台
+                <ArrowRight size={18} />
+              </a>
+              <a className="site-button site-button--soft" href={docsUrl}>
+                打开接入文档
+              </a>
             </div>
-
-            <article className="surface-detail">
-              <div className="surface-detail__head">
-                <span className={`risk risk--${surface.level}`}>{riskLabels[surface.level]}</span>
-                <h3>{surface.name}</h3>
-              </div>
-              <p>{surface.focus}</p>
-              <div className="surface-stats">
-                <span>
-                  <strong>{surface.scripts}</strong>
-                  攻击脚本
-                </span>
-                <span>
-                  <strong>{surface.samples}</strong>
-                  样本证据
-                </span>
-              </div>
-              <div className="policy-line">
-                <ShieldCheck size={18} />
-                <span>{surface.policy}</span>
-              </div>
-            </article>
-          </div>
-        </section>
-
-        <section className="section-frame product-section" id="product">
-          <SectionHeading
-            title="事件、来源、风险和动作一眼可见。"
-            body="控制台保留真正需要扫描的信息，并提供标准事件入口、策略闸门和审计输出。"
-          />
-          <ProductPreview />
-          <div className="integration-flow">
-            <FlowItem icon={<TerminalSquare size={21} />} title="标准事件入口" body="接收工具名、参数、上下文来源和任务目标。" />
-            <FlowItem icon={<LockKeyhole size={21} />} title="策略前置闸门" body="在真实工具执行前完成评分、拒绝、询问或隔离。" />
-            <FlowItem icon={<FileText size={21} />} title="审计报告输出" body="生成参数快照、复核链路和接入验收材料。" />
-          </div>
-        </section>
-
-        <section className="final-cta" id="start">
-          <div>
-            <h2>进入控制台，运行攻击脚本和监督策略。</h2>
-            <p>官网负责说明重点，完整操作、接口和证据都在控制台与文档中。</p>
-          </div>
-          <div className="final-cta__actions">
-            <a className="button button--ghost" href={repoUrl} target="_blank" rel="noreferrer">
-              <Github size={18} />
-              查看仓库
-            </a>
-            <a className="button button--ghost" href={docsUrl}>
-              查看文档
-            </a>
-            <a className="button button--primary" href={consoleUrl}>
-              进入控制台
-              <ArrowRight size={18} />
-            </a>
           </div>
         </section>
       </main>
@@ -300,161 +257,128 @@ export function App() {
   );
 }
 
-function Header() {
+function Header({
+  theme,
+  onToggleTheme
+}: {
+  theme: ThemeMode;
+  onToggleTheme: () => void;
+}) {
   return (
     <header className="site-header">
       <a className="brand" href="#top" aria-label="智安哨官网首页">
         <img src="/favicon.svg" alt="" />
-        <strong>智安哨</strong>
+        <span>智安哨</span>
       </a>
 
-      <div className="header-actions">
-        <a className="button button--small button--primary" href={consoleUrl}>
-          进入控制台
+      <div className="header-tools">
+        <button
+          className="theme-toggle"
+          type="button"
+          role="switch"
+          aria-label="切换深浅色模式"
+          aria-checked={theme === 'dark'}
+          onClick={onToggleTheme}
+        >
+          <span className="theme-toggle__track" aria-hidden="true">
+            <span className="theme-toggle__thumb">
+              <Sun className="theme-toggle__icon theme-toggle__icon--sun" size={12} />
+              <Moon className="theme-toggle__icon theme-toggle__icon--moon" size={12} />
+            </span>
+          </span>
+        </button>
+        <span className="header-tools__divider" aria-hidden="true" />
+        <a className="header-icon-link" href={repoUrl} target="_blank" rel="noreferrer" aria-label="打开 GitHub 仓库">
+          <Github size={20} />
+        </a>
+        <a className="header-action" href={consoleUrl}>
+          控制台
         </a>
       </div>
     </header>
   );
 }
 
-function SectionNavigator({
-  activeSection,
-  onNavigate
+function FoliaBackground() {
+  return (
+    <div className="folia-background" aria-hidden="true">
+      <div className="bg-word bg-word-a">工具调用要留痕</div>
+      <div className="bg-word bg-word-b">风险先判定</div>
+      <div className="bg-word bg-word-c">证据会发光</div>
+      <span className="geo geo-circle" />
+      <span className="geo geo-square" />
+      <span className="geo geo-triangle" />
+      <span className="geo geo-dots" />
+      <span className="geo geo-ring" />
+      <span className="star star-a" />
+      <span className="star star-b" />
+      <span className="star star-c" />
+    </div>
+  );
+}
+
+function FeatureSection({
+  eyebrow,
+  title,
+  body,
+  visual,
+  reverse = false
 }: {
-  activeSection: string;
-  onNavigate: (id: string) => void;
+  eyebrow: string;
+  title: ReactNode;
+  body: string;
+  visual: ReactNode;
+  reverse?: boolean;
+}) {
+  const id =
+    eyebrow === '调用前置闸门'
+      ? 'gate'
+      : eyebrow === '审计链路'
+        ? 'evidence'
+        : eyebrow === '攻防覆盖'
+          ? 'surface'
+          : 'console';
+
+  return (
+    <section className={`landing-section feature-section ${reverse ? 'reverse' : ''}`} id={id} data-scroll-fx>
+      <div className="feature-copy">
+        <span>{eyebrow}</span>
+        <h2>{title}</h2>
+        <p>{body}</p>
+      </div>
+      <div className="feature-visual">{visual}</div>
+    </section>
+  );
+}
+
+function ReferenceCardStack({
+  cards,
+  tone,
+  activeIndex = 0
+}: {
+  cards: CardItem[];
+  tone: string;
+  activeIndex?: number;
 }) {
   return (
-    <nav className="section-nav" aria-label="页面分区导航">
-      {pageSections.map((item) => {
-        const isActive = item.id === activeSection;
-        return (
-          <button
-            type="button"
-            key={item.id}
-            className={isActive ? 'is-active' : ''}
-            onClick={() => onNavigate(item.id)}
-            aria-current={isActive ? 'location' : undefined}
-            aria-label={`前往${item.label}`}
-          >
-            <span className="section-nav__label">{item.label}</span>
-            <span className="section-nav__dot" aria-hidden="true" />
-          </button>
-        );
-      })}
-    </nav>
-  );
-}
-
-function SectionHeading({ title, body }: { title: string; body: string }) {
-  return (
-    <div className="section-heading">
-      <h2>{title}</h2>
-      <p>{body}</p>
+    <div className={`reference-card-stack reference-card-stack--${tone}`} aria-label="信息卡片">
+      {cards.map((card, index) => (
+        <article
+          className={`reference-card reference-card-${index + 1} ${index === activeIndex ? 'active' : ''}`}
+          key={card.title}
+        >
+          <small>{card.meta}</small>
+          <strong>{card.title}</strong>
+          <p>{card.body}</p>
+          {index === activeIndex ? (
+            <span>
+              <CheckCircle2 size={15} />
+              当前重点
+            </span>
+          ) : null}
+        </article>
+      ))}
+      <ShieldCheck className="reference-card-mark" size={38} aria-hidden="true" />
     </div>
-  );
-}
-
-function ProductPreview() {
-  const productTabs = [
-    {
-      id: 'events',
-      label: '事件',
-      icon: Blocks,
-      ariaLabel: '控制台事件列表预览',
-      columns: ['事件', '来源', '风险分', '动作'],
-      rows: productRows.map((row) => ({
-        primary: row.event,
-        source: row.source,
-        score: String(row.score),
-        action: row.action
-      }))
-    },
-    {
-      id: 'policies',
-      label: '策略',
-      icon: GitBranch,
-      ariaLabel: '控制台策略命中预览',
-      columns: ['策略', '作用范围', '命中', '结果'],
-      rows: [
-        { primary: '来源隔离', source: '不可信文档', score: '3 项', action: '已命中' },
-        { primary: '工具前置闸门', source: '文件 / 接口', score: '2 项', action: '拦截' },
-        { primary: '异常分融合', source: '行为上下文', score: '88', action: '复核' },
-        { primary: '审计指纹', source: '参数快照', score: '已生成', action: '留痕' }
-      ]
-    },
-    {
-      id: 'actions',
-      label: '动作',
-      icon: Zap,
-      ariaLabel: '控制台执行动作预览',
-      columns: ['动作', '触发条件', '处置', '状态'],
-      rows: [
-        { primary: '拒绝执行', source: '高危工具调用', score: '阻断', action: '已完成' },
-        { primary: '人工复核', source: '批量外发', score: '排队', action: '待确认' },
-        { primary: '隔离上下文', source: '记忆写入', score: '隔离', action: '已处理' },
-        { primary: '允许执行', source: '可信资料', score: '放行', action: '低风险' }
-      ]
-    }
-  ] as const;
-  const [activeTabId, setActiveTabId] = useState<(typeof productTabs)[number]['id']>('events');
-  const activeTab = productTabs.find((tab) => tab.id === activeTabId) ?? productTabs[0];
-
-  return (
-    <div className="product-preview">
-      <div className="product-preview__rail" role="tablist" aria-label="控制台预览切换">
-        {productTabs.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = tab.id === activeTab.id;
-
-          return (
-            <button
-              type="button"
-              key={tab.id}
-              className={isActive ? 'is-active' : ''}
-              role="tab"
-              aria-selected={isActive}
-              aria-controls="product-preview-panel"
-              onClick={() => setActiveTabId(tab.id)}
-            >
-              <Icon size={17} />
-              {tab.label}
-            </button>
-          );
-        })}
-      </div>
-      <div
-        className="event-table"
-        role="table"
-        id="product-preview-panel"
-        aria-label={activeTab.ariaLabel}
-      >
-        <div className="event-table__head" role="row">
-          {activeTab.columns.map((column) => (
-            <span key={column}>{column}</span>
-          ))}
-        </div>
-        {activeTab.rows.map((row) => (
-          <div className="event-table__row" role="row" key={`${activeTab.id}-${row.primary}-${row.action}`}>
-            <strong>{row.primary}</strong>
-            <span>{row.source}</span>
-            <span>{row.score}</span>
-            <em>{row.action}</em>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function FlowItem({ icon, title, body }: { icon: ReactNode; title: string; body: string }) {
-  return (
-    <article>
-      <h3>
-        {icon}
-        <span>{title}</span>
-      </h3>
-      <p>{body}</p>
-    </article>
   );
 }
