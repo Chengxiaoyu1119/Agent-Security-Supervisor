@@ -1,0 +1,119 @@
+﻿/* 官网设计 Token：颜色、主题、动画节奏统一从这里维护，页面样式只消费变量。 */
+:root {
+  color-scheme: light;
+  --page-bg: #f7fbff;
+  --page-ink: #081427;
+  --page-soft: rgba(8, 20, 39, 0.64);
+  --page-muted: rgba(8, 20, 39, 0.46);
+  --page-line: rgba(37, 99, 235, 0.12);
+  --glass: rgba(255, 255, 255, 0.68);
+  --glass-strong: rgba(255, 255, 255, 0.86);
+  --accent-blue: #2563eb;
+  --accent-sky: #61a5ff;
+  --accent-cyan: #04a8c7;
+  --nav-height: 72px;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  background: var(--page-bg);
+  color: var(--page-ink);
+  font-family:
+    'HarmonyOS Sans SC', 'MiSans', 'Alibaba PuHuiTi 3.0', 'PingFang SC', 'Microsoft YaHei UI', 'Microsoft YaHei',
+    'Noto Sans CJK SC', 'Source Han Sans SC', system-ui, sans-serif;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --page-bg: #050914;
+  --page-ink: #f6f9ff;
+  --page-soft: rgba(232, 241, 255, 0.68);
+  --page-muted: rgba(232, 241, 255, 0.48);
+  --page-line: rgba(143, 220, 255, 0.16);
+  --glass: rgba(13, 25, 48, 0.62);
+  --glass-strong: rgba(20, 38, 70, 0.78);
+  --accent-blue: #7db8ff;
+  --accent-sky: #a8d6ff;
+  --accent-cyan: #8fdcff;
+}
+
+:root {
+  --www-color-001: rgba(37, 99, 235, 0.12);
+  --www-color-002: rgba(4, 168, 199, 0.1);
+  --www-color-003: #fbfdff;
+  --www-color-004: #f6faff;
+  --www-color-005: #edf5ff;
+  --www-color-006: rgba(125, 184, 255, 0.14);
+  --www-color-007: rgba(143, 220, 255, 0.1);
+  --www-color-011: rgba(37, 99, 235, 0.045);
+  --www-color-012: rgba(37, 99, 235, 0.035);
+  --www-color-014: rgba(143, 220, 255, 0.045);
+  --www-color-015: rgba(143, 220, 255, 0.034);
+  --www-color-016: rgba(37, 99, 235, 0.32);
+  --www-color-017: rgba(37, 99, 235, 0.2);
+  --www-color-018: rgba(8, 20, 39, 0.12);
+  --www-color-019: rgba(230, 240, 255, 0.16);
+  --www-color-020: rgba(8, 20, 39, 0.16);
+  --www-color-021: rgba(255, 255, 255, 0.62);
+  --www-color-022: rgba(37, 99, 235, 0.08);
+  --www-color-025: rgba(8, 20, 39, 0.15);
+  --www-color-028: rgba(143, 220, 255, 0.24);
+  --www-color-029: rgba(255, 255, 255, 0.07);
+  --www-color-030: rgba(8, 20, 39, 0.18);
+  --www-color-031: rgba(8, 20, 39, 0.2);
+  --www-color-033: rgba(255, 255, 255, 0.72);
+  --www-color-034: rgba(37, 99, 235, 0.1);
+  --www-color-035: rgba(37, 99, 235, 0.06);
+  --www-color-037: rgba(124, 183, 255, 0.12);
+  --www-color-038: rgba(255, 255, 255, 0.08);
+  --www-color-039: rgba(143, 220, 255, 0.12);
+  --www-color-040: rgba(37, 99, 235, 0.055);
+  --www-color-041: rgba(124, 183, 255, 0.075);
+  --www-color-042: rgba(37, 99, 235, 0.36);
+  --www-color-043: rgba(143, 220, 255, 0.14);
+  --www-color-044: rgba(143, 220, 255, 0.08);
+  --www-color-045: rgba(143, 220, 255, 0.2);
+  --www-color-046: rgba(143, 220, 255, 0.42);
+  --www-color-048: rgba(175, 207, 255, 0.95);
+  --www-color-049: rgba(175, 207, 255, 0.88);
+  --www-color-050: rgba(175, 207, 255, 0.78);
+  --www-color-051: rgba(175, 207, 255, 0.68);
+  --www-color-052: rgba(37, 99, 235, 0.18);
+  --www-color-053: rgba(255, 255, 255, 0.22);
+  --www-color-054: rgba(37, 99, 235, 0.11);
+  --www-color-055: rgba(255, 255, 255, 0.92);
+  --www-color-056: rgba(245, 250, 255, 0.7);
+  --www-color-057: rgba(8, 20, 39, 0.1);
+  --www-color-058: rgba(255, 255, 255, 0.68);
+  --www-color-059: rgba(37, 99, 235, 0.62);
+  --www-color-060: rgba(8, 20, 39, 0.6);
+  --www-color-062: rgba(236, 246, 255, 0.94);
+  --www-color-063: rgba(255, 255, 255, 0.74);
+  --www-color-064: rgba(8, 20, 39, 0.13);
+  --www-color-065: rgba(12, 24, 46, 0.3);
+  --www-color-066: rgba(143, 220, 255, 0.11);
+  --www-color-067: rgba(20, 39, 72, 0.78);
+  --www-color-068: rgba(8, 16, 32, 0.58);
+  --www-color-069: rgba(230, 240, 255, 0.66);
+  --www-color-070: rgba(0, 0, 0, 0.3);
+  --www-color-071: rgba(0, 0, 0, 0.34);
+  --www-color-072: rgba(230, 240, 255, 0.58);
+  --www-color-074: rgba(230, 240, 255, 0.18);
+  --www-color-075: rgba(34, 52, 86, 0.98);
+  --www-color-076: rgba(34, 52, 86, 0.9);
+  --www-color-077: rgba(34, 52, 86, 0.82);
+  --www-color-078: rgba(34, 52, 86, 0.72);
+  --www-color-079: rgba(124, 183, 255, 0.2);
+  --www-color-080: rgba(175, 207, 255, 0.82);
+  --www-color-black: #000;
+  --www-color-brand-blue: #2563eb;
+  --www-color-brand-cyan-dark: #8fdcff;
+  --www-color-dark-mid: #08111f;
+  --www-color-dark-on-light: #07101f;
+  --www-color-dark-start: #070a15;
+  --www-color-ink-dark: #f5f8ff;
+  --www-color-ink-light: #081427;
+  --www-color-page-dark: #050914;
+  --www-color-primary-hover: #1c2a42;
+  --www-color-subtle-slate: #536174;
+  --www-color-track-blue: #d8ecff;
+  --www-color-white: #fff;
+}
+

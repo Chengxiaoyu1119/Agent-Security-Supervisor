@@ -10,7 +10,9 @@
     "dev": "node ../../scripts/start-www-dev.mjs",
     "dev:raw": "vite --host 127.0.0.1 --port 4321 --strictPort",
     "build": "tsc --noEmit && vite build",
-    "preview": "vite preview --host 127.0.0.1 --port 4321 --strictPort"
+    "preview": "vite preview --host 127.0.0.1 --port 4321 --strictPort",
+    "ui:audit": "node ../../scripts/www-governance-check.mjs",
+    "verify": "npm run ui:audit && npm run build"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

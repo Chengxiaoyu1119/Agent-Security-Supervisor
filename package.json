@@ -39,6 +39,7 @@
     "audit:raw:www": "npm audit --prefix apps/www --audit-level=low --registry=https://registry.npmjs.org",
     "audit:raw:docs": "npm audit --prefix apps/docs --audit-level=low --registry=https://registry.npmjs.org",
     "self:review": "node scripts/project-self-review.mjs --output apps/api/sandbox/reports",
-    "verify": "npm run console:lint:strict && npm run ui:audit && npm run console:test && npm run api:lint && npm run api:typecheck && npm run api:check && npm run api:test && npm run build"
+    "verify": "npm run console:lint:strict && npm run ui:audit && npm run www:ui:audit && npm run console:test && npm run api:lint && npm run api:typecheck && npm run api:check && npm run api:test && npm run build",
+    "www:ui:audit": "npm --prefix apps/www run ui:audit"
   }
 }
