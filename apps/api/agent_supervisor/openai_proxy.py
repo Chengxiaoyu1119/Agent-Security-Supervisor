@@ -6,8 +6,8 @@ import time
 from typing import Any, Iterable
 from uuid import uuid4
 
+from .adapters.models.model_adapter import filter_model_output, generate_optimizer_prompt, generate_redteam_model_response
 from .events import evaluate_agent_event
-from .model_adapter import filter_model_output, generate_optimizer_prompt, generate_redteam_model_response
 
 CONTROL_DECISIONS = {"拒绝", "询问", "隔离"}
 DEFAULT_BLOCK_TERMS = "拒绝,不能,抱歉,绕过,忽略,系统提示词,token,secret,flag"

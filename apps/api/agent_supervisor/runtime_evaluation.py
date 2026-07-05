@@ -7,10 +7,10 @@ from statistics import median
 from time import perf_counter
 from typing import Any
 
+from .adapters.models.model_adapter import filter_model_output, generate_model_tool_plan
 from .benign import get_benign_cases
 from .data import get_scenarios
 from .events import evaluate_agent_event
-from .model_adapter import filter_model_output, generate_model_tool_plan
 from .paths import SANDBOX_REPORTS_DIR
 
 DEFAULT_ATTACK_IDS = ["TOOL-HIJACK-001", "PROMPT-INJECT-001", "DATA-LEAK-001"]

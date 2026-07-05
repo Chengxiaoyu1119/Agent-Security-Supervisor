@@ -23,6 +23,14 @@ from .data import get_scenarios
 from .database import init_db, latest_runs
 from .datasets import build_attack_case_dataset, build_attack_case_markdown
 from .demo_drill import build_judge_demo_drill_markdown, load_judge_demo_drill_report, run_judge_demo_drill
+from .domains.reports.readiness import build_competition_readiness, build_competition_readiness_markdown, write_competition_readiness_report
+from .domains.reports.roadmap import write_project_roadmap
+from .domains.reports.surface_pack import (
+    write_all_surface_briefing_sheets,
+    write_all_surface_evidence_packs,
+    write_surface_briefing_sheet,
+    write_surface_evidence_pack,
+)
 from .events import evaluate_agent_event
 from .evidence import (
     build_output_filter_evidence,
@@ -32,15 +40,7 @@ from .evidence import (
 )
 from .external_agent_demo import run_minimal_external_agent_demo
 from .openclaw_plugin_package import write_openclaw_plugin_package, write_openclaw_plugin_validation_report
-from .readiness import build_competition_readiness, build_competition_readiness_markdown, write_competition_readiness_report
-from .roadmap import write_project_roadmap
 from .runtime_evaluation import write_real_model_evaluation_report
-from .surface_pack import (
-    write_all_surface_briefing_sheets,
-    write_all_surface_evidence_packs,
-    write_surface_briefing_sheet,
-    write_surface_evidence_pack,
-)
 from .tools import init_sandbox
 
 

@@ -6,8 +6,8 @@ from typing import Any
 from .agents import batch_compare_scenarios
 from .assessment import build_attack_effectiveness
 from .database import latest_runs
-from .roadmap import build_project_roadmap, write_project_roadmap
-from .surface_pack import build_surface_evidence_index, write_all_surface_briefing_sheets, write_all_surface_evidence_packs
+from .domains.reports.roadmap import build_project_roadmap, write_project_roadmap
+from .domains.reports.surface_pack import build_surface_evidence_index, write_all_surface_briefing_sheets, write_all_surface_evidence_packs
 
 
 def run_gap_rerun() -> dict[str, Any]:

@@ -4,11 +4,11 @@ from datetime import datetime, timezone
 from time import perf_counter
 from uuid import uuid4
 
+from .adapters.models.model_adapter import generate_model_response
 from .data import find_scenario, get_scenarios
 from .database import write_run
 from .event_stream import publish_runtime_event
 from .integrity import attach_audit_hashes
-from .model_adapter import generate_model_response
 from .supervisor import decide
 from .tools import execute_tool
 

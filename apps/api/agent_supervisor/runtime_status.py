@@ -4,7 +4,7 @@ import os
 from datetime import datetime, timezone
 from pathlib import Path
 
-from .model_adapter import provider_status
+from .adapters.models.model_adapter import provider_status
 from .model_runtime_config import runtime_real_api_enabled
 from .paths import MEMORY_DIR, OUTBOX_DIR, SANDBOX_RUNTIME_DIR, WORKSPACE_DIR
 from .proxy_security import proxy_security_snapshot

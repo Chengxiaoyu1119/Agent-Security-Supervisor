@@ -11,34 +11,23 @@ from ..assessment import build_attack_effectiveness
 from ..auth import current_security_role, require_api_token, require_role
 from ..benign import build_benign_cases_markdown, evaluate_benign_cases, get_benign_cases
 from ..benign_workflows import build_benign_workflow_markdown, evaluate_benign_workflows, write_benign_workflow_report
-from ..briefing_export import (
+from ..calibration import build_anomaly_calibration, build_anomaly_calibration_markdown, write_anomaly_calibration_report
+from ..database import latest_runs
+from ..datasets import build_attack_case_dataset, build_attack_case_markdown
+from ..demo_drill import build_judge_demo_drill_markdown, load_judge_demo_drill_report, run_judge_demo_drill
+from ..domains.reports.briefing_export import (
     EXPORT_DIR_NAME,
     build_briefing_sheet_export_markdown,
     load_briefing_sheet_export_report,
     write_briefing_sheet_exports,
 )
-from ..calibration import build_anomaly_calibration, build_anomaly_calibration_markdown, write_anomaly_calibration_report
-from ..database import latest_runs
-from ..datasets import build_attack_case_dataset, build_attack_case_markdown
-from ..demo_drill import build_judge_demo_drill_markdown, load_judge_demo_drill_report, run_judge_demo_drill
-from ..evidence import (
-    build_output_filter_evidence,
-    build_output_filter_markdown,
-    build_surface_conclusions,
-    build_surface_conclusions_markdown,
+from ..domains.reports.readiness import (
+    build_competition_readiness,
+    build_competition_readiness_markdown,
+    write_competition_readiness_report,
 )
-from ..gap_rerun import run_gap_rerun
-from ..main_models import ApprovalDecisionRequest, RealModelEvaluationRequest
-from ..paths import SANDBOX_REPORTS_DIR
-from ..readiness import build_competition_readiness, build_competition_readiness_markdown, write_competition_readiness_report
-from ..roadmap import build_project_roadmap, build_project_roadmap_markdown, write_project_roadmap
-from ..runtime_evaluation import (
-    build_real_model_evaluation,
-    build_real_model_evaluation_markdown,
-    write_real_model_evaluation_report,
-)
-from ..services.report_service import build_report
-from ..surface_pack import (
+from ..domains.reports.roadmap import build_project_roadmap, build_project_roadmap_markdown, write_project_roadmap
+from ..domains.reports.surface_pack import (
     build_surface_briefing_sheet_html,
     build_surface_evidence_index,
     build_surface_evidence_index_markdown,
@@ -49,6 +38,21 @@ from ..surface_pack import (
     write_surface_briefing_sheet,
     write_surface_evidence_pack,
 )
+from ..evidence import (
+    build_output_filter_evidence,
+    build_output_filter_markdown,
+    build_surface_conclusions,
+    build_surface_conclusions_markdown,
+)
+from ..gap_rerun import run_gap_rerun
+from ..main_models import ApprovalDecisionRequest, RealModelEvaluationRequest
+from ..paths import SANDBOX_REPORTS_DIR
+from ..runtime_evaluation import (
+    build_real_model_evaluation,
+    build_real_model_evaluation_markdown,
+    write_real_model_evaluation_report,
+)
+from ..services.report_service import build_report
 
 router = APIRouter(dependencies=[Depends(require_api_token)])
 

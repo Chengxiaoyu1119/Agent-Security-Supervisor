@@ -2,6 +2,7 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 
+from ..adapters.models.model_adapter import provider_status
 from ..auth import current_security_role, require_api_token, require_role
 from ..data import (
     get_attack_surfaces,
@@ -15,7 +16,6 @@ from ..data import (
 from ..database import latest_audit_logs, latest_runs, list_policy_versions, runtime_metrics_snapshot
 from ..main_models import ModelRuntimeConfigUpdate, PolicySettingsUpdate, PolicyUpdate
 from ..memory_governance import memory_governance_snapshot, rollback_latest_memory, update_memory_status
-from ..model_adapter import provider_status
 from ..model_runtime_config import get_model_runtime_config, update_model_runtime_config
 from ..runtime_status import build_runtime_status
 from ..services.package_service import build_competition_package

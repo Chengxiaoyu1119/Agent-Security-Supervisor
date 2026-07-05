@@ -11,8 +11,8 @@ from copy import deepcopy
 from typing import Any
 from uuid import uuid4
 
+from .adapters.models.model_adapter import filter_model_output, generate_optimizer_prompt, generate_redteam_model_response
 from .events import evaluate_agent_event
-from .model_adapter import filter_model_output, generate_optimizer_prompt, generate_redteam_model_response
 
 CONTROL_DECISIONS = {"拒绝", "询问", "隔离"}
 MAX_TARGET_BODY_BYTES = 24_000

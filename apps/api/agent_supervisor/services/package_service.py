@@ -11,11 +11,11 @@ from ..benign_workflows import build_benign_workflow_markdown
 from ..calibration import build_anomaly_calibration_markdown
 from ..data import get_attack_surfaces, get_policies, get_scenarios
 from ..demo_drill import build_judge_demo_drill_markdown
+from ..domains.reports.readiness import build_competition_readiness_markdown
+from ..domains.reports.roadmap import build_project_roadmap_markdown
+from ..domains.reports.surface_pack import build_surface_evidence_index_markdown
 from ..evidence import build_output_filter_markdown, build_surface_conclusions_markdown
 from ..openclaw_plugin_package import build_openclaw_plugin_package_markdown, build_openclaw_plugin_validation_markdown
-from ..readiness import build_competition_readiness_markdown
-from ..roadmap import build_project_roadmap_markdown
-from ..surface_pack import build_surface_evidence_index_markdown
 from .package_content import (
     _checklist,
     _experiment_report,

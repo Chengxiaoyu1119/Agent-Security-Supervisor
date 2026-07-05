@@ -4,8 +4,8 @@ from copy import deepcopy
 from typing import Any
 from uuid import uuid4
 
+from .adapters.models.model_adapter import generate_model_tool_plan, simulate_tool_plan
 from .events import evaluate_agent_event
-from .model_adapter import generate_model_tool_plan, simulate_tool_plan
 from .target_lab import target_lab_snapshot
 from .tools import TOOL_HIJACK_PROBE_COMMAND
 
