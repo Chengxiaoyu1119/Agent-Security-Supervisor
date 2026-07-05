@@ -25,7 +25,7 @@ function metricDelta(before: TargetLabState | null, after: TargetLabState, key: 
 
 export function TargetLabDeltaPanel({ before, after }: TargetLabDeltaPanelProps) {
   return (
-    <PanelCard title="靶场状态变化" type="inner">
+    <PanelCard title="环境状态变化" type="inner">
       <Row gutter={[12, 12]}>
         {TARGET_LAB_METRICS.map((item) => {
           const delta = metricDelta(before, after, item.key);
@@ -41,7 +41,7 @@ export function TargetLabDeltaPanel({ before, after }: TargetLabDeltaPanelProps)
         })}
       </Row>
       <Typography.Text type="secondary" className="zh-attack-lab__hint">
-        括号内是本次运行相对运行前的变化，用来判断工具是否真实触碰了本地靶场资产。
+        括号内是本次运行相对运行前的变化，用来判断工具是否真实触碰了本地受控环境资产。
       </Typography.Text>
     </PanelCard>
   );

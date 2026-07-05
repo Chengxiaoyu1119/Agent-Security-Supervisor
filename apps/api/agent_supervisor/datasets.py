@@ -42,7 +42,7 @@ def build_attack_case_markdown(surface_id: str | None = None) -> str:
     lines = [
         f"# 智安哨攻击样本与脚本数据集{title_suffix}",
         "",
-        "该文件用于比赛材料中的“模型对抗样本与越狱测试用例集”和“智能体攻击脚本”。",
+        "该文件用于成果材料中的“模型对抗样本与越狱测试用例集”和“智能体攻击脚本”。",
         "",
         "## 数据集概览",
         "",
@@ -138,7 +138,7 @@ def _case_from_scenario(scenario: dict[str, Any], surface_name: dict[str, str]) 
         "detection_points": scenario.get("detection_points", []),
         "success_criteria": scenario.get("success_criteria", []),
         "defense": scenario["defense"],
-        "safety_boundary": scenario.get("safety_boundary", "仅在本地沙箱靶场复现。"),
+        "safety_boundary": scenario.get("safety_boundary", "仅在本地沙箱受控实验环境复现。"),
     }
 
 
@@ -172,7 +172,7 @@ def _adversarial_samples(scenario: dict[str, Any]) -> list[dict[str, Any]]:
             "expected_risk": scenario["expected_risk"],
             "target_tool": scenario["target"],
             "tags": scenario.get("tags", []),
-            "safety_boundary": scenario.get("safety_boundary", "仅在本地沙箱靶场复现。"),
+            "safety_boundary": scenario.get("safety_boundary", "仅在本地沙箱受控实验环境复现。"),
         }
         for index, item in enumerate(variants, start=1)
     ]
@@ -240,7 +240,7 @@ def _agent_attack_script(scenario: dict[str, Any]) -> dict[str, Any]:
         },
         "safety_controls": [
             "所有工具调用默认进入本地沙箱或只做审计判定。",
-            "邮件、文件、API、代码执行均使用本地靶场业务工具，不连接真实外部系统。",
+            "邮件、文件、API、代码执行均使用本地受控环境业务工具，不连接真实外部系统。",
             "有防护运行时会输出策略、风险分、异常分和审计 hash，便于复核。",
         ],
     }

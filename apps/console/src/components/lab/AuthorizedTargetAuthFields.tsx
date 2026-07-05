@@ -27,7 +27,7 @@ export function AuthorizedTargetAuthFields({
           value={authorizationNote}
           onChange={(event) => onAuthorizationNoteChange(event.target.value)}
           rows={2}
-          placeholder="说明该靶场属于本人、团队或比赛授权范围。"
+          placeholder="说明该受控实验环境属于本人、团队或授权范围。"
           showCount
           maxLength={1200}
         />

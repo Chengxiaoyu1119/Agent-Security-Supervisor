@@ -201,7 +201,7 @@ def build_openclaw_integration_bundle() -> dict[str, Any]:
                 "risk_hint": "可选风险提示，例如 sensitive_file、external_mail、bulk_export",
             },
             "optional_fields": ["agent_role", "context_sources", "guard_enabled", "execute_in_sandbox"],
-            "safe_default": "execute_in_sandbox 默认为 false，只做判定和审计，不替代真实比赛平台执行工具。",
+            "safe_default": "execute_in_sandbox 默认为 false，只做判定和审计，不替代真实外部系统执行工具。",
         },
         "adapter_code": build_openclaw_hook_example(),
         "openclaw_plugin_package": plugin_summary,
@@ -230,8 +230,8 @@ def build_openclaw_integration_bundle() -> dict[str, Any]:
         "safety_boundary": [
             "默认不发送真实邮件。",
             "默认不读取真实用户文件。",
-            "默认不替代真实比赛平台执行工具。",
-            "如需执行，只允许在本项目沙箱和模拟比赛工具中验证。",
+            "默认不替代真实外部系统执行工具。",
+            "如需执行，只允许在本项目沙箱和模拟业务工具中验证。",
         ],
     }
 

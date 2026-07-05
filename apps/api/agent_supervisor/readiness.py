@@ -165,7 +165,7 @@ def build_competition_readiness_markdown(data: dict[str, Any] | None = None) -> 
         f"- 结论：{data['verdict']}",
         f"- 通过/警告/阻塞：{summary['passed_count']} / {summary['warning_count']} / {summary['blocker_count']}",
         f"- 攻击面/脚本：{summary['surface_count']} / {summary['scenario_count']}",
-        f"- 正常比赛任务误报率：{summary['benign_false_positive_rate']}%",
+        f"- 正常业务任务误报率：{summary['benign_false_positive_rate']}%",
         f"- 连续流程误报率：{summary['benign_workflow_false_positive_rate']}%",
         f"- 人工复核闭环：{summary['approval_review_count']} 条复核单，待处理 {summary['pending_approval_count']}，已处理 {summary['resolved_approval_count']}",
         f"- 答辩一键演示：{summary['demo_drill_stage_count']} 步，复核 hash {summary['demo_drill_review_hash_count']} 个",

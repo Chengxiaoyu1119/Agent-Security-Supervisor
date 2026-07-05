@@ -268,7 +268,7 @@ export function SettingsBasicsTab({
         )}
       </PanelCard>
 
-      <PanelCard title="赛题成果对齐" type="inner">
+      <PanelCard title="成果能力对齐" type="inner">
         <div className="zh-column-stack">
           {competitionCapabilityRows.map((item, idx) => (
             <div key={idx} className="zh-divided-list__item">

@@ -111,7 +111,7 @@ export function ReportNormalEvaluationTab({ report, onRefreshReport }: ReportNor
       <PanelCard
         title={
           <SectionTitle
-            title="正常比赛任务误报评测"
+            title="正常业务任务误报评测"
             meta={`${report.benign_evaluation.summary.case_count} 个正常样本 / 误报 ${report.benign_evaluation.summary.false_positive_count} 个`}
           />
         }

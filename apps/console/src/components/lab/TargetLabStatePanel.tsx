@@ -12,7 +12,7 @@ export function TargetLabStatePanel({ targetLab, onReset }: TargetLabStatePanelP
     <Row gutter={[20, 20]} className="zh-attack-lab__evidence-row">
       <Col xs={24}>
         <PanelCard
-          title="靶场变化区"
+          title="环境变化区"
           subtitle={<span className="zh-lab-path-text">{targetLab ? targetLab.state_path : '尚未加载'}</span>}
         >
           <Row gutter={[12, 12]} className="zh-mb-16">
@@ -41,7 +41,7 @@ export function TargetLabStatePanel({ targetLab, onReset }: TargetLabStatePanelP
 
           {targetLab?.latest_api_call && (
             <div className="zh-attack-lab__field zh-mb-16">
-              <Typography.Text strong>最近一次靶场 API 调用</Typography.Text>
+              <Typography.Text strong>最近一次模拟 API 调用</Typography.Text>
               <EvidenceCodeBlock maxHeight="small">
                 {JSON.stringify(targetLab.latest_api_call, null, 2)}
               </EvidenceCodeBlock>
@@ -49,9 +49,9 @@ export function TargetLabStatePanel({ targetLab, onReset }: TargetLabStatePanelP
           )}
 
           <div className="zh-lab-state-actions">
-            <UiButton onClick={onReset}>重置本地靶场</UiButton>
+            <UiButton onClick={onReset}>重置本地受控环境</UiButton>
             <Typography.Text type="secondary" className="zh-lab-state-actions__note">
-              所有变化只写入本地沙箱文件，不访问真实比赛平台，也不会发送真实邮件。
+              所有变化只写入本地沙箱文件，不访问真实外部系统，也不会发送真实邮件。
             </Typography.Text>
           </div>
         </PanelCard>

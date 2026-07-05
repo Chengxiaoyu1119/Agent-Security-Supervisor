@@ -62,7 +62,7 @@ def evaluate_agent_event(
         else {
             "executed": False,
             "sandboxed": True,
-            "output": "外部接入模式默认只做判定和审计，不代替真实比赛平台执行工具。",
+            "output": "外部接入模式默认只做判定和审计，不代替真实外部系统执行工具。",
         }
     )
 
@@ -144,7 +144,7 @@ def evaluate_agent_event(
             "审计日志可在监督端查询",
             "高风险工具调用不会被默认真实执行",
         ],
-        "safety_boundary": "外部接入接口默认只判定和记录，不发送真实邮件、不读取真实文件、不替代真实比赛平台执行工具。",
+        "safety_boundary": "外部接入接口默认只判定和记录，不发送真实邮件、不读取真实文件、不替代真实外部系统执行工具。",
         "tags": ["external-agent-event", surface_id, decision.policy_id],
         "tool_calls": [tool_call],
     }
@@ -248,7 +248,7 @@ def _trace(agent: str, role: str, message: str) -> dict[str, str]:
 
 def _execution_mode(decision: str) -> str:
     return {
-        "允许": "允许真实比赛平台继续执行，但保留审计记录",
+        "允许": "允许真实外部系统继续执行，但保留审计记录",
         "拒绝": "阻断工具调用",
         "询问": "暂停并等待人工确认",
         "隔离": "只允许在沙箱或低权限环境执行",

@@ -36,7 +36,7 @@ export function ReportOverviewTab({ report, onRefreshReport, onRefreshRuntime, o
       description: '无防护对照中的暴露比例，用来证明攻击样本确实能复现，不代表防护失败。'
     },
     {
-      label: '正常比赛任务误报率',
+      label: '正常业务任务误报率',
       value: report.summary.false_positive_rate,
       color: 'var(--ant-color-warning)',
       description: '正常业务工具调用被误拦的比例，越低说明系统越不影响正常使用。'
@@ -174,7 +174,7 @@ export function ReportOverviewTab({ report, onRefreshReport, onRefreshRuntime, o
       <Row gutter={[24, 24]}>
         <Col xs={24} lg={12}>
           <PanelCard
-            title={<SectionTitle title="比赛预期成果对齐" meta={`${report.deliverables.length} 项`} />}
+            title={<SectionTitle title="成果能力对齐" meta={`${report.deliverables.length} 项`} />}
             variant="borderless"
             className="zh-full-height"
           >

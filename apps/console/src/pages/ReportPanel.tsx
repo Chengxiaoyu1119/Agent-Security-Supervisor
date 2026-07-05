@@ -65,7 +65,7 @@ export function ReportPanel({
         <Flex justify="space-between" align="center" className="zh-report-hero-row">
           <div className="zh-flex-min zh-report-hero-copy">
             <Typography.Title level={3} className="zh-title-flush">
-              比赛材料中心
+              研究材料中心
             </Typography.Title>
             <Typography.Text type="secondary" className="zh-text-body zh-text-block zh-mt-4">
               面向大模型及智能体应用安全，汇总攻击场景、对抗样本、智能体脚本、监督策略、审计告警和交付材料。
@@ -114,7 +114,7 @@ export function ReportPanel({
             },
             {
               key: '4',
-              label: '比赛交付与接口',
+              label: '成果交付与接口',
               children: (
                 <ReportDeliveryTab
                   competitionPackage={competitionPackage}

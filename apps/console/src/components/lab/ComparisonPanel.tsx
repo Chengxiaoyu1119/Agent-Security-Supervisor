@@ -19,7 +19,7 @@ export function ComparisonPanel({ comparison }: { comparison: CompareResult }) {
               {before.attack_success ? '攻击成功' : '未达成风险'}
             </Typography.Title>
             <Typography.Paragraph className="zh-text-body">
-              监督器只记录不阻断，用本地靶场复现真实攻击风险暴露。
+              监督器只记录不阻断，用本地受控环境复现真实攻击风险暴露。
             </Typography.Paragraph>
             <Typography.Text type="secondary" className="zh-text-meta">
               延迟 {before.metrics.detection_latency_ms}ms · 阻断 {before.metrics.blocked_count}

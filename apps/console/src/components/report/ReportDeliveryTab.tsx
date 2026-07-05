@@ -28,7 +28,7 @@ export function ReportDeliveryTab({
         <PanelCard
           title={
             <SectionTitle
-              title="比赛交付材料包"
+              title="成果交付材料包"
               meta={`${competitionPackage.summary.file_count} 份材料 / ${competitionPackage.summary.alert_count} 条告警证据`}
             />
           }
@@ -63,7 +63,7 @@ export function ReportDeliveryTab({
       )}
       {competitionPackage && (
         <PanelCard
-          title={<SectionTitle title="赛题要求逐条检查" meta={`${competitionPackage.checklist.length} 条验收项`} />}
+          title={<SectionTitle title="功能目标逐条检查" meta={`${competitionPackage.checklist.length} 条验收项`} />}
           variant="borderless"
         >
           <div className="zh-column-stack">

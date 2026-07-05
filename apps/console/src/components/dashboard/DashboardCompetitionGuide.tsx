@@ -36,7 +36,7 @@ export function DashboardCompetitionGuide({
     },
     {
       title: '复现实验台',
-      desc: '从页面选择攻击脚本，真实触发本地靶场工具调用、监督判定、审计落库和防护对比。',
+      desc: '从页面选择攻击脚本，真实触发本地受控环境工具调用、监督判定、审计落库和防护对比。',
       metric: `${overview.summary.scenario_count} 个可运行脚本`,
       icon: <Play size={18} />,
       action: '进入实验台',

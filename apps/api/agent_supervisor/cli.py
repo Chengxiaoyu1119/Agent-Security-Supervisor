@@ -101,7 +101,7 @@ def cmd_benign(args: argparse.Namespace) -> None:
     else:
         data = evaluate_benign_cases(args.category, guard_enabled=args.guard == "on")
         output.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"已导出正常比赛任务样本误报评测：{output}")
+    print(f"已导出正常业务任务样本误报评测：{output}")
 
 
 def cmd_benign_workflows(args: argparse.Namespace) -> None:
@@ -112,7 +112,7 @@ def cmd_benign_workflows(args: argparse.Namespace) -> None:
     else:
         data = evaluate_benign_workflows(guard_enabled=args.guard == "on")
         output.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"已导出连续正常比赛任务流程误报评测：{output}")
+    print(f"已导出连续正常业务任务流程误报评测：{output}")
 
 
 def cmd_benign_workflows_write(args: argparse.Namespace) -> None:
@@ -199,9 +199,9 @@ def cmd_requirements(args: argparse.Namespace) -> None:
     output.parent.mkdir(parents=True, exist_ok=True)
     if args.format == "md":
         lines = [
-            "# 赛题要求对齐矩阵",
+            "# 功能验收对齐矩阵",
             "",
-            "| 要求 | 状态 | 赛题期望 | 当前证据 |",
+            "| 要求 | 状态 | 目标说明 | 当前证据 |",
             "|---|---|---|---|",
         ]
         for item in data:
@@ -209,7 +209,7 @@ def cmd_requirements(args: argparse.Namespace) -> None:
         output.write_text("\n".join(lines), encoding="utf-8")
     else:
         output.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(f"已导出赛题要求对齐矩阵：{output}")
+    print(f"已导出功能验收对齐矩阵：{output}")
 
 
 def cmd_evaluate(args: argparse.Namespace) -> None:
@@ -465,7 +465,7 @@ def _attack_assessment_markdown(data: dict) -> str:
     lines.extend(
         [
             "",
-            "## 赛题要求对齐",
+            "## 方向目标对齐",
             "",
             "| 要求 | 状态 | 当前证据 |",
             "|---|---|---|",
@@ -501,20 +501,20 @@ def build_parser() -> argparse.ArgumentParser:
     samples.add_argument("--surface", help="只导出指定攻击面，例如 prompt-injection、memory-poison")
     samples.set_defaults(func=cmd_samples)
 
-    benign = sub.add_parser("benign", help="导出正常比赛任务样本和误报率评测")
-    benign.add_argument("--output", default="apps/api/sandbox/reports/正常比赛任务误报评测.json")
+    benign = sub.add_parser("benign", help="导出正常业务任务样本和误报率评测")
+    benign.add_argument("--output", default="apps/api/sandbox/reports/正常业务任务误报评测.json")
     benign.add_argument("--format", choices=["json", "md"], default="json")
-    benign.add_argument("--category", help="只评估指定正常比赛任务类别，例如 API 调用、文件访问")
+    benign.add_argument("--category", help="只评估指定正常业务任务类别，例如 API 调用、文件访问")
     benign.add_argument("--guard", choices=["on", "off"], default="on")
     benign.set_defaults(func=cmd_benign)
 
-    benign_workflows = sub.add_parser("benign-workflows", help="导出连续正常比赛任务流程误报评测")
-    benign_workflows.add_argument("--output", default="apps/api/sandbox/reports/连续正常比赛任务流程误报评测.json")
+    benign_workflows = sub.add_parser("benign-workflows", help="导出连续正常业务任务流程误报评测")
+    benign_workflows.add_argument("--output", default="apps/api/sandbox/reports/连续正常业务任务流程误报评测.json")
     benign_workflows.add_argument("--format", choices=["json", "md"], default="json")
     benign_workflows.add_argument("--guard", choices=["on", "off"], default="on")
     benign_workflows.set_defaults(func=cmd_benign_workflows)
 
-    benign_workflows_write = sub.add_parser("benign-workflows-write", help="同时生成连续正常比赛任务流程误报评测 JSON 和 Markdown")
+    benign_workflows_write = sub.add_parser("benign-workflows-write", help="同时生成连续正常业务任务流程误报评测 JSON 和 Markdown")
     benign_workflows_write.add_argument("--output", default="apps/api/sandbox/reports")
     benign_workflows_write.set_defaults(func=cmd_benign_workflows_write)
 
@@ -544,8 +544,8 @@ def build_parser() -> argparse.ArgumentParser:
     attack_chains.add_argument("--format", choices=["json", "md"], default="json")
     attack_chains.set_defaults(func=cmd_attack_chains)
 
-    requirements = sub.add_parser("requirements", help="导出赛题要求对齐矩阵")
-    requirements.add_argument("--output", default="apps/api/sandbox/reports/赛题要求对齐矩阵.md")
+    requirements = sub.add_parser("requirements", help="导出功能验收对齐矩阵")
+    requirements.add_argument("--output", default="apps/api/sandbox/reports/功能验收对齐矩阵.md")
     requirements.add_argument("--format", choices=["json", "md"], default="md")
     requirements.set_defaults(func=cmd_requirements)
 
@@ -595,7 +595,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     anomaly_calibration = sub.add_parser("anomaly-calibration", help="导出异常检测阈值校准 JSON 与 Markdown")
     anomaly_calibration.add_argument("--output", default="apps/api/sandbox/reports")
-    anomaly_calibration.add_argument("--max-false-alarm-rate", type=int, default=10, help="允许的正常比赛任务误报率上限，默认 10%")
+    anomaly_calibration.add_argument("--max-false-alarm-rate", type=int, default=10, help="允许的正常业务任务误报率上限，默认 10%")
     anomaly_calibration.set_defaults(func=cmd_anomaly_calibration)
 
     real_model_eval = sub.add_parser("real-model-eval", help="运行真实模型结构化工具调用盲测并生成报告")

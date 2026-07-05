@@ -31,7 +31,7 @@ export function SurfaceResearchMatrix({
   return (
     <PanelCard variant="borderless" className="zh-mb-24">
       <div className="zh-surface-matrix-hero">
-        <Typography.Text type="secondary">学生比赛攻击面画像</Typography.Text>
+        <Typography.Text type="secondary">业务攻击面画像</Typography.Text>
         <Typography.Title level={2} className="zh-surface-matrix-hero__title">
           把抽象安全风险落到真实比赛对象
         </Typography.Title>

@@ -45,7 +45,7 @@ SENSITIVE_MARKERS = [
     "提交物",
     "成绩",
     "成绩榜",
-    "靶场",
+    "受控实验环境",
     "密钥",
     "confidential",
 ]

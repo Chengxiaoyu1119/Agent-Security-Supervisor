@@ -33,7 +33,7 @@ function formatCalibrationSource(source: string) {
     return '项目攻击样本库中的模型对抗样本、越狱样例和工具调用攻击脚本。';
   }
   if (source.includes('BENIGN_CASES')) {
-    return '正常比赛任务库中的邮件、文件、API、记忆等授权业务流程。';
+    return '正常业务任务库中的邮件、文件、API、记忆等授权业务流程。';
   }
   return source;
 }
@@ -164,7 +164,7 @@ export function AnomalyCalibrationBlock({
           <PanelCard size="small" type="inner" className="zh-calibration-info-card">
             <Typography.Text strong>阈值选择规则</Typography.Text>
             <Typography.Paragraph type="secondary" className="zh-text-body zh-mb-0">
-              {formatThresholdRule(summary)} 目标是尽量保留攻击召回，同时把正常比赛任务误报压低。
+              {formatThresholdRule(summary)} 目标是尽量保留攻击召回，同时把正常业务任务误报压低。
             </Typography.Paragraph>
           </PanelCard>
         </Col>

@@ -146,7 +146,7 @@ export function AttackTestsetLab() {
               <UiAlert
                 type="info"
                 showIcon
-                message="测试集会批量运行本地靶场样本，并用检测器判断攻击是否复现、监督器是否控制。"
+                message="测试集会批量运行本地受控环境样本，并用检测器判断攻击是否复现、监督器是否控制。"
               />
               <LabRuntimeFlow compact steps={attackTestsetFlowSteps(selectedSurface, plannerMode)} />
               <div className="zh-attack-lab__field">
@@ -207,7 +207,7 @@ export function AttackTestsetLab() {
                 <div>
                   <Typography.Text strong>沙箱执行</Typography.Text>
                   <Typography.Paragraph type="secondary" className="zh-attack-lab__hint">
-                    所有样本只触碰项目本地靶场资产。
+                    所有样本只触碰项目本地受控环境资产。
                   </Typography.Paragraph>
                 </div>
                 <UiSwitch checked={executeInSandbox} onChange={setExecuteInSandbox} />

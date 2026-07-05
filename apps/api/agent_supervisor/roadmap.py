@@ -70,7 +70,7 @@ def build_project_roadmap(runs: list[dict[str, Any]] | None = None) -> dict[str,
         "direction": {
             "verdict": verdict,
             "score": overall_score,
-            "reason": "项目已经覆盖赛题要求的攻击场景、对抗样本、智能体脚本、监督器、审计、告警和提交材料；当前重点是保持真实接入、可部署复现和多模型实测闭环。",
+            "reason": "项目已经覆盖方向目标的攻击场景、对抗样本、智能体脚本、监督器、审计、告警和提交材料；当前重点是保持真实接入、可部署复现和多模型实测闭环。",
             "competition_fit": _competition_fit(requirements),
         },
         "summary": {
@@ -297,7 +297,7 @@ def _maturity_dimensions(
     )
     return [
         _dimension(
-            "赛题方向匹配",
+            "研究方向匹配",
             95 if all(item["status"] in {"满足", "基本满足"} for item in requirements[:3]) else 80,
             "已覆盖大模型/智能体安全研究，核心成果围绕红队样本、工具调用监督和防御策略。",
             ["继续把叙事聚焦在真实智能体工具调用安全，而不是泛泛数据安全平台。"],
@@ -315,9 +315,9 @@ def _maturity_dimensions(
             ["补充一键补跑缺口脚本，避免历史数据不足时页面只展示静态结论。"],
         ),
         _dimension(
-            "比赛工具与靶场真实性",
+            "比赛工具与受控实验环境真实性",
             95 if {"mail.send", "file.read", "file.write", "api.call", "code.run"}.issubset(tool_surfaces) and workflow_fp_rate == 0 else 78,
-            f"当前攻击脚本工具覆盖：{', '.join(sorted(tool_surfaces))}；连续正常比赛任务流程 {benign_workflows['summary']['workflow_count']} 条、{benign_workflows['summary']['step_count']} 个步骤，误报率 {workflow_fp_rate}%，期望匹配率 {workflow_match_rate}%。",
+            f"当前攻击脚本工具覆盖：{', '.join(sorted(tool_surfaces))}；连续正常业务任务流程 {benign_workflows['summary']['workflow_count']} 条、{benign_workflows['summary']['step_count']} 个步骤，误报率 {workflow_fp_rate}%，期望匹配率 {workflow_match_rate}%。",
             ["继续补跨模型、跨赛道和跨角色的长流程样本，验证边界控制稳定性。"],
         ),
         _dimension(
@@ -332,7 +332,7 @@ def _maturity_dimensions(
             "模型检测与异常检测",
             92 if calibration["summary"]["benign_false_alarm_rate"] <= 10 else 75,
             f"已有输入过滤、输出过滤、上下文隔离、风险评分和异常分字段；推荐异常阈值 {calibration['summary']['recommended_threshold']}，攻击召回率 {calibration['summary']['attack_recall_rate']}%，正常误报率 {calibration['summary']['benign_false_alarm_rate']}%。",
-            ["继续扩充正常比赛任务样本和跨模型样本，验证阈值在更多比赛任务上下文中稳定。"],
+            ["继续扩充正常业务任务样本和跨模型样本，验证阈值在更多比赛任务上下文中稳定。"],
         ),
         _dimension(
             "多模型实测能力",
@@ -436,7 +436,7 @@ def _feature_backlog(
             "id": "real-openclaw-hook",
             "priority": "P0",
             "title": "真实 OpenClaw 源码级工具调用 Hook",
-            "why": "赛题明确提到开源智能化应用，源码级接入比兼容样例更有说服力。",
+            "why": "研究方向明确提到开源智能化应用，源码级接入比兼容样例更有说服力。",
             "scope": "接入 OpenClaw 或同类 Agent 的工具调用前后置事件。",
             "acceptance": "能从真实 OpenClaw Agent 操作触发监督 API、审计日志和告警记录。",
             "status": "已完成"
@@ -450,7 +450,7 @@ def _feature_backlog(
             "priority": "P0",
             "title": "异常检测阈值校准报告",
             "why": "当前 anomaly_score 已存在，但需要解释分数来源和误报控制。",
-            "scope": "用攻击样本和正常比赛任务样本生成阈值、召回率、误报率。",
+            "scope": "用攻击样本和正常业务任务样本生成阈值、召回率、误报率。",
             "acceptance": "输出 Markdown/JSON 报告，并在报告页展示异常检测曲线。",
             "status": "已完成" if calibration_done else "未完成",
         },
@@ -487,7 +487,7 @@ def _feature_backlog(
             "title": "一键启动与宝塔复现",
             "why": "评委复现时越少命令越稳。",
             "scope": "提供 Windows 启动脚本、npm 命令和宝塔部署启动口径。",
-            "acceptance": "一条命令启动 API、前端和初始化本地靶场数据。",
+            "acceptance": "一条命令启动 API、前端和初始化本地受控环境数据。",
             "status": "已完成" if one_command_done else "未完成",
         },
     ]

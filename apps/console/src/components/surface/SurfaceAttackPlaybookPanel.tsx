@@ -161,7 +161,7 @@ export function SurfaceAttackPlaybookPanel({
                   </Col>
                   <Col xs={24} lg={13}>
                     <div className="zh-surface-brief-block">
-                      <Typography.Text strong>本地靶场工具调用链</Typography.Text>
+                      <Typography.Text strong>本地受控环境工具调用链</Typography.Text>
                       <EvidenceCodeBlock size="small" maxHeight="large">
                         {formatToolCalls(representativeScenario, expectedDecisions)}
                       </EvidenceCodeBlock>

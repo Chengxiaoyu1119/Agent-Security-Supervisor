@@ -31,7 +31,7 @@ REQUIREMENT_ALIGNMENT = [
     },
     {
         "id": "business-tools",
-        "requirement": "模拟比赛工具",
+        "requirement": "模拟业务工具",
         "expected": "覆盖发送邮件、读写文件、调用 API、代码执行等工具。",
     },
     {

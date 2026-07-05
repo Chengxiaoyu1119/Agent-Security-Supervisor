@@ -115,7 +115,7 @@ export function AgentChain({
               </Col>
               <Col xs={24} md={12}>
                 <Typography.Text type="secondary" className="zh-text-block">
-                  比赛场景
+                  业务场景
                 </Typography.Text>
                 <Typography.Text strong>{activeChain.business_context}</Typography.Text>
               </Col>

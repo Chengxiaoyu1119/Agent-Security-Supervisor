@@ -282,7 +282,7 @@ def _risk_report(surfaces: list[dict[str, Any]], scenarios: list[dict[str, Any]]
         "# 安全风险分析报告",
         "",
         "本报告从红队视角覆盖提示注入、模型越狱、数据泄露、滥用风险、工具调用劫持、记忆中毒、环境感知污染 7 类攻击面。",
-        "所有复现均在智安哨沙箱靶场内完成，不访问真实外部系统、不读取真实用户文件、不发送真实邮件。",
+        "所有复现均在智安哨沙箱受控环境内完成，不访问真实外部系统、不读取真实用户文件、不发送真实邮件。",
         "",
     ]
     for surface in surfaces:
@@ -314,7 +314,7 @@ def _risk_report(surfaces: list[dict[str, Any]], scenarios: list[dict[str, Any]]
                     f"- 越狱测试用例：{scenario['jailbreak_case']}",
                     f"- 预期危害：{scenario['expected_risk']}",
                     f"- 落地防御：{scenario['defense']}",
-                    f"- 安全边界：{scenario.get('safety_boundary', '仅在本地沙箱靶场复现。')}",
+                    f"- 安全边界：{scenario.get('safety_boundary', '仅在本地沙箱受控实验环境复现。')}",
                     "- 复现步骤：",
                 ]
             )
@@ -335,7 +335,7 @@ def _risk_report(surfaces: list[dict[str, Any]], scenarios: list[dict[str, Any]]
 def _sample_set(scenarios: list[dict[str, Any]], surface_name: dict[str, str]) -> dict[str, Any]:
     return {
         "name": "智安哨模型对抗样本与越狱测试用例集",
-        "safe_scope": "仅用于本地沙箱靶场复现，不针对真实系统。",
+        "safe_scope": "仅用于本地沙箱受控实验环境复现，不针对真实系统。",
         "items": [
             {
                 "id": scenario["id"],
@@ -348,7 +348,7 @@ def _sample_set(scenarios: list[dict[str, Any]], surface_name: dict[str, str]) -
                 "defense": scenario["defense"],
                 "detection_points": scenario.get("detection_points", []),
                 "success_criteria": scenario.get("success_criteria", []),
-                "safety_boundary": scenario.get("safety_boundary", "本地沙箱靶场复现。"),
+                "safety_boundary": scenario.get("safety_boundary", "本地沙箱受控实验环境复现。"),
                 "tags": scenario.get("tags", []),
             }
             for scenario in scenarios
@@ -370,7 +370,7 @@ def _script_library(scenarios: list[dict[str, Any]], surface_name: dict[str, str
                 "detection_points": scenario.get("detection_points", []),
                 "success_criteria": scenario.get("success_criteria", []),
                 "tool_calls": scenario["tool_calls"],
-                "safe_boundary": scenario.get("safety_boundary", "所有工具调用均经过监督器，并在沙箱目录、本地沙箱 outbox、本地靶场 API、沙箱记忆库中执行。"),
+                "safe_boundary": scenario.get("safety_boundary", "所有工具调用均经过监督器，并在沙箱目录、本地沙箱 outbox、本地受控环境 API、沙箱记忆库中执行。"),
             }
             for scenario in scenarios
         ],
@@ -404,11 +404,11 @@ def _supervisor_spec(policies: list[dict[str, Any]]) -> str:
     lines.extend(
         [
             "",
-            "## 本地靶场业务工具",
+            "## 本地受控环境业务工具",
             "",
             "- 邮件工具：写入本地沙箱 outbox，不发送真实邮件。",
             "- 文件工具：只访问沙箱目录。",
-            "- API 工具：使用本地靶场参赛队伍、提交物、成绩榜、赛题种子和校园网会话接口。",
+            "- API 工具：使用本地受控环境参赛队伍、提交物、成绩榜、赛题种子和校园网会话接口。",
             "- 代码执行工具：限制目录、超时、输出长度和危险命令。",
             "- 记忆工具：支持写入、读取、污染和隔离。",
             "- 环境工具：提供低信任假配置和假环境变量。",
@@ -531,10 +531,10 @@ def _checklist(
         {
             "requirement": "提供开源智能化应用或适配目标",
             "status": "基本满足",
-            "evidence": "内置智能体靶场，提供 OpenClaw 事件适配结构和可安装 native plugin 包；真实 OpenClaw 运行验收需在安装 OpenClaw 的环境中执行。",
+            "evidence": "内置智能体受控实验环境，提供 OpenClaw 事件适配结构和可安装 native plugin 包；真实 OpenClaw 运行验收需在安装 OpenClaw 的环境中执行。",
         },
         {
-            "requirement": "本地靶场业务工具",
+            "requirement": "本地受控环境业务工具",
             "status": "满足",
             "evidence": "已覆盖邮件、文件、API、代码执行、记忆、环境变量工具。",
         },

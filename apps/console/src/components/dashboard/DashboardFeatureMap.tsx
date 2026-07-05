@@ -36,7 +36,7 @@ export function DashboardFeatureMap({
   const groups: FeatureMapGroup[] = [
     {
       title: '红队攻击研究层',
-      desc: '把比赛要求的攻击面、对抗样本、越狱用例和智能体脚本归到同一组。',
+      desc: '把作品目标的攻击面、对抗样本、越狱用例和智能体脚本归到同一组。',
       icon: <ClipboardList size={18} />,
       points: [
         {
@@ -50,10 +50,10 @@ export function DashboardFeatureMap({
     },
     {
       title: '真实运行验证层',
-      desc: '从页面选择脚本后，后端执行靶场工具调用、模型调用和监督器判定。',
+      desc: '从页面选择脚本后，后端执行模拟业务工具调用、模型调用和监督器判定。',
       icon: <BrainCircuit size={18} />,
       points: [
-        { label: '本地靶场复现', value: `${overview.summary.scenario_count} 个入口`, page: 'lab' },
+        { label: '本地受控环境复现', value: `${overview.summary.scenario_count} 个入口`, page: 'lab' },
         { label: '模型接入状态', value: `${configuredModelCount}/${overview.models.length} 个可用`, page: 'settings' },
         { label: '行为审计日志', value: `${overview.audit_logs.length} 条`, page: 'audit' }
       ]
@@ -75,7 +75,7 @@ export function DashboardFeatureMap({
       title={
         <span className="zh-card-title-inline">
           <FileCheck2 size={18} />
-          <Typography.Text strong>比赛能力地图</Typography.Text>
+          <Typography.Text strong>能力地图</Typography.Text>
         </span>
       }
       variant="borderless"

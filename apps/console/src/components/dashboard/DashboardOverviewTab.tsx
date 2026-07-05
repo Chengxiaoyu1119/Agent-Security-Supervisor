@@ -64,7 +64,7 @@ export function DashboardOverviewTab({
           <PanelCard variant="borderless" bodyPadding={32}>
             <Flex justify="space-between" align="center" wrap="wrap" gap={24}>
               <div className="zh-dashboard-hero-copy">
-                <Typography.Text type="secondary">命题挑战赛 · 大模型应用安全监督原型</Typography.Text>
+                <Typography.Text type="secondary">大模型应用安全监督原型</Typography.Text>
                 <Typography.Title level={1} className="zh-title-compact">
                   智能体工具调用实时审计与阻断台
                 </Typography.Title>

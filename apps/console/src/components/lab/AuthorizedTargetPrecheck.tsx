@@ -54,7 +54,7 @@ function buildPrecheck(targetUrl: string, authorizationConfirmed: boolean) {
     const allowedPath = ALLOWED_PATH_MARKERS.some((marker) => parsed?.pathname.includes(marker));
     items.push({
       label: '接口路径',
-      value: allowedPath ? 'LLM/Agent 靶场路径' : '非允许路径，后端会拒绝',
+      value: allowedPath ? 'LLM/Agent 授权接口路径' : '非允许路径，后端会拒绝',
       tone: allowedPath ? 'success' : 'error'
     });
     items.push({

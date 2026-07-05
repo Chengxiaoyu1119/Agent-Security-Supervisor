@@ -110,7 +110,7 @@ export function AttackFunctionLab({ refresh }: AttackFunctionLabProps) {
     try {
       setTargetLab(await resetTargetLabState());
     } catch (error) {
-      setNotice(`靶场状态重置失败：${error instanceof Error ? error.message : '未知错误'}`);
+      setNotice(`环境状态重置失败：${error instanceof Error ? error.message : '未知错误'}`);
     }
   }
 
@@ -184,7 +184,7 @@ export function AttackFunctionLab({ refresh }: AttackFunctionLabProps) {
                 <div>
                   <Typography.Text strong>沙箱执行</Typography.Text>
                   <Typography.Paragraph type="secondary" className="zh-attack-lab__hint">
-                    只执行项目内置靶场工具，邮件、文件、API、命令和记忆都限制在本地隔离环境。
+                    只执行项目内置模拟业务工具，邮件、文件、API、命令和记忆都限制在本地隔离环境。
                   </Typography.Paragraph>
                 </div>
                 <UiSwitch checked={executeInSandbox} onChange={setExecuteInSandbox} />

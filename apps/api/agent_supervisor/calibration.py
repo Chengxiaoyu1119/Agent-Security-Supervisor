@@ -39,12 +39,12 @@ def build_anomaly_calibration(max_false_alarm_rate: int = DEFAULT_MAX_FALSE_ALAR
 
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
-        "objective": "用攻击样本和正常比赛任务样本校准 anomaly_score 的人工复核阈值，解释分数来源、召回率和误报率。",
+        "objective": "用攻击样本和正常业务任务样本校准 anomaly_score 的人工复核阈值，解释分数来源、召回率和误报率。",
         "method": {
             "attack_source": "apps.api.agent_supervisor.data.SCENARIOS 中的模型对抗样本、越狱用例和工具调用脚本。",
-            "benign_source": "apps.api.agent_supervisor.benign.BENIGN_CASES 中的正常比赛任务样本。",
+            "benign_source": "apps.api.agent_supervisor.benign.BENIGN_CASES 中的正常业务任务样本。",
             "score_range": "0-100，分数越高代表工具、参数、提示和上下文组合越异常。",
-            "selection_rule": f"优先选择 0% 正常比赛任务误报阈值；如不存在 0% 误报阈值，再选择误报率不超过 {max_false_alarm_rate}% 且攻击召回率更高的阈值。",
+            "selection_rule": f"优先选择 0% 正常业务任务误报阈值；如不存在 0% 误报阈值，再选择误报率不超过 {max_false_alarm_rate}% 且攻击召回率更高的阈值。",
             "important_note": "异常检测是兜底层；明确命中路径、邮件、代码、记忆等固定策略的攻击，即使低于异常阈值也会被监督器控制。",
         },
         "summary": {
@@ -99,9 +99,9 @@ def build_anomaly_calibration_markdown(max_false_alarm_rate: int = DEFAULT_MAX_F
         "",
         f"- 推荐人工复核阈值：`anomaly_score >= {summary['recommended_threshold']}`",
         f"- 攻击样本召回率：{summary['attack_recall_rate']}%",
-        f"- 正常比赛任务误报率：{summary['benign_false_alarm_rate']}%",
+        f"- 正常业务任务误报率：{summary['benign_false_alarm_rate']}%",
         f"- 攻击样本数量：{summary['attack_sample_count']}",
-        f"- 正常比赛任务样本数量：{summary['benign_sample_count']}",
+        f"- 正常业务任务样本数量：{summary['benign_sample_count']}",
         f"- 低于异常阈值但已被固定策略控制的攻击样本：{summary['policy_controlled_missed_count']} 个",
         "",
         data["conclusion"],
@@ -161,7 +161,7 @@ def build_anomaly_calibration_markdown(max_false_alarm_rate: int = DEFAULT_MAX_F
     lines.extend(
         [
             "",
-            "## 正常比赛任务误报复核",
+            "## 正常业务任务误报复核",
             "",
             "| 样本 | 工具 | 异常分 | 期望 | 说明 |",
             "|---|---|---:|---|---|",
@@ -171,7 +171,7 @@ def build_anomaly_calibration_markdown(max_false_alarm_rate: int = DEFAULT_MAX_F
         for item in data["benign_false_alarm_review"]:
             lines.append(f"| {item['id']} | {item['tool']} | {item['anomaly_score']} | {item['expected_decision']} | {item['title']} |")
     else:
-        lines.append("| 无 | - | 0 | - | 推荐阈值下未产生正常比赛任务误报 |")
+        lines.append("| 无 | - | 0 | - | 推荐阈值下未产生正常业务任务误报 |")
 
     return "\n".join(lines)
 
@@ -393,12 +393,12 @@ def _conclusion(
         return "当前缺少攻击样本，无法校准异常检测阈值。"
     if not benign_false_alarms and len(policy_controlled_misses) == len(attack_missed):
         return (
-            f"推荐阈值 {threshold} 下没有正常比赛任务误报；低于异常阈值的攻击样本均已被固定监督策略控制。"
+            f"推荐阈值 {threshold} 下没有正常业务任务误报；低于异常阈值的攻击样本均已被固定监督策略控制。"
             "因此 anomaly_score 可以作为兜底复核层，与路径边界、外发邮件、危险命令等确定性策略组合使用。"
         )
     if benign_false_alarms:
         return (
-            f"推荐阈值 {threshold} 下仍有 {len(benign_false_alarms)} 个正常比赛任务样本触发异常复核，"
+            f"推荐阈值 {threshold} 下仍有 {len(benign_false_alarms)} 个正常业务任务样本触发异常复核，"
             "后续应补充比赛任务白名单或上下文可信度字段，降低误报。"
         )
     return f"推荐阈值 {threshold} 能在误报可控的前提下覆盖主要攻击样本，适合作为当前原型的人工复核阈值。"

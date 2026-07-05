@@ -416,7 +416,7 @@ def _scenario_card(surface: dict[str, Any], scenario: dict[str, Any], runs: list
         "attack_path": scenario.get("attack_path", []),
         "detection_points": scenario.get("detection_points", []),
         "success_criteria": scenario.get("success_criteria", []),
-        "safety_boundary": scenario.get("safety_boundary", "仅在本地沙箱靶场复现。"),
+        "safety_boundary": scenario.get("safety_boundary", "仅在本地沙箱受控实验环境复现。"),
         "tool_calls": scenario.get("tool_calls", []),
         "script_steps": scenario.get("script_steps", []),
         "expected_decisions": expectations,

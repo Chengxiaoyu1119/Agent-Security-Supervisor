@@ -67,7 +67,7 @@ def _submission_readme(package: dict[str, Any]) -> str:
             "",
             "## 目录说明",
             "",
-            "- `01_比赛要求材料`：对应赛题要求的风险报告、样本集、脚本库、监督原型说明和实验评测结果。",
+            "- `01_作品目标材料`：对应研究目标的风险报告、样本集、脚本库、监督原型说明和实验评测结果。",
             "- `02_运行与答辩说明`：运行方式、接口清单、验收清单、源码结构和截图建议。",
             "- `manifest.json`：提交包文件清单。",
         ]
@@ -151,7 +151,7 @@ def _run_guide() -> str:
             "node scripts/agent-supervisor-cli.mjs anomaly-calibration --output apps/api/sandbox/reports",
             "```",
             "",
-            "导出连续正常比赛任务流程误报评测：",
+            "导出连续正常业务任务流程误报评测：",
             "",
             "```powershell",
             "node scripts/agent-supervisor-cli.mjs benign-workflows-write --output apps/api/sandbox/reports",
@@ -237,12 +237,12 @@ def _api_inventory() -> str:
             "| `/api/evaluations/anomaly_calibration` | GET | 异常检测阈值校准 JSON，含推荐阈值、召回率、误报率和复核样本 |",
             "| `/api/evaluations/anomaly_calibration.md` | GET | 异常检测阈值校准 Markdown 报告 |",
             "| `/api/evaluations/anomaly_calibration/write` | POST | 在本地生成异常检测阈值校准 JSON 与 Markdown |",
-            "| `/api/evaluations/benign_workflows` | GET | 连续正常比赛任务流程误报评测 JSON，含流程级误报率和审计 hash 链 |",
-            "| `/api/evaluations/benign_workflows.md` | GET | 连续正常比赛任务流程误报评测 Markdown |",
-            "| `/api/evaluations/benign_workflows/write` | POST | 在本地生成连续正常比赛任务流程误报评测 JSON 与 Markdown |",
+            "| `/api/evaluations/benign_workflows` | GET | 连续正常业务任务流程误报评测 JSON，含流程级误报率和审计 hash 链 |",
+            "| `/api/evaluations/benign_workflows.md` | GET | 连续正常业务任务流程误报评测 Markdown |",
+            "| `/api/evaluations/benign_workflows/write` | POST | 在本地生成连续正常业务任务流程误报评测 JSON 与 Markdown |",
             "| `/api/evaluations/policy_ablation` | GET | 策略消融实验结果，展示关闭关键策略后的风险暴露和兜底控制 |",
             "| `/api/evaluations/policy_ablation.md` | GET | 策略消融实验 Markdown 证据 |",
-            "| `/api/deliverables` | GET | 比赛交付材料包内容 |",
+            "| `/api/deliverables` | GET | 成果交付材料包内容 |",
             "| `/api/submission_package` | POST | 已停用，保留 410 响应用于兼容旧调用 |",
             "| `/api/submission_package/clean` | POST | 已停用，保留 410 响应用于兼容旧调用 |",
             "| `/api/integrations/openclaw/schema` | GET | OpenClaw/通用智能体适配结构 |",
@@ -262,9 +262,9 @@ def _api_inventory() -> str:
 
 def _acceptance_checklist(package: dict[str, Any]) -> str:
     lines = [
-        "# 赛题验收清单",
+        "# 验收清单",
         "",
-        "| 赛题要求 | 状态 | 证据 |",
+        "| 方向目标 | 状态 | 证据 |",
         "|---|---|---|",
     ]
     for item in package["checklist"]:
@@ -282,13 +282,13 @@ def _source_tree() -> str:
             "| `apps/api/agent_supervisor/data.py` | 攻击面、脚本和策略基础数据 |",
             "| `apps/api/agent_supervisor/agents.py` | 多 agent 攻击复现流程和批量评测 |",
             "| `apps/api/agent_supervisor/supervisor.py` | 行为监督策略判定 |",
-            "| `apps/api/agent_supervisor/benign.py` | 正常比赛任务单步样本和误报率评测 |",
-            "| `apps/api/agent_supervisor/benign_workflows.py` | 连续正常比赛任务流程误报评测和审计 hash 链 |",
+            "| `apps/api/agent_supervisor/benign.py` | 正常业务任务单步样本和误报率评测 |",
+            "| `apps/api/agent_supervisor/benign_workflows.py` | 连续正常业务任务流程误报评测和审计 hash 链 |",
             "| `apps/api/agent_supervisor/approvals.py` | 人工复核队列、批准/驳回和 review_hash 证据生成 |",
             "| `apps/api/agent_supervisor/calibration.py` | 异常检测阈值校准、召回率和误报率报告生成 |",
             "| `apps/api/agent_supervisor/demo_drill.py` | 答辩复现实验编排和证据报告生成 |",
-            "| `apps/api/agent_supervisor/tools.py` | 邮件、文件、API、代码、记忆、环境靶场工具 |",
-            "| `apps/api/agent_supervisor/services/package_service.py` | 比赛材料包和提交包生成 |",
+            "| `apps/api/agent_supervisor/tools.py` | 邮件、文件、API、代码、记忆、环境模拟业务工具 |",
+            "| `apps/api/agent_supervisor/services/package_service.py` | 成果材料包和提交包生成 |",
             "| `apps/api/agent_supervisor/events.py` | 外部智能体工具调用事件评估和审计落库 |",
             "| `apps/api/agent_supervisor/openclaw_adapter.py` | OpenClaw 兼容接口、源码级 native plugin 包生成 |",
             "| `apps/api/agent_supervisor/readiness.py` | 赛前一键体检、提交包完整性检查和 P0 补证项汇总 |",
@@ -325,7 +325,7 @@ def _threat_model_for_package() -> str:
             "- 沙箱文件、参赛队伍资料、提交物摘要与赛题种子",
             "- 长期记忆库",
             "- 本地沙箱 outbox",
-            "- 本地靶场比赛平台 API",
+            "- 本地受控环境模拟业务 API",
             "- 代码执行工具",
             "- 审计日志与告警证据",
             "",
@@ -337,7 +337,7 @@ def _threat_model_for_package() -> str:
             "| 模型输出到工具调用 | 模型生成的工具名和参数 | 工具权限矩阵、参数审计 |",
             "| 工具返回到模型上下文 | 文件、API、环境、网页返回 | 低信任隔离、禁止覆盖授权 |",
             "| 智能体记忆写入 | 用户偏好、会话摘要、外部内容 | 写入审计、隔离区、回滚 |",
-            "| 沙箱工具到本机环境 | 文件路径、命令、外发请求 | 路径限制、本地沙箱 outbox、本地靶场 API |",
+            "| 沙箱工具到本机环境 | 文件路径、命令、外发请求 | 路径限制、本地沙箱 outbox、本地受控环境 API |",
             "",
             "## 关键攻击面",
             "",
@@ -397,7 +397,7 @@ def _multi_agent_self_review_record() -> str:
         [
             "# 多 Agent 自审优化闭环报告",
             "",
-            "本轮通过代码结构、页面审美和比赛交付三个子代理并行审查，再由主线程完成低风险修复和自动自审报告生成。",
+            "本轮通过代码结构、页面审美和成果交付三个子代理并行审查，再由主线程完成低风险修复和自动自审报告生成。",
         ]
     )
 
@@ -475,7 +475,7 @@ def _anomaly_calibration_record() -> str:
         [
             "# 异常检测阈值校准完善记录",
             "",
-            "本轮新增异常检测阈值校准能力，用攻击样本和正常比赛任务样本计算推荐阈值、攻击召回率、正常比赛任务误报率和低分攻击复核结果。",
+            "本轮新增异常检测阈值校准能力，用攻击样本和正常业务任务样本计算推荐阈值、攻击召回率、正常业务任务误报率和低分攻击复核结果。",
             "",
             "新增接口：`/api/evaluations/anomaly_calibration`、`/api/evaluations/anomaly_calibration.md`、`/api/evaluations/anomaly_calibration/write`。",
             "",
@@ -485,27 +485,27 @@ def _anomaly_calibration_record() -> str:
 
 
 def _benign_expansion_record() -> str:
-    doc_path = ROOT_DOCS_DIR / "正常比赛任务样本扩充记录-20260608.md"
+    doc_path = ROOT_DOCS_DIR / "正常业务任务样本扩充记录-20260608.md"
     if doc_path.exists():
         return doc_path.read_text(encoding="utf-8")
     return "\n".join(
         [
-            "# 正常比赛任务样本扩充记录",
+            "# 正常业务任务样本扩充记录",
             "",
-            "正常比赛任务样本已扩充到 36 条，覆盖 7 类赛事任务和 9 种工具，误报率 0%，期望决策匹配率 100%。",
+            "正常业务任务样本已扩充到 36 条，覆盖 7 类赛事任务和 9 种工具，误报率 0%，期望决策匹配率 100%。",
         ]
     )
 
 
 def _benign_workflow_record() -> str:
-    doc_path = ROOT_DOCS_DIR / "连续正常比赛任务流程误报评测记录-20260608.md"
+    doc_path = ROOT_DOCS_DIR / "连续正常业务任务流程误报评测记录-20260608.md"
     if doc_path.exists():
         return doc_path.read_text(encoding="utf-8")
     return "\n".join(
         [
-            "# 连续正常比赛任务流程误报评测记录",
+            "# 连续正常业务任务流程误报评测记录",
             "",
-            "系统新增连续正常比赛任务流程误报评测，覆盖公开资料到内部周报、赛事复盘闭环、外部分享审批和沙箱统计脚本流程。",
+            "系统新增连续正常业务任务流程误报评测，覆盖公开资料到内部周报、赛事复盘闭环、外部分享审批和沙箱统计脚本流程。",
             "",
             "当前结果：4 条流程、14 个工具步骤、误报率 0%、期望决策匹配率 100%、审计 hash 链全部有效。",
         ]
@@ -535,9 +535,9 @@ def _readiness_record() -> str:
             "",
             "- 攻击面与脚本覆盖",
             "- 对抗样本、越狱用例和智能体攻击脚本",
-            "- 行为监督器、策略和本地靶场业务工具",
-            "- 正常比赛任务单步误报评测",
-            "- 连续正常比赛任务流程误报评测",
+            "- 行为监督器、策略和本地受控环境业务工具",
+            "- 正常业务任务单步误报评测",
+            "- 连续正常业务任务流程误报评测",
             "- 异常检测阈值校准",
             "- OpenClaw 插件静态验收和 runtime inspect 缺口",
             "- 初赛提交包、manifest 和复现截图完整性",
@@ -620,13 +620,13 @@ def _screenshot_checklist() -> str:
             "5. 行为监督记录：展示工具调用、代码执行、文件访问、API 调用审计。",
             "6. 告警与阻断：展示告警证据、策略命中和处置建议。",
             "7. 防御策略中心：展示允许、拒绝、询问、隔离策略配置。",
-            "8. 评测报告：展示比赛交付材料包和赛题验收清单。",
+            "8. 评测报告：展示交付材料包和验收清单。",
             "9. 全量证据索引：展示 7 类攻击面的完整度、控制率和缺口状态。",
             "10. 攻击面答辩单页：展示单个攻击面的攻击链路、监督命中、工具覆盖和验收闭环。",
             "11. 项目成熟度路线图：展示方向判断、成熟度、P0 缺口和下一轮计划。",
             "12. 异常检测校准：展示推荐阈值、攻击召回率、正常误报率和低分攻击复核。",
             "13. OpenClaw 源码级插件包：展示 before_tool_call 检查结果、插件输出路径和安装命令。",
-            "14. 连续正常比赛任务流程误报评测：展示流程通过率、步骤误报率、边界控制和审计 hash 链。",
+            "14. 连续正常业务任务流程误报评测：展示流程通过率、步骤误报率、边界控制和审计 hash 链。",
             "15. 赛前一键体检：展示就绪分、P0 补证项、关键检查项和提交包状态。",
             "16. 人工复核队列：展示待复核、已批准、已驳回和 review_hash 证据。",
             "17. 答辩复现：展示正常放行、外发复核、批量导出审批和记忆隔离。",

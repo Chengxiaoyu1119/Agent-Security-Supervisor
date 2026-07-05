@@ -69,7 +69,7 @@ export function ReportAttackEvidenceActions({ onRefreshReport, onRefreshRuntime 
         <div className="zh-report-action-copy">
           <Typography.Text strong>攻防证据补齐</Typography.Text>
           <Typography.Text type="secondary">
-            运行全部脚本的无防护攻击复现和有防护监督拦截，生成可用于比赛材料的审计日志、告警和 hash 链证据。
+            运行全部脚本的无防护攻击复现和有防护监督拦截，生成可用于成果材料的审计日志、告警和 hash 链证据。
           </Typography.Text>
         </div>
         <Space wrap className="zh-report-action-buttons">

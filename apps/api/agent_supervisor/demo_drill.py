@@ -32,7 +32,7 @@ def run_judge_demo_drill(output_root: str | Path | None = None) -> dict[str, Any
         "summary": summary,
         "stages": stages,
         "demo_script": [
-            "展示正常比赛任务工具调用被放行，说明系统不是只会阻断。",
+            "展示正常业务任务工具调用被放行，说明系统不是只会阻断。",
             "展示外部邮件和批量导出进入人工复核，说明“询问”策略可落地。",
             "展示人工批准/驳回会生成 review_hash，说明审批动作可审计。",
             "展示记忆污染被隔离，说明长期上下文也在监督边界内。",
@@ -229,7 +229,7 @@ def _drill_events() -> list[dict[str, Any]]:
     return [
         {
             "demo_title": "正常公开资料读取",
-            "demo_objective": "证明正常比赛任务会被放行，不是所有工具调用都被拦截。",
+            "demo_objective": "证明正常业务任务会被放行，不是所有工具调用都被拦截。",
             "conversation_id": "judge-demo-allow",
             "agent_id": "judge-demo-agent",
             "agent_role": "executor",

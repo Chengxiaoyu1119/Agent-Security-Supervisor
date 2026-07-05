@@ -46,7 +46,7 @@ export function PenetrationLearningLab({ refresh }: PenetrationLearningLabProps)
         }
       })
       .catch(() => {
-        if (mounted) setNotice('后端未连接时只能查看默认场景，运行本地靶场需要启动智安哨后端。');
+        if (mounted) setNotice('后端未连接时只能查看默认场景，运行本地受控环境需要启动智安哨后端。');
       });
     fetchTargetLabState()
       .then((state) => {
@@ -87,7 +87,7 @@ export function PenetrationLearningLab({ refresh }: PenetrationLearningLabProps)
       setTargetLab(nextResult.target_lab);
       await refresh?.();
     } catch (error) {
-      setNotice(`本地靶场攻击失败：${error instanceof Error ? error.message : '未知错误'}`);
+      setNotice(`本地受控环境攻击失败：${error instanceof Error ? error.message : '未知错误'}`);
     } finally {
       setRunning(false);
     }
@@ -100,19 +100,19 @@ export function PenetrationLearningLab({ refresh }: PenetrationLearningLabProps)
       setResult(null);
       await refresh?.();
     } catch (error) {
-      setNotice(`本地靶场重置失败：${error instanceof Error ? error.message : '未知错误'}`);
+      setNotice(`本地受控环境重置失败：${error instanceof Error ? error.message : '未知错误'}`);
     }
   }
 
   if (!activeScenario) {
-    return <UiAlert type="warning" showIcon title="暂无本地靶场场景。" />;
+    return <UiAlert type="warning" showIcon title="暂无本地受控环境场景。" />;
   }
 
   return (
     <div className="zh-attack-lab">
       {notice && <UiAlert type="warning" showIcon title={notice} className="zh-mb-24" />}
 
-      <PanelCard title="本地靶场分步训练" subtitle="从目标资产开始操作，不再只看一键结果" className="zh-mb-24">
+      <PanelCard title="本地受控实验分步训练" subtitle="从目标资产开始操作，不再只看一键结果" className="zh-mb-24">
         <div className="zh-lab-step-strip">
           {stepLabels.map((label, index) => (
             <div key={label} className={`zh-lab-step zh-lab-step--${stepState(index, Boolean(result))}`}>
@@ -123,7 +123,7 @@ export function PenetrationLearningLab({ refresh }: PenetrationLearningLabProps)
         </div>
         <LabRuntimeFlow
           compact
-          title="本地靶场执行路径"
+          title="本地受控环境执行路径"
           steps={penetrationFlowSteps(activeAsset.asset, activeScenario.category, executeInSandbox, Boolean(result))}
         />
       </PanelCard>
@@ -132,7 +132,7 @@ export function PenetrationLearningLab({ refresh }: PenetrationLearningLabProps)
         <Col xs={24} xl={6}>
           <LabModulePicker
             title="选择攻击面"
-            subtitle={`${scenarios.length} 类本机授权靶场`}
+            subtitle={`${scenarios.length} 类本机授权目标`}
             items={scenarios.map((scenario) => ({
               id: scenario.id,
               title: scenario.name,
@@ -184,7 +184,7 @@ export function PenetrationLearningLab({ refresh }: PenetrationLearningLabProps)
                 <div>
                   <Typography.Text strong>执行本地沙箱工具</Typography.Text>
                   <Typography.Paragraph type="secondary" className="zh-attack-lab__hint">
-                    只触碰项目自带靶场文件、靶场 API、靶场记忆和安全探针，不访问真实比赛平台。
+                    只触碰项目自带受控环境文件、模拟 API、受控记忆和安全探针，不访问真实外部系统。
                   </Typography.Paragraph>
                 </div>
                 <UiSwitch checked={executeInSandbox} onChange={setExecuteInSandbox} />
@@ -277,8 +277,8 @@ export function PenetrationLearningLab({ refresh }: PenetrationLearningLabProps)
             ) : (
               <RunResultEmptyState
                 icon={<Target size={28} />}
-                title="等待执行本地靶场"
-                description="会在项目内置靶场里执行当前攻击步骤，对比无防护响应、监督器拦截和靶场状态变化。"
+                title="等待执行本地受控实验"
+                description="会在项目内置受控环境里执行当前攻击步骤，对比无防护响应、监督器拦截和环境状态变化。"
                 actionLabel="执行当前攻击步骤"
                 loading={running}
                 onAction={runAttack}

@@ -68,7 +68,7 @@ export function AuthorizedTargetLab({ refresh }: AuthorizedTargetLabProps) {
 
   async function runLab() {
     if (!canRunAuthorizedTarget) {
-      setNotice('请先填写授权靶场 URL，并确认该目标属于本人、团队或比赛授权范围。');
+      setNotice('请先填写授权目标 URL，并确认该目标属于本人、团队或授权范围。');
       return;
     }
     setRunning(true);
@@ -87,7 +87,7 @@ export function AuthorizedTargetLab({ refresh }: AuthorizedTargetLabProps) {
       setResult(nextResult);
       await refresh?.();
     } catch (error) {
-      setNotice(`授权公网靶场测试失败：${error instanceof Error ? error.message : '未知错误'}`);
+      setNotice(`外部授权目标测试失败：${error instanceof Error ? error.message : '未知错误'}`);
     } finally {
       setRunning(false);
     }
@@ -98,16 +98,16 @@ export function AuthorizedTargetLab({ refresh }: AuthorizedTargetLabProps) {
       {notice && <UiAlert type="warning" showIcon title={notice} className="zh-mb-24" />}
       <Row gutter={[20, 20]} align="stretch">
         <Col xs={24} xl={9}>
-          <PanelCard title="授权公网靶场" subtitle="只向授权 LLM/Agent 接口发起单点测试" className="zh-full-height">
+          <PanelCard title="外部授权目标" subtitle="只向授权 LLM/Agent 接口发起单点测试" className="zh-full-height">
             <Space orientation="vertical" size={16} className="zh-full-width">
               <UiAlert
                 type="warning"
                 showIcon
-                message="这里不是任意网站攻击器。后端只允许公网 LLM/Agent 靶场路径，并拒绝本机、内网、保留地址和非模型接口。"
+                message="这里不是任意网站攻击器。后端只允许公网 LLM/Agent 授权接口路径，并拒绝本机、内网、保留地址和非模型接口。"
               />
               <LabRuntimeFlow compact steps={authorizedTargetFlowSteps(authorizationConfirmed)} />
               <div className="zh-attack-lab__field">
-                <Typography.Text strong>靶场 URL</Typography.Text>
+                <Typography.Text strong>目标接口 URL</Typography.Text>
                 <UiInput
                   value={targetUrl}
                   onChange={(event) => setTargetUrl(event.target.value)}
@@ -166,7 +166,7 @@ export function AuthorizedTargetLab({ refresh }: AuthorizedTargetLabProps) {
                 disabled={!canRunAuthorizedTarget}
                 onClick={runLab}
               >
-                运行授权靶场测试
+                运行授权目标测试
               </UiButton>
               <AuthorizedTargetPreview
                 targetUrl={targetUrl}
@@ -182,7 +182,7 @@ export function AuthorizedTargetLab({ refresh }: AuthorizedTargetLabProps) {
 
         <Col xs={24} xl={15}>
           <PanelCard
-            title="靶场调用结果"
+            title="目标调用结果"
             subtitle={result ? result.target_url : '等待运行'}
             className="zh-full-height"
             extra={
@@ -256,7 +256,7 @@ export function AuthorizedTargetLab({ refresh }: AuthorizedTargetLabProps) {
                   </Descriptions>
                 </PanelCard>
                 <div className="zh-attack-lab__field">
-                  <Typography.Text strong>靶场响应</Typography.Text>
+                  <Typography.Text strong>目标响应</Typography.Text>
                   <EvidenceCodeBlock maxHeight="large">
                     {result.target_response || result.summary.reason || '无响应正文'}
                   </EvidenceCodeBlock>
@@ -275,8 +275,8 @@ export function AuthorizedTargetLab({ refresh }: AuthorizedTargetLabProps) {
               <RunResultEmptyState
                 icon={<Globe2 size={28} />}
                 title="等待授权后运行"
-                description="填写靶场 URL 并确认授权后，系统会先做边界预检，再发起一次受控 POST 测试并记录审计证据。"
-                actionLabel="运行授权靶场测试"
+                description="填写目标接口 URL 并确认授权后，系统会先做边界预检，再发起一次受控 POST 测试并记录审计证据。"
+                actionLabel="运行授权目标测试"
                 loading={running}
                 disabled={!canRunAuthorizedTarget}
                 onAction={runLab}

@@ -11,7 +11,7 @@ export function attackFunctionFlowSteps(
       detail: plannerMode === 'model' ? '调用后端配置模型生成工具调用' : '使用模块映射生成可复核调用',
       tone: plannerMode === 'model' ? 'success' : 'warning'
     },
-    { label: '本地靶场', detail: executeInSandbox ? '沙箱工具执行并改变靶场状态' : '只生成判定证据' },
+    { label: '本地受控环境', detail: executeInSandbox ? '沙箱工具执行并改变环境状态' : '只生成判定证据' },
     { label: '监督审计', detail: '输出无防护/有防护两组记录', tone: 'success' }
   ];
 }
@@ -78,7 +78,7 @@ export function penetrationFlowSteps(
   return [
     { label: '选择资产', detail: assetLabel, tone: 'active' },
     { label: '构造输入', detail: category },
-    { label: '沙箱执行', detail: executeInSandbox ? '会触碰本地靶场资产' : '仅生成判定证据' },
+    { label: '沙箱执行', detail: executeInSandbox ? '会触碰本地受控环境资产' : '仅生成判定证据' },
     {
       label: '攻防对照',
       detail: hasResult ? '已有运行证据' : '运行后生成差异',

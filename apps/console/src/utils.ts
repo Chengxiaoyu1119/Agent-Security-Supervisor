@@ -98,8 +98,8 @@ export const competitionCapabilityRows = [
     evidence: 'POST /api/integrations/openclaw/events'
   },
   {
-    requirement: '本地靶场业务工具',
-    implementation: '邮件、文件、API、代码执行、记忆、环境变量全部在本地沙箱和靶场数据中运行。',
+    requirement: '本地受控环境业务工具',
+    implementation: '邮件、文件、API、代码执行、记忆、环境变量全部在本地沙箱和模拟业务数据中运行。',
     evidence: 'mail.send / file.read / api.call / code.run / memory.write / env.read'
   },
   {

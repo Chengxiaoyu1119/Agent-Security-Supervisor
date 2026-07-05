@@ -21,8 +21,8 @@ REJECTED_STATUS = "已驳回"
 
 STATUS_VALUES = {PENDING_STATUS, APPROVED_STATUS, REJECTED_STATUS}
 ACTION_MAP = {
-    "approve": (APPROVED_STATUS, "允许", "人工批准后，上游比赛平台仍应按最小权限重新执行工具调用。"),
-    "批准": (APPROVED_STATUS, "允许", "人工批准后，上游比赛平台仍应按最小权限重新执行工具调用。"),
+    "approve": (APPROVED_STATUS, "允许", "人工批准后，上游业务系统仍应按最小权限重新执行工具调用。"),
+    "批准": (APPROVED_STATUS, "允许", "人工批准后，上游业务系统仍应按最小权限重新执行工具调用。"),
     "reject": (REJECTED_STATUS, "拒绝", "人工驳回后，工具调用保持阻断，建议补充赛事授权或改用脱敏结果。"),
     "驳回": (REJECTED_STATUS, "拒绝", "人工驳回后，工具调用保持阻断，建议补充赛事授权或改用脱敏结果。"),
 }
@@ -80,7 +80,7 @@ def create_approval_review(event: dict[str, Any], supervisor_result: dict[str, A
         "sla_minutes": sla_minutes,
         "sla_breached": False,
         "escalation_level": escalation_level,
-        "execution_note": "监督器已暂停该工具调用，等待人工确认后由上游比赛平台决定是否重新发起。",
+        "execution_note": "监督器已暂停该工具调用，等待人工确认后由上游业务系统决定是否重新发起。",
         "sandbox_replay_requested": False,
         "sandbox_replayed_at": "",
         "sandbox_replay": None,
@@ -142,14 +142,14 @@ def decide_approval_review(
                 },
                 "允许",
             )
-            execution_note = "人工批准后已在本地沙箱重放工具调用；不会触达真实比赛平台。"
+            execution_note = "人工批准后已在本地沙箱重放工具调用；不会触达真实外部系统。"
         except Exception as exc:  # noqa: BLE001 - persisted as review evidence
             sandbox_replay = {
                 "executed": False,
                 "sandboxed": True,
                 "output": f"沙箱重放失败：{exc}",
             }
-            execution_note = "人工批准后尝试沙箱重放，但执行失败；真实比赛平台仍需重新发起并按最小权限执行。"
+            execution_note = "人工批准后尝试沙箱重放，但执行失败；真实外部系统仍需重新发起并按最小权限执行。"
 
     updated = {
         **review,

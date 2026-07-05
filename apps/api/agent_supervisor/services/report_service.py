@@ -107,7 +107,7 @@ def build_report() -> dict:
             "evidence": "监督器拦截工具调用并输出允许、拒绝、询问、隔离。",
         },
         {
-            "name": "本地靶场业务工具",
+            "name": "本地受控环境业务工具",
             "status": "已实现",
             "evidence": "覆盖邮件、文件、API、代码执行、记忆、环境变量工具。",
         },
@@ -124,20 +124,20 @@ def build_report() -> dict:
         {
             "name": "基座模型检测或过滤原型",
             "status": "已实现",
-            "evidence": f"支持越狱过滤、输出过滤、策略判定、异常检测；校准阈值 {anomaly_calibration_eval['summary']['recommended_threshold']}，正常比赛任务误报率 {anomaly_calibration_eval['summary']['benign_false_alarm_rate']}%。",
+            "evidence": f"支持越狱过滤、输出过滤、策略判定、异常检测；校准阈值 {anomaly_calibration_eval['summary']['recommended_threshold']}，正常业务任务误报率 {anomaly_calibration_eval['summary']['benign_false_alarm_rate']}%。",
         },
         {
             "name": "异常检测阈值校准报告",
             "status": "已实现",
-            "evidence": f"攻击召回率 {anomaly_calibration_eval['summary']['attack_recall_rate']}%，正常比赛任务误报率 {anomaly_calibration_eval['summary']['benign_false_alarm_rate']}%。",
+            "evidence": f"攻击召回率 {anomaly_calibration_eval['summary']['attack_recall_rate']}%，正常业务任务误报率 {anomaly_calibration_eval['summary']['benign_false_alarm_rate']}%。",
         },
         {
-            "name": "正常比赛任务误报评测",
+            "name": "正常业务任务误报评测",
             "status": "已实现",
-            "evidence": f"{benign_eval['summary']['case_count']} 个正常比赛任务样本，误报率 {benign_eval['summary']['false_positive_rate']}%。",
+            "evidence": f"{benign_eval['summary']['case_count']} 个正常业务任务样本，误报率 {benign_eval['summary']['false_positive_rate']}%。",
         },
         {
-            "name": "连续正常比赛任务流程误报评测",
+            "name": "连续正常业务任务流程误报评测",
             "status": "已实现",
             "evidence": f"{benign_workflow_eval['summary']['workflow_count']} 条比赛任务流程，{benign_workflow_eval['summary']['step_count']} 个工具步骤，误报率 {benign_workflow_eval['summary']['false_positive_rate']}%。",
         },
@@ -184,7 +184,7 @@ def build_report() -> dict:
         "",
         "## 1. 作品定位",
         "",
-        "本作品面向“面向大模型及其应用的安全性研究”赛题，构建红队攻击面研究、智能体靶场复现、行为监督拦截和防御评测闭环。",
+        "本作品面向“面向大模型及其应用的安全性研究”方向，构建红队攻击面研究、智能体受控实验环境复现、行为监督拦截和防御评测闭环。",
         "",
         "## 2. 核心统计",
         "",
@@ -193,7 +193,7 @@ def build_report() -> dict:
         f"- 已记录实验：{summary['run_count']} 次",
         f"- 防护开启实验：{summary['guarded_run_count']} 次",
         f"- 防护控制率：{summary['control_rate']}%",
-        f"- 正常比赛任务误报率：{summary['false_positive_rate']}%",
+        f"- 正常业务任务误报率：{summary['false_positive_rate']}%",
         f"- 连续比赛任务流程误报率：{summary['benign_workflow_false_positive_rate']}%",
         f"- 期望决策匹配率：{summary['expected_match_rate']}%",
         f"- 输出过滤阻断率：{summary['output_filter_block_rate']}%",
@@ -241,7 +241,7 @@ def build_report() -> dict:
     lines.extend(
         [
             "",
-            "## 5. 比赛预期成果对齐",
+            "## 5. 成果能力对齐",
             "",
             "| 要求 | 状态 | 证据 |",
             "|---|---|---|",
@@ -268,7 +268,7 @@ def build_report() -> dict:
     lines.extend(
         [
             "",
-            "## 7. 正常比赛任务误报评测",
+            "## 7. 正常业务任务误报评测",
             "",
             "| 样本 | 类别 | 工具 | 期望 | 实际 | 误报 | 策略 |",
             "|---|---|---|---|---|---|---|",
@@ -291,7 +291,7 @@ def build_report() -> dict:
     lines.extend(
         [
             "",
-            "## 8. 连续正常比赛任务流程误报评测",
+            "## 8. 连续正常业务任务流程误报评测",
             "",
             f"- 流程数量：{benign_workflow_eval['summary']['workflow_count']}",
             f"- 工具步骤：{benign_workflow_eval['summary']['step_count']}",
@@ -384,7 +384,7 @@ def build_report() -> dict:
             "",
             f"- 推荐阈值：anomaly_score >= {anomaly_calibration_eval['summary']['recommended_threshold']}",
             f"- 攻击样本召回率：{anomaly_calibration_eval['summary']['attack_recall_rate']}%",
-            f"- 正常比赛任务误报率：{anomaly_calibration_eval['summary']['benign_false_alarm_rate']}%",
+            f"- 正常业务任务误报率：{anomaly_calibration_eval['summary']['benign_false_alarm_rate']}%",
             f"- 低于异常阈值但被固定策略控制：{anomaly_calibration_eval['summary']['policy_controlled_missed_count']} 个",
             "",
             "| 阈值 | 攻击召回率 | 正常误报率 | 精确率 |",

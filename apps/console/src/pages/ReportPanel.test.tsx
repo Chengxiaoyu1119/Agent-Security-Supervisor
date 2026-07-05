@@ -41,18 +41,18 @@ describe('ReportPanel', () => {
   it('renders the report center and primary tabs', () => {
     render(<ReportPanel report={report} onOpenScenario={vi.fn()} />);
 
-    expect(screen.getByText('比赛材料中心')).toBeInTheDocument();
+    expect(screen.getByText('研究材料中心')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: '复制 Markdown' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: '报告概览与成熟度' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: '攻防实战评测' })).toBeInTheDocument();
     expect(screen.getByRole('tab', { name: '正常与消融评测' })).toBeInTheDocument();
-    expect(screen.getByRole('tab', { name: '比赛交付与接口' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: '成果交付与接口' })).toBeInTheDocument();
   });
 
   it('keeps the report page usable while report data is loading', () => {
     render(<ReportPanel report={null} onOpenScenario={vi.fn()} />);
 
-    expect(screen.getByText('比赛材料中心')).toBeInTheDocument();
+    expect(screen.getByText('研究材料中心')).toBeInTheDocument();
     expect(screen.getByText('正在加载报告...')).toBeInTheDocument();
   });
 });

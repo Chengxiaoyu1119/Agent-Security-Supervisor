@@ -81,9 +81,9 @@ def build_benign_cases_markdown(category: str | None = None) -> str:
     dataset = evaluate_benign_cases(category)
     title_suffix = f"（{category}）" if category else ""
     lines = [
-        f"# 正常比赛任务样本与误报评测{title_suffix}",
+        f"# 正常业务任务样本与误报评测{title_suffix}",
         "",
-        "该文件用于证明行为监督器不仅能拦截攻击，也能放行正常比赛任务，并给出误报率评测依据。",
+        "该文件用于证明行为监督器不仅能拦截攻击，也能放行正常业务任务，并给出误报率评测依据。",
         "",
         "## 汇总",
         "",

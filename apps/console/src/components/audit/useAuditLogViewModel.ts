@@ -104,7 +104,7 @@ export function useAuditLogViewModel({ logs, refresh }: UseAuditLogViewModelPara
           review.id,
           action,
           action === 'approve'
-            ? '复核批准：确认可由上游比赛平台按最小权限重新发起。'
+            ? '复核批准：确认可由上游业务系统按最小权限重新发起。'
             : '复核驳回：外部收件人或敏感数据范围未满足授权条件。',
           action === 'approve'
         );

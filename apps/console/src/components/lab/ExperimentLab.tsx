@@ -58,7 +58,7 @@ export function ExperimentLab(props: ExperimentLabProps) {
               items={[
                 {
                   key: 'penetration-learning',
-                  label: '本地靶场攻破',
+                  label: '本地受控实验',
                   children: <PenetrationLearningLab refresh={props.refresh} />
                 },
                 {
@@ -107,7 +107,7 @@ export function ExperimentLab(props: ExperimentLabProps) {
               items={[
                 {
                   key: 'authorized-target',
-                  label: '授权公网靶场',
+                  label: '外部授权目标',
                   children: <AuthorizedTargetLab refresh={props.refresh} />
                 },
                 {

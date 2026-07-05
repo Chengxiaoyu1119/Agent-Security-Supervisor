@@ -84,7 +84,7 @@ export function ProjectRoadmapBlock({
           <Metric label="P0 待办" value={`${roadmap.summary.p0_backlog_count}`} tone="amber" />
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Metric label="赛题匹配" value={`${roadmap.direction.competition_fit}%`} tone="cyan" />
+          <Metric label="方向匹配" value={`${roadmap.direction.competition_fit}%`} tone="cyan" />
         </Col>
       </Row>
 

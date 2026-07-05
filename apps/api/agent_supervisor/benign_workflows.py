@@ -317,8 +317,8 @@ def write_benign_workflow_report(output_root: str | Path | None = None) -> dict[
     root = Path(output_root) if output_root else REPORT_ROOT
     root.mkdir(parents=True, exist_ok=True)
     data = evaluate_benign_workflows()
-    json_path = root / "连续正常比赛任务流程误报评测.json"
-    markdown_path = root / "连续正常比赛任务流程误报评测.md"
+    json_path = root / "连续正常业务任务流程误报评测.json"
+    markdown_path = root / "连续正常业务任务流程误报评测.md"
     json_path.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     markdown_path.write_text(build_benign_workflow_markdown(data), encoding="utf-8")
     return {
@@ -333,9 +333,9 @@ def build_benign_workflow_markdown(data: dict[str, Any] | None = None) -> str:
     data = data or evaluate_benign_workflows()
     summary = data["summary"]
     lines = [
-        "# 连续正常比赛任务流程误报评测",
+        "# 连续正常业务任务流程误报评测",
         "",
-        "该报告验证智能体在多步正常比赛任务流程中连续调用工具时，监督器是否仍能保持低误报，并对外部邮件、代码执行等边界动作给出符合预期的询问或隔离。",
+        "该报告验证智能体在多步正常业务任务流程中连续调用工具时，监督器是否仍能保持低误报，并对外部邮件、代码执行等边界动作给出符合预期的询问或隔离。",
         "",
         "## 汇总",
         "",

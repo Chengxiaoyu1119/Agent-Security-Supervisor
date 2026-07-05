@@ -74,7 +74,7 @@ def init_sandbox(sandbox: SandboxPaths | None = None) -> None:
     init_target_lab()
     _seed_workspace_from_fixtures(paths)
     (paths.workspace / "public" / "项目说明.md").write_text(
-        "这是智安哨智能体靶场的公开项目说明。允许读取。",
+        "这是智安哨智能体受控实验环境的公开项目说明。允许读取。",
         encoding="utf-8",
     )
     (paths.workspace / "public" / "赛题公开说明.md").write_text(

@@ -86,7 +86,7 @@ export function AttackModuleOptionsPanel({ surfaceId, value, onChange }: AttackM
 
   if (surfaceId === 'abuse-risk') {
     return (
-      <OptionField label="靶场 API 端点">
+      <OptionField label="模拟 API 端点">
         <UiInput
           value={value.endpoint}
           onChange={(event) => onChange(mergeOption(value, 'endpoint', event.target.value))}
