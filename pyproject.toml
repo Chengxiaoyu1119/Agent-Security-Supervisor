@@ -38,11 +38,11 @@ disallow_untyped_defs = false
 [tool.coverage.run]
 branch = true
 include = [
-  "apps/api/agent_supervisor/anomaly.py",
   "apps/api/agent_supervisor/auth.py",
-  "apps/api/agent_supervisor/data.py",
-  "apps/api/agent_supervisor/risk_score.py",
-  "apps/api/agent_supervisor/supervisor.py",
+  "apps/api/agent_supervisor/domains/governance/anomaly.py",
+  "apps/api/agent_supervisor/domains/governance/risk_score.py",
+  "apps/api/agent_supervisor/domains/governance/supervisor.py",
+  "apps/api/agent_supervisor/storage/data.py",
 ]
 omit = [
   "apps/api/agent_supervisor/config/*",

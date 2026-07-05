@@ -15,6 +15,8 @@ import type {
   LearningLabRunRequest,
   LearningLabRunResult,
   LearningLabScenariosResponse,
+  RefusalRewriteEvasionRequest,
+  RefusalRewriteEvasionResult,
   TargetLabState
 } from '../types';
 import { request } from './apiRequest';
@@ -85,6 +87,19 @@ export async function runJailbreakRedteam(payload: JailbreakRedteamRequest): Pro
 export async function runDualModelJailbreak(payload: DualModelJailbreakRequest): Promise<DualModelJailbreakResult> {
   return request<DualModelJailbreakResult>(
     '/api/redteam_lab/jailbreak/dual_model/run',
+    {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    },
+    { timeoutMs: 120000 }
+  );
+}
+
+export async function runRefusalRewriteEvasion(
+  payload: RefusalRewriteEvasionRequest
+): Promise<RefusalRewriteEvasionResult> {
+  return request<RefusalRewriteEvasionResult>(
+    '/api/redteam_lab/jailbreak/refusal_rewrite/run',
     {
       method: 'POST',
       body: JSON.stringify(payload)

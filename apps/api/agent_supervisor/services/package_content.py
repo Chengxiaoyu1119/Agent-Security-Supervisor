@@ -6,7 +6,7 @@ from collections import Counter
 from pathlib import Path
 from typing import Any
 
-from ..paths import REPO_ROOT, SANDBOX_REPORTS_DIR
+from apps.api.agent_supervisor.paths import REPO_ROOT, SANDBOX_REPORTS_DIR
 
 
 def _clean_submission_summary(runs: list[dict[str, Any]], scenarios: list[dict[str, Any]]) -> dict[str, Any]:

@@ -2,7 +2,7 @@
 
 from typing import Any
 
-from ..paths import ROOT_DOCS_DIR
+from apps.api.agent_supervisor.paths import ROOT_DOCS_DIR
 
 
 def _adapter_schema() -> dict[str, Any]:

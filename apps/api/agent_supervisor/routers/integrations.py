@@ -3,15 +3,35 @@ from typing import Any
 from fastapi import APIRouter, Body, Depends, HTTPException, Response
 from fastapi.responses import StreamingResponse
 
-from ..agent_integrations import build_agent_integration_bundle, build_agent_integration_markdown
-from ..attack_lab import list_attack_lab_modules, run_attack_lab_module
-from ..attack_testsets import list_attack_testsets, run_attack_testset
-from ..auth import require_api_token
-from ..capability_replay import run_capability_replay
-from ..event_stream import stream_runtime_events
-from ..events import evaluate_agent_event
-from ..external_agent_demo import run_minimal_external_agent_demo
-from ..main_models import (
+from apps.api.agent_supervisor.adapters.integrations.agent_integrations import (
+    build_agent_integration_bundle,
+    build_agent_integration_markdown,
+)
+from apps.api.agent_supervisor.adapters.integrations.external_agent_demo import run_minimal_external_agent_demo
+from apps.api.agent_supervisor.adapters.integrations.openclaw_adapter import build_openclaw_hook_example, build_openclaw_integration_bundle
+from apps.api.agent_supervisor.adapters.integrations.openclaw_plugin_package import (
+    build_openclaw_plugin_package_markdown,
+    build_openclaw_plugin_package_summary,
+    build_openclaw_plugin_validation_markdown,
+    validate_openclaw_plugin_package,
+    write_openclaw_plugin_package,
+    write_openclaw_plugin_validation_report,
+)
+from apps.api.agent_supervisor.auth import require_api_token
+from apps.api.agent_supervisor.domains.attacks.attack_lab import list_attack_lab_modules, run_attack_lab_module
+from apps.api.agent_supervisor.domains.attacks.attack_testsets import list_attack_testsets, run_attack_testset
+from apps.api.agent_supervisor.domains.attacks.capability_replay import run_capability_replay
+from apps.api.agent_supervisor.domains.attacks.penetration_lab import list_learning_scenarios, run_learning_attack
+from apps.api.agent_supervisor.domains.attacks.redteam_lab import (
+    run_authorized_target_test,
+    run_dual_model_jailbreak,
+    run_jailbreak_redteam,
+    run_refusal_rewrite_evasion,
+)
+from apps.api.agent_supervisor.domains.attacks.target_lab import reset_target_lab, target_lab_snapshot
+from apps.api.agent_supervisor.domains.runtime.event_stream import stream_runtime_events
+from apps.api.agent_supervisor.domains.runtime.events import evaluate_agent_event
+from apps.api.agent_supervisor.schemas.main_models import (
     AgentToolEvent,
     AttackLabRunRequest,
     AttackTestsetRunRequest,
@@ -20,20 +40,10 @@ from ..main_models import (
     DualModelJailbreakRequest,
     JailbreakRedteamRequest,
     LearningLabRunRequest,
+    RefusalRewriteEvasionRequest,
 )
-from ..openclaw_adapter import build_openclaw_hook_example, build_openclaw_integration_bundle
-from ..openclaw_plugin_package import (
-    build_openclaw_plugin_package_markdown,
-    build_openclaw_plugin_package_summary,
-    build_openclaw_plugin_validation_markdown,
-    validate_openclaw_plugin_package,
-    write_openclaw_plugin_package,
-    write_openclaw_plugin_validation_report,
-)
-from ..penetration_lab import list_learning_scenarios, run_learning_attack
-from ..redteam_lab import run_authorized_target_test, run_dual_model_jailbreak, run_jailbreak_redteam
+
 from ..services.package_service import build_competition_package
-from ..target_lab import reset_target_lab, target_lab_snapshot
 
 router = APIRouter(dependencies=[Depends(require_api_token)])
 
@@ -167,6 +177,14 @@ def redteam_jailbreak_run(request: JailbreakRedteamRequest) -> dict:
 def redteam_dual_model_jailbreak_run(request: DualModelJailbreakRequest) -> dict:
     try:
         return run_dual_model_jailbreak(request.dict())
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+
+@router.post("/api/redteam_lab/jailbreak/refusal_rewrite/run")
+def redteam_refusal_rewrite_evasion_run(request: RefusalRewriteEvasionRequest) -> dict:
+    try:
+        return run_refusal_rewrite_evasion(request.dict())
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc)) from exc
 

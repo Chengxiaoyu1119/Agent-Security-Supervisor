@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import unittest
 
-from apps.api.agent_supervisor.penetration_lab import list_learning_scenarios, run_learning_attack
+from apps.api.agent_supervisor.domains.attacks.penetration_lab import list_learning_scenarios, run_learning_attack
 
 
 class PenetrationLearningLabTests(unittest.TestCase):

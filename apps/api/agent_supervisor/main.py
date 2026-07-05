@@ -6,10 +6,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from .database import init_db
+from apps.api.agent_supervisor.domains.runtime.tools import init_sandbox
+from apps.api.agent_supervisor.storage.database import init_db
+
 from .paths import REPO_ROOT
 from .routers import core, evaluations, integrations, proxy, scenarios
-from .tools import init_sandbox
 
 app = FastAPI(title="智安哨 API", version="0.1.0")
 

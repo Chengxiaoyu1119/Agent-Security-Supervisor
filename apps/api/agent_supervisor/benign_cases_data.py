@@ -1,11 +1,8 @@
-from __future__ import annotations
+"""Compatibility wrapper for moved module `agent_supervisor.benign_cases_data`."""
 
-from typing import Any
+import sys
 
-from .benign_cases_group1 import BENIGN_CASE_GROUP_1
-from .benign_cases_group2 import BENIGN_CASE_GROUP_2
+from .domains.evaluations import benign_cases_data as _impl
+from .domains.evaluations.benign_cases_data import *  # noqa: F401,F403
 
-BENIGN_CASES: list[dict[str, Any]] = [
-    *BENIGN_CASE_GROUP_1,
-    *BENIGN_CASE_GROUP_2,
-]
+sys.modules[__name__] = _impl

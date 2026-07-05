@@ -7,7 +7,7 @@ from typing import Any
 
 from fastapi import HTTPException
 
-from apps.api.agent_supervisor.proxy_security import require_openai_proxy_access, reset_proxy_rate_limits
+from apps.api.agent_supervisor.adapters.proxy.proxy_security import require_openai_proxy_access, reset_proxy_rate_limits
 
 
 class ProxySecurityTest(unittest.TestCase):

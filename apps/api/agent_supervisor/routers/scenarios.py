@@ -1,12 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException
 
-from ..agents import batch_compare_scenarios, compare_scenario, run_scenario
-from ..attack_chains import compare_attack_chain, list_attack_chains, run_attack_chain, write_attack_chain_report
-from ..auth import require_api_token
-from ..data import get_scenarios
-from ..database import load_run
-from ..integrity import verify_audit_hashes
-from ..main_models import AttackChainRunRequest, BatchCompareRequest, RunRequest
+from apps.api.agent_supervisor.auth import require_api_token
+from apps.api.agent_supervisor.domains.attacks.agents import batch_compare_scenarios, compare_scenario, run_scenario
+from apps.api.agent_supervisor.domains.attacks.attack_chains import (
+    compare_attack_chain,
+    list_attack_chains,
+    run_attack_chain,
+    write_attack_chain_report,
+)
+from apps.api.agent_supervisor.domains.governance.integrity import verify_audit_hashes
+from apps.api.agent_supervisor.schemas.main_models import AttackChainRunRequest, BatchCompareRequest, RunRequest
+from apps.api.agent_supervisor.storage.data import get_scenarios
+from apps.api.agent_supervisor.storage.database import load_run
 
 router = APIRouter(dependencies=[Depends(require_api_token)])
 

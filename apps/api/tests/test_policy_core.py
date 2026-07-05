@@ -7,10 +7,10 @@ from unittest.mock import patch
 from apps.api.agent_supervisor import data as policy_data
 from apps.api.agent_supervisor import memory_governance
 from apps.api.agent_supervisor import openclaw_plugin_package as openclaw_pkg
-from apps.api.agent_supervisor.agent_integrations import build_agent_integration_bundle
-from apps.api.agent_supervisor.anomaly import detect_tool_anomaly
-from apps.api.agent_supervisor.risk_score import calculate_risk_score
-from apps.api.agent_supervisor.supervisor import decide
+from apps.api.agent_supervisor.adapters.integrations.agent_integrations import build_agent_integration_bundle
+from apps.api.agent_supervisor.domains.governance.anomaly import detect_tool_anomaly
+from apps.api.agent_supervisor.domains.governance.risk_score import calculate_risk_score
+from apps.api.agent_supervisor.domains.governance.supervisor import decide
 
 
 class SupervisorPolicyBranchTest(unittest.TestCase):

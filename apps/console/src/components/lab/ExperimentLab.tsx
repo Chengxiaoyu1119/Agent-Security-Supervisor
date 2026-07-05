@@ -9,6 +9,7 @@ import type { ExperimentLabProps } from './ExperimentLab.types';
 import { ExperimentResultPanel } from './ExperimentResultPanel';
 import { JailbreakRedteamLab } from './JailbreakRedteamLab';
 import { PenetrationLearningLab } from './PenetrationLearningLab';
+import { RefusalRewriteEvasionLab } from './RefusalRewriteEvasionLab';
 import { ScenarioSamplePanel } from './ScenarioSamplePanel';
 import { UiTabs } from '../ui';
 
@@ -92,6 +93,11 @@ export function ExperimentLab(props: ExperimentLabProps) {
                   key: 'dual-model-jailbreak',
                   label: '双模型优化越狱',
                   children: <DualModelJailbreakLab refresh={props.refresh} />
+                },
+                {
+                  key: 'refusal-rewrite-evasion',
+                  label: '拒答改写绕过',
+                  children: <RefusalRewriteEvasionLab refresh={props.refresh} />
                 }
               ]}
             />

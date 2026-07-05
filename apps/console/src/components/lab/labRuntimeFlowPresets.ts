@@ -49,6 +49,15 @@ export const dualModelFlowSteps: LabRuntimeFlowStep[] = [
   { label: '监督审计', detail: '生成无监督/有监督对照证据', tone: 'success' }
 ];
 
+export function refusalRewriteFlowSteps(iterationCount: number, forceRealTarget: boolean): LabRuntimeFlowStep[] {
+  return [
+    { label: '首轮主模型', detail: forceRealTarget ? '优先调用真实目标模型' : '使用本地可复现拒答样例', tone: 'active' },
+    { label: '拒答命中', detail: '检查抱歉、无法协助等拒答词并记录证据' },
+    { label: '副模型改写', detail: `最多 ${iterationCount} 轮，复现拒答后重写链`, tone: 'success' },
+    { label: '监督审计', detail: '识别 rewrite_evasion、refusal_rewrite、prompt_pollution 风险', tone: 'success' }
+  ];
+}
+
 export function authorizedTargetFlowSteps(authorizationConfirmed: boolean): LabRuntimeFlowStep[] {
   return [
     {

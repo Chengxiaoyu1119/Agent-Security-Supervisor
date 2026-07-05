@@ -9,9 +9,9 @@ from fastapi import HTTPException
 from apps.api.agent_supervisor import benign_workflows, tools
 from apps.api.agent_supervisor import data as policy_data
 from apps.api.agent_supervisor.auth import require_api_token
-from apps.api.agent_supervisor.correlation import reset_correlation_state
-from apps.api.agent_supervisor.events import evaluate_agent_event
-from apps.api.agent_supervisor.supervisor import decide
+from apps.api.agent_supervisor.domains.governance.correlation import reset_correlation_state
+from apps.api.agent_supervisor.domains.governance.supervisor import decide
+from apps.api.agent_supervisor.domains.runtime.events import evaluate_agent_event
 
 
 class ApiTokenAuthTest(unittest.TestCase):

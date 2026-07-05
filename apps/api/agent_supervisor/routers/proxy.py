@@ -3,8 +3,8 @@ from typing import Any
 from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 
-from ..openai_proxy import run_openai_proxy_completion, stream_openai_proxy_completion
-from ..proxy_security import require_openai_proxy_access
+from apps.api.agent_supervisor.adapters.proxy.openai_proxy import run_openai_proxy_completion, stream_openai_proxy_completion
+from apps.api.agent_supervisor.adapters.proxy.proxy_security import require_openai_proxy_access
 
 router = APIRouter()
 

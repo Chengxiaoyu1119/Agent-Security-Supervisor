@@ -3,19 +3,23 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Any
 
-from ..ablation import build_policy_ablation_markdown, load_policy_ablation_report
-from ..approvals import build_approval_review_markdown
-from ..attack_chains import build_attack_chain_catalog_markdown
-from ..benign import build_benign_cases_markdown
-from ..benign_workflows import build_benign_workflow_markdown
-from ..calibration import build_anomaly_calibration_markdown
-from ..data import get_attack_surfaces, get_policies, get_scenarios
-from ..demo_drill import build_judge_demo_drill_markdown
+from apps.api.agent_supervisor.adapters.integrations.openclaw_plugin_package import (
+    build_openclaw_plugin_package_markdown,
+    build_openclaw_plugin_validation_markdown,
+)
+from apps.api.agent_supervisor.domains.attacks.attack_chains import build_attack_chain_catalog_markdown
+from apps.api.agent_supervisor.domains.evaluations.ablation import build_policy_ablation_markdown, load_policy_ablation_report
+from apps.api.agent_supervisor.domains.evaluations.benign import build_benign_cases_markdown
+from apps.api.agent_supervisor.domains.evaluations.benign_workflows import build_benign_workflow_markdown
+from apps.api.agent_supervisor.domains.evaluations.calibration import build_anomaly_calibration_markdown
+from apps.api.agent_supervisor.domains.evaluations.demo_drill import build_judge_demo_drill_markdown
+from apps.api.agent_supervisor.domains.evaluations.evidence import build_output_filter_markdown, build_surface_conclusions_markdown
+from apps.api.agent_supervisor.domains.governance.approvals import build_approval_review_markdown
+from apps.api.agent_supervisor.storage.data import get_attack_surfaces, get_policies, get_scenarios
+
 from ..domains.reports.readiness import build_competition_readiness_markdown
 from ..domains.reports.roadmap import build_project_roadmap_markdown
 from ..domains.reports.surface_pack import build_surface_evidence_index_markdown
-from ..evidence import build_output_filter_markdown, build_surface_conclusions_markdown
-from ..openclaw_plugin_package import build_openclaw_plugin_package_markdown, build_openclaw_plugin_validation_markdown
 from .package_content import (
     _checklist,
     _experiment_report,

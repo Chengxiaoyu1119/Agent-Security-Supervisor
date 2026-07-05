@@ -4,17 +4,53 @@ from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException, Query, Response
 from fastapi.responses import FileResponse
 
-from ..ablation import build_policy_ablation, build_policy_ablation_markdown, write_policy_ablation_report
-from ..agents import batch_compare_scenarios
-from ..approvals import build_approval_review_markdown, decide_approval_review, list_approval_reviews, write_approval_review_report
-from ..assessment import build_attack_effectiveness
-from ..auth import current_security_role, require_api_token, require_role
-from ..benign import build_benign_cases_markdown, evaluate_benign_cases, get_benign_cases
-from ..benign_workflows import build_benign_workflow_markdown, evaluate_benign_workflows, write_benign_workflow_report
-from ..calibration import build_anomaly_calibration, build_anomaly_calibration_markdown, write_anomaly_calibration_report
-from ..database import latest_runs
-from ..datasets import build_attack_case_dataset, build_attack_case_markdown
-from ..demo_drill import build_judge_demo_drill_markdown, load_judge_demo_drill_report, run_judge_demo_drill
+from apps.api.agent_supervisor.auth import current_security_role, require_api_token, require_role
+from apps.api.agent_supervisor.domains.attacks.agents import batch_compare_scenarios
+from apps.api.agent_supervisor.domains.evaluations.ablation import (
+    build_policy_ablation,
+    build_policy_ablation_markdown,
+    write_policy_ablation_report,
+)
+from apps.api.agent_supervisor.domains.evaluations.assessment import build_attack_effectiveness
+from apps.api.agent_supervisor.domains.evaluations.benign import build_benign_cases_markdown, evaluate_benign_cases, get_benign_cases
+from apps.api.agent_supervisor.domains.evaluations.benign_workflows import (
+    build_benign_workflow_markdown,
+    evaluate_benign_workflows,
+    write_benign_workflow_report,
+)
+from apps.api.agent_supervisor.domains.evaluations.calibration import (
+    build_anomaly_calibration,
+    build_anomaly_calibration_markdown,
+    write_anomaly_calibration_report,
+)
+from apps.api.agent_supervisor.domains.evaluations.datasets import build_attack_case_dataset, build_attack_case_markdown
+from apps.api.agent_supervisor.domains.evaluations.demo_drill import (
+    build_judge_demo_drill_markdown,
+    load_judge_demo_drill_report,
+    run_judge_demo_drill,
+)
+from apps.api.agent_supervisor.domains.evaluations.evidence import (
+    build_output_filter_evidence,
+    build_output_filter_markdown,
+    build_surface_conclusions,
+    build_surface_conclusions_markdown,
+)
+from apps.api.agent_supervisor.domains.evaluations.gap_rerun import run_gap_rerun
+from apps.api.agent_supervisor.domains.governance.approvals import (
+    build_approval_review_markdown,
+    decide_approval_review,
+    list_approval_reviews,
+    write_approval_review_report,
+)
+from apps.api.agent_supervisor.domains.runtime.runtime_evaluation import (
+    build_real_model_evaluation,
+    build_real_model_evaluation_markdown,
+    write_real_model_evaluation_report,
+)
+from apps.api.agent_supervisor.paths import SANDBOX_REPORTS_DIR
+from apps.api.agent_supervisor.schemas.main_models import ApprovalDecisionRequest, RealModelEvaluationRequest
+from apps.api.agent_supervisor.storage.database import latest_runs
+
 from ..domains.reports.briefing_export import (
     EXPORT_DIR_NAME,
     build_briefing_sheet_export_markdown,
@@ -37,20 +73,6 @@ from ..domains.reports.surface_pack import (
     write_all_surface_evidence_packs,
     write_surface_briefing_sheet,
     write_surface_evidence_pack,
-)
-from ..evidence import (
-    build_output_filter_evidence,
-    build_output_filter_markdown,
-    build_surface_conclusions,
-    build_surface_conclusions_markdown,
-)
-from ..gap_rerun import run_gap_rerun
-from ..main_models import ApprovalDecisionRequest, RealModelEvaluationRequest
-from ..paths import SANDBOX_REPORTS_DIR
-from ..runtime_evaluation import (
-    build_real_model_evaluation,
-    build_real_model_evaluation_markdown,
-    write_real_model_evaluation_report,
 )
 from ..services.report_service import build_report
 

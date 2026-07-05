@@ -3,8 +3,8 @@ from __future__ import annotations
 import unittest
 from unittest.mock import patch
 
-from apps.api.agent_supervisor.model_adapter import _provider_priority
-from apps.api.agent_supervisor.redteam_lab import run_dual_model_jailbreak
+from apps.api.agent_supervisor.adapters.models.model_adapter import _provider_priority
+from apps.api.agent_supervisor.domains.attacks.redteam_lab import run_dual_model_jailbreak
 
 
 class DualModelJailbreakTests(unittest.TestCase):
