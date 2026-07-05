@@ -24,9 +24,9 @@ export function ReportOverviewSurfaceDistribution({ report, onOpenPage }: Report
     >
       <div className="zh-report-surface-summary">
         <div>
-          <Typography.Text strong>从攻击面进入真实运行</Typography.Text>
+          <Typography.Text strong>攻击面运行入口</Typography.Text>
           <Typography.Text type="secondary" className="zh-text-block zh-mt-4">
-            这里不是静态说明：每类攻击面都能跳到工作台运行脚本、生成审计日志，并回写报告证据。
+            选择攻击面后可运行脚本、生成审计日志，并同步更新报告证据。
           </Typography.Text>
         </div>
         <Space wrap className="zh-report-surface-actions">

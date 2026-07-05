@@ -674,6 +674,19 @@ html[data-theme='dark'] .zh-label-tag.ant-tag-purple {
   gap: 12px !important;
 }
 
+.zh-report-metric-row {
+  display: grid;
+  gap: 8px;
+  min-height: 88px;
+  align-content: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--ant-color-border-secondary);
+}
+
+.zh-report-metric-row:last-child {
+  border-bottom: 0;
+}
+
 .zh-report-metric-row-card .ant-card-body {
   display: grid;
   gap: 8px;
@@ -834,31 +847,33 @@ html[data-theme='dark'] .zh-label-tag.ant-tag-purple {
   min-width: 118px;
 }
 
-.zh-brief-export-grid > .ant-col {
+.zh-brief-export-table {
+  display: grid;
+  border-top: 1px solid var(--ant-color-border-secondary);
+}
+
+.zh-brief-export-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(210px, auto) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--ant-color-border-secondary);
+}
+
+.zh-brief-export-row__name {
   display: flex;
-}
-
-.zh-brief-export-card {
-  width: 100%;
-}
-
-.zh-brief-export-card .ant-card-head-title {
   min-width: 0;
-}
-
-.zh-brief-export-card .ant-card-body {
-  display: flex;
-  min-height: 132px;
   flex-direction: column;
+  gap: 4px;
 }
 
-.zh-brief-export-desc {
-  flex: 1;
-  line-height: 1.65;
+.zh-brief-export-row__status {
+  justify-content: flex-start;
 }
 
 .zh-brief-export-file-actions {
-  margin-top: 16px;
+  justify-content: flex-end;
 }
 
 .zh-brief-export-file-actions .ant-btn {
@@ -875,6 +890,14 @@ html[data-theme='dark'] .zh-label-tag.ant-tag-purple {
   }
 
   .zh-brief-export-actions {
+    justify-content: flex-start;
+  }
+
+  .zh-brief-export-row {
+    grid-template-columns: 1fr;
+  }
+
+  .zh-brief-export-file-actions {
     justify-content: flex-start;
   }
 }
@@ -931,7 +954,10 @@ html[data-theme='dark'] .zh-label-tag.ant-tag-purple {
 
   .zh-brief-export-actions,
   .zh-brief-export-actions .ant-space-item,
-  .zh-brief-export-actions .ant-btn {
+  .zh-brief-export-actions .ant-btn,
+  .zh-brief-export-file-actions,
+  .zh-brief-export-file-actions .ant-space-item,
+  .zh-brief-export-file-actions .ant-btn {
     width: 100%;
   }
 

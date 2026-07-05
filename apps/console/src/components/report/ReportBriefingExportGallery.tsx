@@ -24,8 +24,9 @@ function errorMessage(error: unknown, fallback: string) {
   return error instanceof Error ? error.message : fallback;
 }
 
-function fileUrl(surfaceId: string, fileFormat: 'png' | 'pdf') {
-  return `/api/attack_surfaces/briefing_sheets/export/files/${encodeURIComponent(surfaceId)}.${fileFormat}`;
+function fileUrl(surfaceId: string, fileFormat: 'png' | 'pdf', version?: string) {
+  const base = `/api/attack_surfaces/briefing_sheets/export/files/${encodeURIComponent(surfaceId)}.${fileFormat}`;
+  return version ? `${base}?v=${encodeURIComponent(version)}` : base;
 }
 
 export function ReportBriefingExportGallery() {
@@ -42,7 +43,7 @@ export function ReportBriefingExportGallery() {
       const result = await fetchBriefingSheetExports();
       setData(result);
       if (showNotice) {
-        setNotice({ type: 'success', message: '答辩单页导出清单已刷新。' });
+        setNotice({ type: 'success', message: '攻击面评测导出清单已刷新。' });
       }
     } catch (error) {
       setNotice({ type: 'error', message: `读取导出清单失败：${errorMessage(error, '未知错误')}` });
@@ -66,7 +67,7 @@ export function ReportBriefingExportGallery() {
         message: `已生成 ${result.summary.png_count} 个 PNG 和 ${result.summary.pdf_count} 个 PDF，可直接逐项预览。`
       });
     } catch (error) {
-      setNotice({ type: 'error', message: `导出答辩单页失败：${errorMessage(error, '未知错误')}` });
+      setNotice({ type: 'error', message: `导出攻击面评测单页失败：${errorMessage(error, '未知错误')}` });
     } finally {
       setRunning(false);
       setLoading(false);
@@ -104,8 +105,8 @@ export function ReportBriefingExportGallery() {
     <PanelCard
       title={
         <SectionTitle
-          title="答辩单页 PNG/PDF"
-          meta={data?.ok ? `${files.length} 类攻击面已导出` : '从页面触发真实后端导出'}
+          title="攻击面评测 PNG/PDF"
+          meta={data?.ok ? `${files.length} 类已导出` : '点击按钮生成最新文件'}
         />
       }
       variant="borderless"
@@ -121,16 +122,18 @@ export function ReportBriefingExportGallery() {
           <Metric label="攻击面覆盖" value={`${data?.summary.exported_surface_count ?? 0}/7`} tone="amber" />
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Metric label="HTML 源文件" value={`${data?.summary.html_file_count ?? 0}`} tone="red" />
+          <Metric
+            label="导出状态"
+            value={data?.ok ? '正常' : loading ? '读取中' : '待生成'}
+            tone={data?.ok ? 'green' : 'amber'}
+          />
         </Col>
       </Row>
 
       <div className="zh-brief-export-toolbar">
         <div className="zh-brief-export-copy">
-          <Typography.Text strong>真实导出文件清单</Typography.Text>
-          <Typography.Text type="secondary">
-            点击导出会调用后端生成 7 类攻击面的 HTML，再由本机浏览器内核转换成 PNG/PDF，不是前端假数据。
-          </Typography.Text>
+          <Typography.Text strong>导出文件清单</Typography.Text>
+          <Typography.Text type="secondary">重新导出会清理旧文件，页面预览会自动读取最新版本。</Typography.Text>
         </div>
         <Space wrap className="zh-brief-export-actions">
           <UiButton
@@ -163,49 +166,49 @@ export function ReportBriefingExportGallery() {
       {notice && <UiAlert className="zh-mt-16" type={notice.type} message={notice.message} showIcon />}
 
       {files.length ? (
-        <Row gutter={[16, 16]} className="zh-mt-16 zh-brief-export-grid">
+        <div className="zh-brief-export-table zh-mt-16">
           {files.map((file) => {
             const surfaceName = surfaceNameMap[file.surface_id] ?? file.surface_id;
             return (
-              <Col xs={24} md={12} xl={8} key={file.surface_id}>
-                <PanelCard
-                  type="inner"
-                  className="zh-brief-export-card zh-full-height"
-                  title={
-                    <Space size={8} wrap>
-                      <Typography.Text strong>{surfaceName}</Typography.Text>
-                      <LabelTag>{file.surface_id}</LabelTag>
-                    </Space>
-                  }
-                >
-                  <Typography.Text type="secondary" className="zh-text-body zh-text-block zh-brief-export-desc">
-                    可直接打开 PNG 放入答辩 PPT，也可打开 PDF 用于打印、归档或提交材料预览。
+              <div className="zh-brief-export-row" key={file.surface_id}>
+                <div className="zh-brief-export-row__name">
+                  <Typography.Text strong>{surfaceName}</Typography.Text>
+                  <Typography.Text type="secondary" className="zh-text-meta">
+                    最新评测单页
                   </Typography.Text>
-                  <Space wrap className="zh-brief-export-file-actions">
-                    <UiButton
-                      size="small"
-                      icon={<FileImage size={14} />}
-                      href={file.png_path ? fileUrl(file.surface_id, 'png') : undefined}
-                      target="_blank"
-                      disabled={!file.png_path}
-                    >
-                      预览 PNG
-                    </UiButton>
-                    <UiButton
-                      size="small"
-                      icon={<FileText size={14} />}
-                      href={file.pdf_path ? fileUrl(file.surface_id, 'pdf') : undefined}
-                      target="_blank"
-                      disabled={!file.pdf_path}
-                    >
-                      打开 PDF
-                    </UiButton>
-                  </Space>
-                </PanelCard>
-              </Col>
+                </div>
+                <Space size={8} wrap className="zh-brief-export-row__status">
+                  <LabelTag color={file.png_path ? 'success' : 'warning'}>
+                    PNG {file.png_path ? '已生成' : '未生成'}
+                  </LabelTag>
+                  <LabelTag color={file.pdf_path ? 'success' : 'warning'}>
+                    PDF {file.pdf_path ? '已生成' : '未生成'}
+                  </LabelTag>
+                </Space>
+                <Space wrap className="zh-brief-export-file-actions">
+                  <UiButton
+                    size="small"
+                    icon={<FileImage size={14} />}
+                    href={file.png_path ? fileUrl(file.surface_id, 'png', data?.generated_at) : undefined}
+                    target="_blank"
+                    disabled={!file.png_path}
+                  >
+                    预览 PNG
+                  </UiButton>
+                  <UiButton
+                    size="small"
+                    icon={<FileText size={14} />}
+                    href={file.pdf_path ? fileUrl(file.surface_id, 'pdf', data?.generated_at) : undefined}
+                    target="_blank"
+                    disabled={!file.pdf_path}
+                  >
+                    打开 PDF
+                  </UiButton>
+                </Space>
+              </div>
             );
           })}
-        </Row>
+        </div>
       ) : (
         <div className="zh-empty-panel">
           {loading ? '正在读取导出清单...' : '还没有 PNG/PDF 文件，点击“重新导出全部”即可生成。'}

@@ -12,10 +12,10 @@ interface DemoDrillPanelProps {
 export function DemoDrillPanel({ demoDrill, runningDemoDrill, handleRunDemoDrill }: DemoDrillPanelProps) {
   return (
     <PanelCard
-      title="答辩复现实验"
+      title="闭环复现实验"
       extra={
         <UiButton type="primary" icon={<Play size={16} />} onClick={handleRunDemoDrill} loading={runningDemoDrill}>
-          运行答辩复现
+          运行闭环复现
         </UiButton>
       }
       type="inner"
@@ -128,7 +128,7 @@ export function DemoDrillPanel({ demoDrill, runningDemoDrill, handleRunDemoDrill
         </>
       ) : (
         <UiAlert
-          title="还没有运行答辩复现实验。点击按钮后会生成 4 步运行记录、审计证据和本地报告。"
+          title="还没有运行闭环复现实验。点击按钮后会生成 4 步运行记录、审计证据和本地报告。"
           type="info"
           showIcon
         />

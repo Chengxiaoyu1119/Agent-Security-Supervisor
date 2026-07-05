@@ -17,7 +17,7 @@ export function DefenseEvidenceHeader({
     <div className="zh-defense-evidence-head">
       <div>
         <Typography.Title level={4} className="zh-defense-evidence-title">
-          答辩证据视图
+          评测证据视图
         </Typography.Title>
         <Typography.Paragraph type="secondary" className="zh-defense-evidence-subtitle">
           每张证据卡都来自真实运行记录，用于说明攻击可复现、防护可控制、审计可校验。

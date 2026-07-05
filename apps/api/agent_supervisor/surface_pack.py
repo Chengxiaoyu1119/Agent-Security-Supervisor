@@ -117,7 +117,7 @@ def build_surface_evidence_pack_markdown(surface_id: str, runs: list[dict[str, A
     lines = [
         f"# 攻击面证据包：{surface['name']}",
         "",
-        "该文件把单个攻击面的攻击样本、越狱用例、智能体脚本、预期监督策略、运行证据和复现入口汇总到一起，用于答辩时说明该攻击面可复现、可审计、可防御。",
+        "该文件把单个攻击面的攻击样本、越狱用例、智能体脚本、预期监督策略、运行证据和复现入口汇总到一起，用于说明该攻击面可复现、可审计、可防御。",
         "",
         "## 证据概览",
         "",
@@ -293,7 +293,7 @@ def write_surface_briefing_sheet(
     root = Path(output_root) if output_root else REPORT_ROOT
     root.mkdir(parents=True, exist_ok=True)
     pack = build_surface_evidence_pack(surface_id, runs)
-    html_path = root / f"攻击面答辩单页-{surface_id}.html"
+    html_path = root / f"攻击面评测单页-{surface_id}.html"
     html_path.write_text(build_surface_briefing_sheet_html(surface_id, runs), encoding="utf-8")
     return {
         "surface_id": surface_id,
@@ -313,7 +313,7 @@ def write_all_surface_briefing_sheets(
         write_surface_briefing_sheet(surface["id"], root, runs)
         for surface in get_attack_surfaces()
     ]
-    index_path = root / "攻击面答辩单页索引.html"
+    index_path = root / "攻击面评测单页索引.html"
     index_path.write_text(render_briefing_sheet_index_html(sheets), encoding="utf-8")
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
@@ -491,7 +491,7 @@ def _evidence_gaps(
                 "severity": "medium",
                 "title": "部分脚本缺少最近有防护结果",
                 "evidence": "缺少：" + " / ".join(missing_guarded[:5]),
-                "action": "优先运行这些脚本，保证答辩时每张证据卡都有最近结果。",
+                "action": "优先运行这些脚本，保证每张证据卡都有最近结果。",
             }
         )
     return gaps

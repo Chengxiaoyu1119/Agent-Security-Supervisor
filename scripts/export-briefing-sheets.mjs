@@ -10,7 +10,7 @@ const { chromium } = requireFromConsole('playwright');
 function parseArgs(argv) {
   const args = {
     inputDir: path.join(repoRoot, 'apps', 'api', 'sandbox', 'reports'),
-    outputDir: path.join(repoRoot, 'apps', 'api', 'sandbox', 'reports', '答辩单页导出'),
+    outputDir: path.join(repoRoot, 'apps', 'api', 'sandbox', 'reports', '攻击面评测单页导出'),
     format: 'both',
     width: 1440,
     height: 1800
@@ -71,14 +71,14 @@ async function findChromeExecutable() {
 async function findBriefingSheets(inputDir) {
   const entries = await fs.readdir(inputDir, { withFileTypes: true });
   return entries
-    .filter((entry) => entry.isFile() && entry.name.startsWith('攻击面答辩单页-') && entry.name.endsWith('.html'))
+    .filter((entry) => entry.isFile() && entry.name.startsWith('攻击面评测单页-') && entry.name.endsWith('.html'))
     .filter((entry) => !entry.name.includes('索引'))
     .map((entry) => path.join(inputDir, entry.name))
     .sort((a, b) => path.basename(a).localeCompare(path.basename(b), 'zh-Hans-CN'));
 }
 
 function outputBaseName(htmlPath) {
-  return path.basename(htmlPath, '.html').replace(/^攻击面答辩单页-/, '');
+  return path.basename(htmlPath, '.html').replace(/^攻击面评测单页-/, '');
 }
 
 async function main() {
@@ -89,7 +89,7 @@ async function main() {
   if (!htmlFiles.length) {
     console.log(JSON.stringify({
       ok: false,
-      reason: '未找到攻击面答辩单页 HTML，请先生成 briefing_sheets。',
+      reason: '未找到攻击面评测单页 HTML，请先生成 briefing_sheets。',
       input_dir: args.inputDir,
       output_dir: args.outputDir,
       files: []
@@ -131,7 +131,12 @@ async function main() {
 
       const record = { html_path: htmlPath, surface_id: base, png_path: '', pdf_path: '' };
       if (writePng) {
-        await page.screenshot({ path: pngPath, fullPage: true });
+        const sheet = await page.$('.sheet');
+        if (sheet) {
+          await sheet.screenshot({ path: pngPath });
+        } else {
+          await page.screenshot({ path: pngPath, fullPage: true });
+        }
         record.png_path = pngPath;
       }
       if (writePdf) {

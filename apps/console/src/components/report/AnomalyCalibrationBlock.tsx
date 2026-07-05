@@ -73,7 +73,7 @@ export function AnomalyCalibrationBlock({
       setNotice({
         type: 'success',
         message: `异常校准已刷新，推荐复核阈值 ${result.summary?.recommended_threshold ?? selected}。`,
-        description: '后端已重新生成异常检测 JSON/Markdown 证据，并同步刷新项目成熟度路线图。'
+        description: '后端已重新生成异常检测证据，并同步刷新项目成熟度路线图。'
       });
     } catch (error) {
       setNotice({ type: 'error', message: `异常校准刷新失败：${getErrorMessage(error)}` });
@@ -95,7 +95,7 @@ export function AnomalyCalibrationBlock({
             </Typography.Title>
             <Typography.Paragraph type="secondary" className="zh-title-flush">
               {calibration.conclusion || calibration.objective}
-              异常分用于把规则命中、工具风险、上下文异常合并成同一个复核分数，方便学生看到模型风险是怎样被监督器判定出来的。
+              异常分用于把规则命中、工具风险、上下文异常合并成同一个复核分数，作为监督判定依据。
             </Typography.Paragraph>
           </Col>
           <Col xs={24} md={8} className="zh-calibration-hero-action">
@@ -259,7 +259,7 @@ export function AnomalyCalibrationBlock({
             </div>
           </div>
           <Typography.Paragraph type="secondary" className="zh-text-body zh-mb-16">
-            这些样本虽然异常分低于复核阈值，但已被确定性策略拦截，说明系统不是只依赖单一分数判断。
+            下列样本异常分较低，但已由固定策略完成拦截或隔离。
           </Typography.Paragraph>
           {reviewItems.length ? (
             <Space orientation="vertical" className="zh-full-width">

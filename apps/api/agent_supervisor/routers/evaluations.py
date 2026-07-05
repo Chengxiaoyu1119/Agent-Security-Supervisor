@@ -214,7 +214,7 @@ def attack_surface_briefing_sheet_exports() -> dict:
     return {
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "ok": False,
-        "reason": "尚未运行答辩单页 PNG/PDF 导出。",
+        "reason": "尚未运行攻击面评测单页 PNG/PDF 导出。",
         "summary": {"png_count": 0, "pdf_count": 0, "output_dir": ""},
         "export": {"files": []},
     }
@@ -242,13 +242,16 @@ def attack_surface_briefing_sheet_export_file(surface_id: str, file_format: str)
 
     file_path = SANDBOX_REPORTS_DIR / EXPORT_DIR_NAME / f"{surface_id}.{file_format}"
     if not file_path.exists() or not file_path.is_file():
-        raise HTTPException(status_code=404, detail="导出文件不存在，请先运行答辩单页 PNG/PDF 导出。")
+        raise HTTPException(status_code=404, detail="导出文件不存在，请先运行攻击面评测单页 PNG/PDF 导出。")
 
     media_type = "image/png" if file_format == "png" else "application/pdf"
     return FileResponse(
         file_path,
         media_type=media_type,
-        headers={"Content-Disposition": f'inline; filename="{file_path.name}"'},
+        headers={
+            "Content-Disposition": f'inline; filename="{file_path.name}"',
+            "Cache-Control": "no-store",
+        },
     )
 
 

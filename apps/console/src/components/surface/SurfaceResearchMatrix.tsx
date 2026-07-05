@@ -33,13 +33,13 @@ export function SurfaceResearchMatrix({
       <div className="zh-surface-matrix-hero">
         <Typography.Text type="secondary">业务攻击面画像</Typography.Text>
         <Typography.Title level={2} className="zh-surface-matrix-hero__title">
-          把抽象安全风险落到真实比赛对象
+          把抽象安全风险落到真实业务对象
         </Typography.Title>
         <Typography.Paragraph type="secondary" className="zh-surface-matrix-hero__summary">
-          画像层把提示注入、工具劫持、数据泄露等攻击面，映射到队伍账号、赛题附件、提交物、私有榜单和训练平台会话。这样答辩时能讲清楚攻击从哪里进、碰到什么资产、由哪条策略拦截。
+          画像层把提示注入、工具劫持、数据泄露等攻击面，映射到队伍账号、附件资料、提交物、私有榜单和训练平台会话，说明攻击从哪里进、碰到什么资产、由哪条策略拦截。
         </Typography.Paragraph>
         <Space size="large" className="zh-surface-matrix-hero__stats">
-          <Statistic value={displayedProfiles.length} suffix="类比赛对象" className="zh-surface-matrix-stat" />
+          <Statistic value={displayedProfiles.length} suffix="类业务对象" className="zh-surface-matrix-stat" />
           <Statistic value={scenarioCount || surfaces.length} suffix="个关联脚本" className="zh-surface-matrix-stat" />
           <Statistic
             value={highRiskCount || surfaces.filter((surface) => ['critical', 'high'].includes(surface.risk)).length}

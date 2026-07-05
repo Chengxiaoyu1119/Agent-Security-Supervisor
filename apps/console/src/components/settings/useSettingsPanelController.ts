@@ -124,7 +124,7 @@ export function useSettingsPanelController(refresh: () => Promise<unknown>) {
       setCompetitionReadiness(readinessResult.readiness);
       await refresh();
     } catch (error) {
-      setEvaluateError(error instanceof Error ? error.message : '答辩复现实验运行失败');
+      setEvaluateError(error instanceof Error ? error.message : '闭环复现实验运行失败');
     } finally {
       setRunningDemoDrill(false);
     }

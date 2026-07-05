@@ -138,7 +138,7 @@ export function DefenseEvidenceCard({ item, onOpenScenario }: DefenseEvidenceCar
           type={item.evidence_gaps.length ? 'danger' : 'success'}
           className="zh-defense-evidence-gap-text"
         >
-          {item.evidence_gaps.length ? item.evidence_gaps.join('；') : '无证据缺口，可用于答辩复核。'}
+          {item.evidence_gaps.length ? item.evidence_gaps.join('；') : '无证据缺口，可用于复核。'}
         </Typography.Text>
       </div>
     </PanelCard>

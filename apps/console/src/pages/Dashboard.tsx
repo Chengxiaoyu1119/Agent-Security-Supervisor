@@ -227,7 +227,7 @@ export function Dashboard({
           },
           {
             key: 'evidence',
-            label: '答辩证据包',
+            label: '评测证据包',
             children: (
               <DashboardEvidenceTab
                 allPackExportResult={allPackExportResult}

@@ -63,7 +63,7 @@ export function ReportMaturityActions({ onRefreshReport, onRefreshRuntime }: Rep
         <div className="zh-report-action-copy">
           <Typography.Text strong>成熟度补证操作</Typography.Text>
           <Typography.Text type="secondary">
-            针对当前报告里的 P0/P1 缺口直接运行后端评测，生成本地 JSON/Markdown 证据并刷新成熟度结果。
+            针对当前报告里的缺口直接运行后端评测，刷新本地证据文件和成熟度结果。
           </Typography.Text>
         </div>
         <Space wrap className="zh-report-action-buttons">
@@ -104,11 +104,11 @@ export function ReportMaturityActions({ onRefreshReport, onRefreshRuntime }: Rep
               void runAction('demo-readiness', async () => {
                 const demo = await runDemoDrill();
                 const readiness = await writeCompetitionReadiness();
-                return `答辩复现已生成 ${demo.summary.stage_count} 步记录；赛前体检 ${readiness.readiness_score}%，通过 ${readiness.summary.passed_count}/${readiness.summary.check_count}，需补强 ${readiness.summary.warning_count}，阻塞 ${readiness.summary.blocker_count}。`;
+                return `闭环复现已生成 ${demo.summary.stage_count} 步记录；体检得分 ${readiness.readiness_score}%，通过 ${readiness.summary.passed_count}/${readiness.summary.check_count}，需补强 ${readiness.summary.warning_count}，阻塞 ${readiness.summary.blocker_count}。`;
               });
             }}
           >
-            复现并体检
+            运行闭环体检
           </UiButton>
           <UiButton
             icon={<Activity size={16} />}
@@ -149,12 +149,12 @@ export function ReportMaturityActions({ onRefreshReport, onRefreshRuntime }: Rep
                 const result = await writeBriefingSheetExports('both');
                 await writeProjectRoadmapEvidence();
                 if (!result.ok) {
-                  throw new Error(result.reason || '答辩单页导出失败');
+                  throw new Error(result.reason || '攻击面评测单页导出失败');
                 }
                 const firstFile = result.export.files?.[0];
                 return {
                   type: 'success',
-                  message: `答辩单页导出完成：PNG ${result.summary.png_count} 个，PDF ${result.summary.pdf_count} 个。`,
+                  message: `攻击面评测单页导出完成：PNG ${result.summary.png_count} 个，PDF ${result.summary.pdf_count} 个。`,
                   description: (
                     <Space wrap className="zh-report-action-notice-links">
                       <UiButton size="small" href="/api/attack_surfaces/briefing_sheets/export.md" target="_blank">
@@ -184,7 +184,7 @@ export function ReportMaturityActions({ onRefreshReport, onRefreshRuntime }: Rep
               });
             }}
           >
-            导出答辩单页
+            导出评测单页
           </UiButton>
           <UiButton
             variant="primary"

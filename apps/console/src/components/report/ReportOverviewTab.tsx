@@ -17,6 +17,27 @@ type ReportOverviewTabProps = {
   onOpenPage?: (page: PageKey) => void;
 };
 
+const policyLabelMap: Record<string, string> = {
+  'external-mail': '外部收件复核',
+  'sensitive-api': '敏感接口拒绝',
+  'jailbreak-filter': '越狱过滤',
+  'model-output-filter': '输出过滤',
+  'bulk-action-review': '批量操作复核',
+  'tool-return-trust': '工具返回隔离',
+  'environment-trust': '环境信任降级',
+  'memory-write': '记忆写入隔离',
+  'memory-read-sensitive': '敏感记忆读取控制',
+  'path-boundary': '路径边界控制',
+  'guard-disabled': '未启用防护'
+};
+
+function policyLabel(policyId?: string) {
+  if (!policyId) {
+    return '未记录策略';
+  }
+  return policyLabelMap[policyId] ?? policyId;
+}
+
 export function ReportOverviewTab({ report, onRefreshReport, onRefreshRuntime, onOpenPage }: ReportOverviewTabProps) {
   const [isRerunningCoreEvidence, setIsRerunningCoreEvidence] = useState(false);
   const [coreEvidenceNotice, setCoreEvidenceNotice] = useState<{ type: 'success' | 'error'; message: string } | null>(
@@ -131,7 +152,7 @@ export function ReportOverviewTab({ report, onRefreshReport, onRefreshRuntime, o
             <Space orientation="vertical" className="zh-full-width zh-report-curve-stack">
               <div className="zh-report-card-toolbar">
                 <Typography.Text type="secondary">
-                  这里展示的是可复跑的攻防评测结果，不是手写结论；补跑后会同步刷新成熟度和报告证据。
+                  运行攻击脚本后自动刷新控制率、攻击成功率、误报率和输出过滤结果。
                 </Typography.Text>
                 <UiButton
                   size="small"
@@ -148,7 +169,7 @@ export function ReportOverviewTab({ report, onRefreshReport, onRefreshRuntime, o
                 <UiAlert type={coreEvidenceNotice.type} message={coreEvidenceNotice.message} showIcon />
               )}
               {coreMetrics.map((item) => (
-                <PanelCard key={item.label} size="small" type="inner" className="zh-report-metric-row-card">
+                <div key={item.label} className="zh-report-metric-row">
                   <Flex justify="space-between" align="center" gap={12}>
                     <Typography.Text strong>{item.label}</Typography.Text>
                     <Typography.Text strong>{item.value}%</Typography.Text>
@@ -162,7 +183,7 @@ export function ReportOverviewTab({ report, onRefreshReport, onRefreshRuntime, o
                   <Typography.Text type="secondary" className="zh-text-meta">
                     {item.description}
                   </Typography.Text>
-                </PanelCard>
+                </div>
               ))}
             </Space>
           </PanelCard>
@@ -212,7 +233,7 @@ export function ReportOverviewTab({ report, onRefreshReport, onRefreshRuntime, o
             <div className="zh-column-stack">
               {report.policy_hits.map((item, idx) => (
                 <div key={idx} className="zh-report-list-item">
-                  <Typography.Text>{item.policy_id}</Typography.Text>
+                  <Typography.Text>{policyLabel(item.policy_id)}</Typography.Text>
                   <Typography.Text strong>{item.count}</Typography.Text>
                 </div>
               ))}

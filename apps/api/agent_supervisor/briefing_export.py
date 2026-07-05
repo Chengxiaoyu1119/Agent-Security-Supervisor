@@ -12,9 +12,20 @@ from .paths import REPO_ROOT, SANDBOX_REPORTS_DIR
 from .surface_pack import write_all_surface_briefing_sheets
 
 REPORT_ROOT = SANDBOX_REPORTS_DIR
-EXPORT_DIR_NAME = "答辩单页导出"
-EXPORT_REPORT_JSON = "答辩单页PNG-PDF导出报告.json"
-EXPORT_REPORT_MARKDOWN = "答辩单页PNG-PDF导出报告.md"
+EXPORT_DIR_NAME = "攻击面评测单页导出"
+EXPORT_REPORT_JSON = "攻击面评测单页PNG-PDF导出报告.json"
+EXPORT_REPORT_MARKDOWN = "攻击面评测单页PNG-PDF导出报告.md"
+LEGACY_EXPORT_DIR_NAMES = ["答辩单页导出"]
+LEGACY_EXPORT_REPORTS = ["答辩单页PNG-PDF导出报告.json", "答辩单页PNG-PDF导出报告.md"]
+SURFACE_LABELS = {
+    "prompt-injection": "提示注入",
+    "jailbreak": "模型越狱",
+    "data-leakage": "内容泄露",
+    "abuse-risk": "滥用风险",
+    "tool-hijack": "工具调用劫持",
+    "memory-poison": "记忆中毒",
+    "environment-pollution": "环境感知污染",
+}
 
 
 def write_briefing_sheet_exports(format_: str = "both") -> dict[str, Any]:
@@ -22,8 +33,10 @@ def write_briefing_sheet_exports(format_: str = "both") -> dict[str, Any]:
         raise ValueError("format must be one of: png, pdf, both")
 
     REPORT_ROOT.mkdir(parents=True, exist_ok=True)
+    _cleanup_legacy_briefing_outputs()
     briefing_result = write_all_surface_briefing_sheets(runs=latest_runs(500))
     output_dir = REPORT_ROOT / EXPORT_DIR_NAME
+    _reset_output_dir(output_dir)
     script_path = REPO_ROOT / "scripts" / "export-briefing-sheets.mjs"
     node_path = shutil.which("node")
 
@@ -95,10 +108,10 @@ def load_briefing_sheet_export_report() -> dict[str, Any] | None:
 
 
 def build_briefing_sheet_export_markdown(data: dict[str, Any] | None = None) -> str:
-    data = data or load_briefing_sheet_export_report() or _failed_result("尚未运行答辩单页 PNG/PDF 导出。", {}, REPORT_ROOT / EXPORT_DIR_NAME)
+    data = data or load_briefing_sheet_export_report() or _failed_result("尚未运行攻击面评测单页 PNG/PDF 导出。", {}, REPORT_ROOT / EXPORT_DIR_NAME)
     summary = data.get("summary", {})
     lines = [
-        "# 答辩单页 PNG/PDF 导出报告",
+        "# 攻击面评测导出记录",
         "",
         f"- 生成时间：{data.get('generated_at', '-')}",
         f"- 导出状态：{'通过' if data.get('ok') else '未通过'}",
@@ -109,20 +122,25 @@ def build_briefing_sheet_export_markdown(data: dict[str, Any] | None = None) -> 
     ]
     if data.get("reason"):
         lines.extend(["", f"- 失败原因：{data['reason']}"])
-    lines.extend(["", "## 导出文件", "", "| 攻击面 | PNG | PDF |", "|---|---|---|"])
+    lines.extend(["", "## 文件清单", "", "| 攻击面 | PNG | PDF |", "|---|---|---|"])
     files = data.get("export", {}).get("files", [])
     if files:
         for item in files:
             lines.append(
                 "| {surface} | {png} | {pdf} |".format(
-                    surface=item.get("surface_id", "-"),
-                    png=f"`{item['png_path']}`" if item.get("png_path") else "-",
-                    pdf=f"`{item['pdf_path']}`" if item.get("pdf_path") else "-",
+                    surface=_surface_label(item.get("surface_id")),
+                    png="已生成" if item.get("png_path") else "未生成",
+                    pdf="已生成" if item.get("pdf_path") else "未生成",
                 )
             )
     else:
         lines.append("| - | - | - |")
     return "\n".join(lines) + "\n"
+
+
+def _surface_label(surface_id: Any) -> str:
+    text = str(surface_id or "").strip()
+    return SURFACE_LABELS.get(text, text or "-")
 
 
 def _failed_result(reason: str, briefing_result: dict[str, Any], output_dir: Path) -> dict[str, Any]:
@@ -160,3 +178,30 @@ def _write_export_report(data: dict[str, Any]) -> None:
     REPORT_ROOT.mkdir(parents=True, exist_ok=True)
     (REPORT_ROOT / EXPORT_REPORT_JSON).write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
     (REPORT_ROOT / EXPORT_REPORT_MARKDOWN).write_text(build_briefing_sheet_export_markdown(data), encoding="utf-8")
+
+
+def _cleanup_legacy_briefing_outputs() -> None:
+    for name in LEGACY_EXPORT_DIR_NAMES:
+        _remove_report_path(REPORT_ROOT / name)
+    for name in LEGACY_EXPORT_REPORTS:
+        _remove_report_path(REPORT_ROOT / name)
+    for pattern in ("攻击面答辩单页-*.html", "攻击面答辩单页索引.html"):
+        for path in REPORT_ROOT.glob(pattern):
+            _remove_report_path(path)
+
+
+def _reset_output_dir(output_dir: Path) -> None:
+    _remove_report_path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+
+def _remove_report_path(path: Path) -> None:
+    try:
+        resolved = path.resolve()
+        resolved.relative_to(REPORT_ROOT.resolve())
+    except (OSError, ValueError):
+        return
+    if resolved.is_dir():
+        shutil.rmtree(resolved)
+    elif resolved.exists():
+        resolved.unlink()

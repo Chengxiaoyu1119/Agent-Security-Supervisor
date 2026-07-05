@@ -51,7 +51,7 @@ export function SurfaceDefenseBriefCard({
       <div className="zh-surface-brief__head">
         <div>
           <Typography.Text type="secondary" className="zh-surface-matrix-label">
-            答辩单页
+            评测单页
           </Typography.Text>
           <Typography.Title level={4} className="zh-zero-margin">
             {surface.name}

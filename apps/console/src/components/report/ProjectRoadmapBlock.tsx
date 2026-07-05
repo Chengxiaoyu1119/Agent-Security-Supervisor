@@ -34,7 +34,7 @@ export function ProjectRoadmapBlock({
   const visibleBacklog = showAllBacklog ? backlogSource : backlogSource.slice(0, backlogLimit);
   const completionHint = useMemo(() => {
     if (!pendingDimensions.length && !pendingBacklog.length)
-      return '当前报告判断为已闭环，建议答辩前重新补跑一次证据。';
+      return '当前报告判断为已闭环，建议复核前重新补跑一次证据。';
     return `仍有 ${pendingDimensions.length} 个成熟度维度或 ${pendingBacklog.length} 个功能闭环需要复核。`;
   }, [pendingBacklog.length, pendingDimensions.length]);
 

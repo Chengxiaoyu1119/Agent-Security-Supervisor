@@ -580,12 +580,12 @@ def build_parser() -> argparse.ArgumentParser:
     surface_packs.add_argument("--output", default="apps/api/sandbox/reports")
     surface_packs.set_defaults(func=cmd_surface_packs)
 
-    surface_brief = sub.add_parser("surface-brief", help="导出单个攻击面的答辩单页 HTML")
+    surface_brief = sub.add_parser("surface-brief", help="导出单个攻击面的评测单页 HTML")
     surface_brief.add_argument("--surface", required=True, help="攻击面编号，例如 prompt-injection、tool-hijack")
     surface_brief.add_argument("--output", default="apps/api/sandbox/reports")
     surface_brief.set_defaults(func=cmd_surface_brief)
 
-    surface_briefs = sub.add_parser("surface-briefs", help="导出全部攻击面的答辩单页 HTML 和索引")
+    surface_briefs = sub.add_parser("surface-briefs", help="导出全部攻击面的评测单页 HTML 和索引")
     surface_briefs.add_argument("--output", default="apps/api/sandbox/reports")
     surface_briefs.set_defaults(func=cmd_surface_briefs)
 

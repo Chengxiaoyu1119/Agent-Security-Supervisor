@@ -351,13 +351,13 @@ def _maturity_dimensions(
             "答辩材料与可视化",
             98 if briefing_export_done else 88,
             (
-                f"已有全量证据索引、攻击面答辩单页、HTML 导出，并已生成 PNG {briefing_png_count} 个、PDF {briefing_pdf_count} 个。"
+                f"已有全量证据索引、攻击面评测单页、HTML 导出，并已生成 PNG {briefing_png_count} 个、PDF {briefing_pdf_count} 个。"
                 if briefing_export_done
-                else "已有全量证据索引、攻击面答辩单页和 HTML 导出，但还未生成可直接放入 PPT 的 PNG/PDF 文件。"
+                else "已有全量证据索引、攻击面评测单页和 HTML 导出，但还未生成可直接放入 PPT 的 PNG/PDF 文件。"
             ),
             ["保留导出目录和 Markdown 报告，答辩前重新运行一次确认文件最新。"]
             if briefing_export_done
-            else ["点击“导出答辩单页”生成 PNG/PDF，减少手动截图。"],
+            else ["点击“导出评测单页”生成 PNG/PDF，减少手动截图。"],
         ),
         _dimension(
             "部署与可复现",
@@ -475,7 +475,7 @@ def _feature_backlog(
         {
             "id": "brief-export-pdf",
             "priority": "P1",
-            "title": "答辩单页 PNG/PDF 导出",
+            "title": "攻击面评测单页 PNG/PDF 导出",
             "why": "HTML 已可打开，但最终 PPT 仍需要图片或 PDF。",
             "scope": "用 Playwright 或浏览器打印生成图片/PDF。",
             "acceptance": "提交包自动包含每类攻击面 PNG 或 PDF 单页。",
