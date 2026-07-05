@@ -1,3 +1,4 @@
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -323,9 +324,27 @@ class OpenClawValidationTest(unittest.TestCase):
     def test_runtime_validation_installs_enables_and_inspects_when_cli_exists(self):
         observed_labels: list[str] = []
 
-        def fake_command_check(command: list[str], *, command_label: str, missing_message: str):
+        def fake_command_check(
+            command: list[str],
+            *,
+            command_label: str,
+            missing_message: str,
+            timeout: float | None = None,
+        ):
             observed_labels.append(command_label)
-            return self._passed_check(command, command_label=command_label, missing_message=missing_message)
+            result = self._passed_check(command, command_label=command_label, missing_message=missing_message)
+            if "plugins inspect" in command_label:
+                result["stdout"] = json.dumps(
+                    {
+                        "plugin": {
+                            "id": openclaw_pkg.OPENCLAW_PLUGIN_ID,
+                            "status": "loaded",
+                            "enabled": True,
+                        },
+                        "typedHooks": [{"name": "before_tool_call", "priority": 100}],
+                    }
+                )
+            return result
 
         with tempfile.TemporaryDirectory() as tmp:
             with (

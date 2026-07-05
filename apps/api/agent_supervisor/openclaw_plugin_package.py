@@ -444,7 +444,8 @@ def _runtime_inspect_passed(runtime_check: dict[str, Any]) -> bool:
     except json.JSONDecodeError:
         return False
     plugin = payload.get("plugin") if isinstance(payload, dict) else {}
-    typed_hooks = payload.get("typedHooks") if isinstance(payload, dict) else []
+    raw_typed_hooks = payload.get("typedHooks") if isinstance(payload, dict) else []
+    typed_hooks = raw_typed_hooks if isinstance(raw_typed_hooks, list) else []
     hook_names = {str(item.get("name")) for item in typed_hooks if isinstance(item, dict)}
     return (
         isinstance(plugin, dict)

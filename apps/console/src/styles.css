@@ -2691,9 +2691,21 @@ html[data-theme='dark'] .zh-label-tag.ant-tag-purple {
   vertical-align: -1px;
 }
 
+.zh-card-title-inline {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.zh-card-title-inline svg {
+  flex: 0 0 auto;
+  color: var(--ant-color-primary);
+}
+
 .zh-competition-guide-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -2701,7 +2713,7 @@ html[data-theme='dark'] .zh-label-tag.ant-tag-purple {
   display: grid;
   grid-template-columns: 38px minmax(0, 1fr);
   gap: 12px;
-  min-height: 168px;
+  min-height: 178px;
   padding: 16px;
   color: var(--ant-color-text);
   text-align: left;
@@ -2715,6 +2727,12 @@ html[data-theme='dark'] .zh-label-tag.ant-tag-purple {
     transform 0.2s ease;
 }
 
+@media (max-width: 1320px) {
+  .zh-competition-guide-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 768px) {
   .zh-competition-guide-grid {
     grid-template-columns: 1fr;
@@ -2722,6 +2740,32 @@ html[data-theme='dark'] .zh-label-tag.ant-tag-purple {
 
   .zh-competition-guide-item {
     min-height: 0;
+  }
+}
+
+@media (max-width: 1180px) {
+  .zh-feature-map-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .zh-feature-map-group {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .zh-feature-map-group,
+  .zh-competition-guide-item {
+    padding: 14px;
+  }
+
+  .zh-feature-map-point {
+    grid-template-columns: 1fr;
+    gap: 3px;
+  }
+
+  .zh-feature-map-point strong {
+    white-space: normal;
   }
 }
 
@@ -2748,6 +2792,7 @@ html[data-theme='dark'] .zh-label-tag.ant-tag-purple {
   min-width: 0;
   flex-direction: column;
   gap: 8px;
+  min-height: 110px;
 }
 
 .zh-competition-guide-item__main strong {
@@ -2770,10 +2815,103 @@ html[data-theme='dark'] .zh-label-tag.ant-tag-purple {
 
 .zh-competition-guide-item__action {
   grid-column: 2;
+  align-self: end;
   color: var(--ant-color-primary);
   font-size: 13px;
   font-weight: 600;
   line-height: 1.4;
+}
+
+.zh-feature-map-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.zh-feature-map-group {
+  display: flex;
+  min-height: 236px;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  background: var(--ant-color-fill-quaternary);
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: 8px;
+}
+
+.zh-feature-map-group__head {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.zh-feature-map-group__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  color: var(--ant-color-primary);
+  background: var(--ant-color-bg-container);
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: 8px;
+}
+
+.zh-feature-map-group__desc.ant-typography {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.zh-feature-map-points {
+  display: grid;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.zh-feature-map-point {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+  min-height: 40px;
+  padding: 8px 10px;
+  color: var(--ant-color-text);
+  text-align: left;
+  cursor: pointer;
+  background: var(--ant-color-bg-container);
+  border: 1px solid var(--ant-color-border-secondary);
+  border-radius: 8px;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.zh-feature-map-point:hover {
+  color: var(--ant-color-primary);
+  background: var(--ant-color-primary-bg);
+  border-color: var(--ant-color-primary-border);
+}
+
+.zh-feature-map-point span,
+.zh-feature-map-point strong {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.zh-feature-map-point span {
+  color: var(--ant-color-text-secondary);
+}
+
+.zh-feature-map-point strong {
+  color: inherit;
+  font-weight: 650;
 }
 
 .zh-dashboard-agent-node {

@@ -1,13 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import {
-  ArrowRight,
-  CheckCircle2,
-  Github,
-  Moon,
-  Play,
-  ShieldCheck,
-  Sun,
-} from 'lucide-react';
+import { ArrowRight, CheckCircle2, Github, Moon, Play, ShieldCheck, Sun } from 'lucide-react';
 
 type ThemeMode = 'light' | 'dark';
 
@@ -149,9 +141,7 @@ export function App() {
           <div className="hero-center">
             <p className="hero-kicker">LLM Agent Attack Lab</p>
             <h1>智安哨</h1>
-            <p className="hero-subtitle">
-              把智能体每一次工具调用变成可审计、可阻断、可回放的安全链路。
-            </p>
+            <p className="hero-subtitle">把智能体每一次工具调用变成可审计、可阻断、可回放的安全链路。</p>
             <div className="hero-actions">
               <a className="site-button site-button--primary" href={consoleUrl}>
                 <Play size={18} />
@@ -257,13 +247,7 @@ export function App() {
   );
 }
 
-function Header({
-  theme,
-  onToggleTheme
-}: {
-  theme: ThemeMode;
-  onToggleTheme: () => void;
-}) {
+function Header({ theme, onToggleTheme }: { theme: ThemeMode; onToggleTheme: () => void }) {
   return (
     <header className="site-header">
       <a className="brand" href="#top" aria-label="智安哨官网首页">
@@ -304,7 +288,7 @@ function FoliaBackground() {
     <div className="folia-background" aria-hidden="true">
       <div className="bg-word bg-word-a">工具调用要留痕</div>
       <div className="bg-word bg-word-b">风险先判定</div>
-      <div className="bg-word bg-word-c">证据会发光</div>
+      <div className="bg-word bg-word-c">证据可回放</div>
       <span className="geo geo-circle" />
       <span className="geo geo-square" />
       <span className="geo geo-triangle" />

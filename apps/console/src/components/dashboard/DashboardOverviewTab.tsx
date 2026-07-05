@@ -15,6 +15,7 @@ import type { AlertItem, Overview, Scenario } from '@/types';
 import { DashboardAgentNode } from './DashboardAgentNode';
 import type { PageKey } from '@/app/navigation';
 import { DashboardCompetitionGuide } from './DashboardCompetitionGuide';
+import { DashboardFeatureMap } from './DashboardFeatureMap';
 
 type DashboardPipelineNode = {
   label: string;
@@ -145,6 +146,14 @@ export function DashboardOverviewTab({
       <DashboardCompetitionGuide
         overview={overview}
         completeSurfaceCount={completeSurfaceCount}
+        onOpenPage={onOpenPage}
+      />
+
+      <DashboardFeatureMap
+        overview={overview}
+        completeSurfaceCount={completeSurfaceCount}
+        totalSamples={totalSamples}
+        totalScripts={totalScripts}
         onOpenPage={onOpenPage}
       />
 
