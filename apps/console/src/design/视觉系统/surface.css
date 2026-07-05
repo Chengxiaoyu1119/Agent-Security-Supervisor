@@ -1,36 +1,71 @@
 /* 攻击面矩阵 */
 
 .zh-surface-matrix-hero {
-  max-width: 800px;
-  margin: 0 auto 40px;
+  max-width: 840px;
+  margin: 0 auto 28px;
   text-align: center;
 }
 
 .zh-surface-matrix-hero__title {
-  margin-top: 8px;
-  margin-bottom: 16px;
+  margin: 8px 0 12px !important;
+  line-height: 1.25 !important;
+  text-wrap: balance;
 }
 
 .zh-surface-matrix-hero__summary {
-  font-size: 16px;
+  margin-inline: auto;
+  max-width: 760px;
+  font-size: 15px;
+  line-height: 1.75;
 }
 
 .zh-surface-matrix-hero__stats {
-  margin-top: 24px;
+  margin-top: 18px;
+  justify-content: center;
 }
 
 .zh-surface-matrix-grid {
-  margin-bottom: 48px;
+  margin-bottom: 32px;
+}
+
+.zh-surface-matrix-grid > .ant-col,
+.zh-surface-matrix-grid + .ant-divider + .ant-row > .ant-col {
+  display: flex;
 }
 
 .zh-surface-matrix-card {
+  display: flex;
+  width: 100%;
   height: 100%;
+  flex-direction: column;
   transition: all 0.3s;
+}
+
+.zh-surface-matrix-card > .ant-card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 18px 22px;
 }
 
 .zh-surface-matrix-card .ant-card-head {
   background: var(--ant-color-fill-quaternary);
   border-bottom: 1px solid var(--ant-color-border-secondary);
+}
+
+.zh-surface-matrix-card .ant-card-head-wrapper {
+  min-width: 0;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.zh-surface-matrix-card .ant-card-head-title {
+  min-width: 0;
+}
+
+.zh-surface-matrix-card .ant-card-extra {
+  flex: 0 0 auto;
+  margin-inline-start: 0;
 }
 
 .zh-surface-matrix-card--critical {
@@ -59,29 +94,40 @@
 
 .zh-surface-matrix-title {
   display: flex;
+  min-width: 0;
   align-items: center;
   justify-content: space-between;
 }
 
 .zh-surface-matrix-id {
   display: block;
+  max-width: 100%;
+  overflow: hidden;
   font-size: 12px;
   font-weight: normal;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .zh-surface-matrix-tag {
   margin: 0;
+  max-width: 100%;
 }
 
 .zh-surface-matrix-description {
-  min-height: 44px;
-  margin-bottom: 24px;
+  display: -webkit-box;
+  min-height: 66px;
+  margin-bottom: 18px !important;
+  overflow: hidden;
   font-size: 13px;
+  line-height: 1.65;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 
 .zh-surface-matrix-strip {
-  margin-bottom: 24px;
-  padding: 16px;
+  margin-bottom: 18px;
+  padding: 14px 16px;
   border-radius: 8px;
   background: var(--ant-color-fill-quaternary);
 }
@@ -96,16 +142,33 @@
   margin-right: 4px;
 }
 
-.zh-surface-matrix-block-tag {
-  display: block;
+.zh-surface-matrix-block-tag.ant-tag {
+  display: grid;
+  grid-template-columns: 6px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
   width: 100%;
   margin: 0;
-  padding: 4px 8px;
-  line-height: 1.4;
+  padding: 0;
+  color: var(--ant-color-text);
+  line-height: 1.5;
+  text-align: left;
   white-space: normal;
+  background: transparent !important;
+  border: 0;
+}
+
+.zh-surface-matrix-block-tag.ant-tag::before {
+  width: 6px;
+  height: 6px;
+  background: currentColor;
+  border-radius: 999px;
+  opacity: 0.5;
+  content: '';
 }
 
 .zh-surface-matrix-section {
+  min-height: 58px;
   margin-bottom: 16px;
 }
 
@@ -115,35 +178,47 @@
 }
 
 .zh-surface-matrix-code-tag {
-  padding: 4px 8px;
+  max-width: 100%;
+  padding: 3px 8px;
   font-family: monospace;
 }
 
 .zh-surface-matrix-divider {
+  margin: 24px 0;
   border-color: var(--ant-color-border);
 }
 
 .zh-surface-matrix-base-card {
+  display: flex;
+  width: 100%;
   height: 100%;
+  flex-direction: column;
   border: none;
   background: var(--ant-color-fill-quaternary);
 }
 
+.zh-surface-matrix-base-card > .ant-card-body {
+  flex: 1;
+}
+
 .zh-surface-matrix-base-head {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
+  gap: 10px;
   margin-bottom: 16px;
 }
 
 .zh-surface-matrix-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
   gap: 8px;
+  align-items: start;
 }
 
 .zh-surface-matrix-row-label {
-  width: 40px;
-  flex-shrink: 0;
   font-size: 12px;
+  line-height: 24px;
 }
 
 .zh-surface-matrix-row-tags {
@@ -156,6 +231,21 @@
 .zh-surface-matrix-small-tag {
   margin: 0;
   font-size: 12px;
+}
+
+@media (max-width: 768px) {
+  .zh-surface-matrix-hero {
+    text-align: left;
+  }
+
+  .zh-surface-matrix-hero__stats {
+    justify-content: flex-start;
+  }
+
+  .zh-surface-matrix-card .ant-card-head-wrapper,
+  .zh-surface-matrix-base-head {
+    flex-direction: column;
+  }
 }
 
 /* 答辩证据视图 */

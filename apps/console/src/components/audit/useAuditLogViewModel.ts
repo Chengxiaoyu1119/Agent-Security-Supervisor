@@ -219,15 +219,24 @@ export function useAuditLogViewModel({ logs, refresh }: UseAuditLogViewModelPara
   }, [filteredLogs]);
 
   useEffect(() => {
-    const timeoutId = window.setTimeout(() => {
-      void loadApprovalReviews();
-    }, 0);
-
-    return () => window.clearTimeout(timeoutId);
+    let cancelled = false;
+    void Promise.resolve().then(() => {
+      if (!cancelled) {
+        void loadApprovalReviews();
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [loadApprovalReviews]);
 
   useEffect(() => {
-    const initialLinkTimer = window.setTimeout(() => applyAuditDeepLink(getAuditIdFromHash()), 0);
+    let cancelled = false;
+    void Promise.resolve().then(() => {
+      if (!cancelled) {
+        applyAuditDeepLink(getAuditIdFromHash());
+      }
+    });
 
     const handleHashChange = () => applyAuditDeepLink(getAuditIdFromHash());
     const handleAuditDeepLink = (event: Event) => {
@@ -239,7 +248,7 @@ export function useAuditLogViewModel({ logs, refresh }: UseAuditLogViewModelPara
     window.addEventListener(auditDeepLinkEvent, handleAuditDeepLink);
 
     return () => {
-      window.clearTimeout(initialLinkTimer);
+      cancelled = true;
       window.removeEventListener('hashchange', handleHashChange);
       window.removeEventListener(auditDeepLinkEvent, handleAuditDeepLink);
     };

@@ -8,6 +8,18 @@
   margin-bottom: 16px;
 }
 
+.zh-settings-tabs .ant-tabs-nav::before {
+  border-bottom-color: var(--ant-color-border-secondary);
+}
+
+.zh-settings-tabs .ant-tabs-tab {
+  padding: 10px 0;
+}
+
+.zh-settings-tabs .ant-tabs-tab-btn {
+  line-height: 1.45;
+}
+
 .zh-settings-field-title {
   display: block;
   margin-bottom: 8px;
@@ -287,7 +299,7 @@
 
 .zh-settings-status-card,
 .zh-settings-profile-status {
-  min-height: 76px;
+  min-height: 78px;
   padding: 14px 16px;
   border: 1px solid var(--ant-color-border-secondary);
   border-radius: 8px;
@@ -306,6 +318,10 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
+}
+
+.zh-settings-profile-status > div {
+  min-width: 0;
 }
 
 .zh-settings-profile-status .zh-label-tag {
@@ -349,7 +365,9 @@
 }
 
 .zh-settings-model-card > .ant-card-body {
+  display: flex;
   min-height: 246px;
+  flex-direction: column;
 }
 
 .zh-settings-provider-card > .ant-card-body {
@@ -365,6 +383,7 @@
   margin: 4px 0 12px;
   color: var(--ant-color-text-secondary);
   font-size: 12px;
+  line-height: 1.5;
   white-space: normal;
   overflow-wrap: anywhere;
   word-break: normal;
@@ -381,31 +400,56 @@
   gap: 6px;
 }
 
+.zh-settings-model-card .zh-code-sm {
+  display: block;
+  margin-top: auto;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
 .zh-settings-model-select,
 .zh-settings-model-input {
   width: 100%;
 }
 
+html[data-theme='dark'] .zh-settings-status-card,
+html[data-theme='dark'] .zh-settings-profile-status,
+html[data-theme='dark'] .zh-settings-model-toolbar,
+html[data-theme='dark'] .zh-settings-soft-card,
+html[data-theme='dark'] .zh-settings-soft-panel,
+html[data-theme='dark'] .zh-settings-muted-body > .ant-card-body {
+  background: var(--ant-color-fill-quaternary);
+  border-color: var(--ant-color-border-secondary);
+}
+
 @media (max-width: 768px) {
   .zh-settings-tabs .ant-tabs-nav-wrap {
-    overflow: visible;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+  }
+
+  .zh-settings-tabs .ant-tabs-nav-wrap::-webkit-scrollbar {
+    display: none;
   }
 
   .zh-settings-tabs .ant-tabs-nav-list {
-    width: 100%;
+    width: max-content;
     min-width: 0;
-    flex-wrap: wrap;
-    row-gap: 4px;
-    transform: none !important;
+    flex-wrap: nowrap;
   }
 
   .zh-settings-tabs .ant-tabs-tab {
-    margin: 0 20px 0 0 !important;
-    padding: 8px 0;
+    margin: 0 22px 0 0 !important;
+    padding: 8px 0 10px;
   }
 
   .zh-settings-tabs .ant-tabs-tab-btn {
+    max-width: 156px;
+    overflow: hidden;
     line-height: 1.4;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .zh-settings-tabs .ant-tabs-nav-operations {
